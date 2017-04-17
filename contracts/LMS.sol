@@ -1,6 +1,7 @@
 pragma solidity ^0.4.0;
 
 import "./strings.sol";
+import "./StringLib.sol";
 import "zeppelin/lifecycle/Killable.sol";
 
 contract LMS is Killable {
@@ -23,7 +24,7 @@ contract LMS is Killable {
         string publisher;
         address owner;
         State state;
-        uint lastIssueDate;
+        uint dateAdded;
         uint8 rating;
     }
 
@@ -31,17 +32,18 @@ contract LMS is Killable {
         string name;
         address account;
         MemberStatus status;
+        uint dateAdded;
     }
 
     uint public numBooks;
     uint public numMembers;
-    mapping (uint => Book) catalog;
-    mapping (uint => Member) members;
+    mapping (uint => Book) catalog;                 // index 0 to be kept free since 0 is default value
+    mapping (uint => Member) members;               // index 0 to be kept free since 0 is default value
     mapping (address => uint) memberIndex;
 
     modifier onlyMember {
         bool member = false;
-        for (uint i=0; i < numMembers; i++) {
+        for (uint i=1; i <= numMembers; i++) {
             if (msg.sender == members[i].account && members[i].status == MemberStatus.Active) {
                 member = true;
                 break;
@@ -55,10 +57,9 @@ contract LMS is Killable {
     }
 
     function LMS(string name) {
-        // Owner is the first member of our library
-        members[numMembers] = Member(name, owner, MemberStatus.Active);
+        // Owner is the first member of our library, at index 1 (NOT 0)
+        members[++numMembers] = Member(name, owner, MemberStatus.Active, now);
         memberIndex[owner] = numMembers;
-        numMembers++;
     }
 
     function testing(uint8 a1, uint8 a2) constant returns (string) {
@@ -74,49 +75,56 @@ contract LMS is Killable {
     }
 
     function addMember(string name, address account) public onlyOwner {
-        members[numMembers] = Member(name, account, MemberStatus.Active);
+        // Add or activate member
+        var index = memberIndex[account];
+        if (index != 0) {           // This is the reason index 0 is not used
+            members[index].status = MemberStatus.Active;
+            return;
+        }
+        members[++numMembers] = Member(name, account, MemberStatus.Active, now);
         memberIndex[account] = numMembers;
-        numMembers++;
     }
 
     function removeMember(address account) public onlyOwner {
-
+        // Deactivate member
+        var index = memberIndex[account];
+        if (index != 0) {
+            members[index].status = MemberStatus.Inactive;
+        }
     }
 
-    function getOwnerDetails() constant returns (string, address, MemberStatus) {
+    function getOwnerDetails() constant returns (string, address, MemberStatus, uint) {
         return getMemberDetails(owner);
     }
 
-    function getMemberDetails(address account) constant returns (string, address, MemberStatus) {
+    function getMemberDetails(address account) constant returns (string, address, MemberStatus, uint) {
         var i = memberIndex[account];
-        return (members[i].name, members[i].account, members[i].status);
+        return (members[i].name, members[i].account, members[i].status, members[i].dateAdded);
     }
 
     function addBook(string title, string author, string publisher) public onlyMember {
-        catalog[numBooks++] = Book({
+        catalog[++numBooks] = Book({
             title: title,
             publisher: publisher,
             author: author,
             owner: msg.sender,
             state: State.Available,
-            lastIssueDate: 0,
+            dateAdded: now,
             rating: 0
         });
     }
 
-    function getMyBooks() constant onlyMember returns (string books, uint8 bookCount) {
-        uint8 count;
-        var parts = new strings.slice[](3);
-        string memory bookString;
+    function getMyBooks() constant onlyMember returns (string bookString, uint8 count) {
+        var parts = new strings.slice[](6);
         //Iterate over the entire catalog to find my books
-        for (uint i = 0; i < numBooks; i++) {
+        for (uint i = 1; i <= numBooks; i++) {
             if (catalog[i].owner == msg.sender) {
                 parts[0] = catalog[i].title.toSlice();
                 parts[1] = catalog[i].author.toSlice();
                 parts[2] = catalog[i].publisher.toSlice();
-//                catalog[i].owner.toSlice(),
-//                catalog[i].state.toSlice(),
-//                catalog[i].rating.toSlice()
+                parts[3] = StringLib.uintToString(uint(catalog[i].state)).toSlice();
+                parts[4] = StringLib.uintToString(catalog[i].dateAdded).toSlice();
+                parts[5] = StringLib.uintToString(catalog[i].rating).toSlice();
                 var book = ";".toSlice().join(parts);
                 count++;
                 if (bookString.toSlice().equals("".toSlice())) {
@@ -124,16 +132,9 @@ contract LMS is Killable {
                 } else {
                     bookString = book;
                 }
-//                bookString = "|".toSlice().join([bookString.toSlice(), book.toSlice()]);
             }
         }
-        return (bookString, count);
-//        return ("t;a;p;0x0;0;12345;0", 1);
     }
-
-//    function getAllBooks() constant returns () {
-//
-//    }
 
     function addMemberWithBooks(
         string name, 
@@ -154,7 +155,7 @@ contract LMS is Killable {
         // if (s.count(delim) < 2) {       // minimum 3 books required to use this functionality:D
         //     throw;  
         // }
-        members[numMembers++] = Member(name, msg.sender, MemberStatus.Active);
+        members[numMembers++] = Member(name, msg.sender, MemberStatus.Active, now);
         var books = new string[](s.count(delim));
         for(uint i = 0; i < books.length; i++) {
             var book = s.split(delim).toString().toSlice();

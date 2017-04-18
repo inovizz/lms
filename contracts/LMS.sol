@@ -19,12 +19,15 @@ contract LMS is Killable {
     enum MemberStatus { Active, Inactive }
 
     struct Book {
+        uint id;
         string title;
         string author;
         string publisher;
         address owner;
+        address borrower;
         State state;
         uint dateAdded;
+        uint dateIssued;
         uint8 rating;
     }
 
@@ -62,18 +65,6 @@ contract LMS is Killable {
         memberIndex[owner] = numMembers;
     }
 
-    function testing(uint8 a1, uint8 a2) constant returns (string) {
-//    function testing(uint8 a1, uint8 a2) constant returns (uint8, uint8) {
-//    function testing(uint8 a1, uint8 a2) constant returns (uint8 b1, uint8 b2) {
-//        b1 = a1;
-//        b2 = a2;
-//        return (a1, a2);
-        var parts = new strings.slice[](2);
-        parts[0] = "book".toSlice();
-        parts[1] = "worm".toSlice();
-        return ";".toSlice().join(parts);
-    }
-
     function addMember(string name, address account) public onlyOwner {
         // Add or activate member
         var index = memberIndex[account];
@@ -103,57 +94,39 @@ contract LMS is Killable {
     }
 
     function addBook(string title, string author, string publisher) public onlyMember {
-        catalog[++numBooks] = Book({
+        ++numBooks;
+        catalog[numBooks] = Book({
+            id: numBooks,
             title: title,
             publisher: publisher,
             author: author,
+            borrower: 0x0,
             owner: msg.sender,
             state: State.Available,
             dateAdded: now,
+            dateIssued: 0,
             rating: 0
         });
     }
 
-    function getMyBooks() constant onlyMember returns (string bookString, uint8 count) {
-        var parts = new strings.slice[](6);
-        //Iterate over the entire catalog to find my books
-        for (uint i = 1; i <= numBooks; i++) {
-            if (catalog[i].owner == msg.sender) {
-                parts[0] = catalog[i].title.toSlice();
-                parts[1] = catalog[i].author.toSlice();
-                parts[2] = catalog[i].publisher.toSlice();
-                parts[3] = StringLib.uintToString(uint(catalog[i].state)).toSlice();
-                parts[4] = StringLib.uintToString(catalog[i].dateAdded).toSlice();
-                parts[5] = StringLib.uintToString(catalog[i].rating).toSlice();
-                var book = ";".toSlice().join(parts);
-                count++;
-                if (bookString.toSlice().equals("".toSlice())) {
-                    bookString = bookString.toSlice().concat(book.toSlice());
-                } else {
-                    bookString = book;
-                }
-            }
-        }
-    }
-
     function addMemberWithBooks(
-        string name, 
-        string speciallyConstructedBooksString, 
-        string bookSeparator, 
+        string name,
+        string speciallyConstructedBooksString,
+        string bookSeparator,
         string fieldSeparator
     ) returns (string) {
         // TODO Write tests
         // Should be called by the prospective member themselves and NOT by anybody else on their
         // behalf.
         // Each book string should be separated from the other by the bookSeparator e.g. semi-colon
-        // Within each book string, the three fields title, author and publisher should be 
+        // Within each book string, the three fields title, author and publisher should be
         // separated by fieldSeparator e.g. pipe (|)
         // e.g. Ethereum|Ben Abner|CreateSpace Independent Publishing Platform
         // return speciallyConstructedBooksString;
         var s = speciallyConstructedBooksString.toSlice();
         var delim = bookSeparator.toSlice();
         // if (s.count(delim) < 2) {       // minimum 3 books required to use this functionality:D
-        //     throw;  
+        //     throw;
         // }
         members[numMembers++] = Member(name, msg.sender, MemberStatus.Active, now);
         var books = new string[](s.count(delim));
@@ -167,5 +140,63 @@ contract LMS is Killable {
         }
     }
 
+    function getBook(uint i) constant returns (string bookString) {
+        var parts = new strings.slice[](10);
+        //Iterate over the entire catalog to find my books
+        parts[0] = StringLib.uintToString(catalog[i].id).toSlice();
+        parts[1] = catalog[i].title.toSlice();
+        parts[2] = catalog[i].author.toSlice();
+        parts[3] = catalog[i].publisher.toSlice();
+        parts[4] = StringLib.addressToString(catalog[i].owner).toSlice();
+        parts[5] = StringLib.addressToString(catalog[i].borrower).toSlice();
+        parts[6] = StringLib.uintToString(uint(catalog[i].state)).toSlice();
+        parts[7] = StringLib.uintToString(catalog[i].dateAdded).toSlice();
+        parts[8] = StringLib.uintToString(catalog[i].dateIssued).toSlice();
+        parts[9] = StringLib.uintToString(catalog[i].rating).toSlice();
+        bookString = ";".toSlice().join(parts);
+    }
+
+    function getBooks(bool ownerFilter) constant onlyMember returns (string bookString, uint8 count) {
+        string memory book;
+        //Iterate over the entire catalog to find my books
+        for (uint i = 1; i <= numBooks; i++) {
+            if (!ownerFilter || catalog[i].owner == msg.sender) {
+                book = getBook(i);
+                count++;
+                if (bookString.toSlice().equals("".toSlice())) {
+                    bookString = book;
+                } else {
+                    bookString = bookString.toSlice().concat('|'.toSlice()).toSlice().concat(book.toSlice());
+                }
+            }
+        }
+    }
+
+    function getMyBooks() constant onlyMember returns (string bookString, uint8 count) {
+        return getBooks(true);
+    }
+
+    function getAllBooks() constant onlyMember returns (string bookString, uint8 count) {
+        return getBooks(false);
+    }
+
+    function borrowBook(uint id) onlyMember {
+        // Can't borrow a non-existent book
+        if (id > numBooks || catalog[id].state != State.Available) {
+            throw;
+        }
+        catalog[id].borrower = msg.sender;
+        catalog[id].dateIssued = now;
+        catalog[id].state = State.Borrowed;
+    }
+
+    function returnBook(uint id) onlyMember {
+        if (id > numBooks || catalog[id].state == State.Available || catalog[id].owner != msg.sender) {
+            throw;
+        }
+        catalog[id].borrower = 0x0;
+        catalog[id].dateIssued = 0;
+        catalog[id].state = State.Available;
+    }
 }
 

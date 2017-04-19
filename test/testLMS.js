@@ -88,7 +88,6 @@ contract('LMS', function(accounts) {
             assert.isAtMost(bookAttr[7], Math.floor(Date.now() / 1000));
             assert.isAbove(bookAttr[7], Math.floor(Date.now() / 1000) - 300);
             assert.equal(bookAttr[8], '0');
-            assert.equal(bookAttr[9], '0');
         });
         it('should add multiple books', async function() {
             await lms.addMember('another account', accounts[1]);
@@ -118,7 +117,6 @@ contract('LMS', function(accounts) {
                 assert.isAtMost(bookAttr[7], Math.floor(Date.now() / 1000));
                 assert.isAbove(bookAttr[7], Math.floor(Date.now() / 1000) - 300);
                 assert.equal(bookAttr[8], '0');
-                assert.equal(bookAttr[9], '0');
             }
         });
         it('should not allow non-members to add a book', async function() {
@@ -156,22 +154,30 @@ contract('LMS', function(accounts) {
                 assert.isAtMost(bookAttr[7], Math.floor(Date.now() / 1000));
                 assert.isAbove(bookAttr[7], Math.floor(Date.now() / 1000) - 300);
                 assert.equal(bookAttr[8], '0');
-                assert.equal(bookAttr[9], '0');
             }
         });
     });
 
     describe('borrowBook', function() {
+        it('should not allow borrowing books that are already borrowed', async function() {
+            await lms.addBook('t', 'a', 'p');
+            await lms.borrowBook(1);
+            await expectThrow(lms.borrowBook(1));
+        });
+        it("should not allow borrowing books that don't exist", async function() {
+            await expectThrow(lms.borrowBook(1));
+        });
         it('should set the borrower, issue date and state', async function() {
             await lms.addBook("1984", "Orwell", "Classic Publishers");
-            await lms.borrowBook(1);
+            await lms.addMember('Johnny', accounts[1]);
+            await lms.borrowBook(1, {from: accounts[1]});
 
             let book = await lms.getBook(1);
             console.log(book)
             let bookAttr = book.split(';');
 
             // Changed attributes
-            assert.equal('0x' + bookAttr[5], web3.eth.coinbase);
+            assert.equal('0x' + bookAttr[5], accounts[1]);
             assert.equal(bookAttr[6], 1);
             assert.isAtMost(bookAttr[8], Math.floor(Date.now() / 1000));
             assert.isAbove(bookAttr[8], Math.floor(Date.now() / 1000) - 300);
@@ -183,15 +189,20 @@ contract('LMS', function(accounts) {
             assert.equal('0x' + bookAttr[4], web3.eth.coinbase);
             assert.isAtMost(bookAttr[7], Math.floor(Date.now() / 1000));
             assert.isAbove(bookAttr[7], Math.floor(Date.now() / 1000) - 300);
-            assert.equal(bookAttr[9], '0');
         });
-        it('should not allow borrowing books that are already borrowed', async function() {
-            await lms.addBook('t', 'a', 'p');
-            await lms.borrowBook(1);
-            await expectThrow(lms.borrowBook(1));
-        });
-        it("should not allow borrowing books that don't exist", async function() {
-            await expectThrow(lms.borrowBook(1));
+        it("should generate Borrow event log", async function() {
+            await lms.addBook("1984", "Orwell", "Classic Publishers");
+            await lms.addMember('Johnny', accounts[1]);
+            await lms.borrowBook(1, {from: accounts[1]});
+            let borrowEvent = lms.Borrow({fromBlock: 0});
+            borrowEvent.watch(function(err, result) {
+                borrowEvent.stopWatching();
+                if (err) { throw err; }
+                assert.equal(result.args.bookId, 1);
+                assert.equal(result.args.borrower, accounts[1]);
+                assert.isAtMost(result.args.timestamp, Math.floor(Date.now() / 1000));
+                assert.isAbove(result.args.timestamp, Math.floor(Date.now() / 1000) - 300);
+            });
         });
     });
 
@@ -222,5 +233,40 @@ contract('LMS', function(accounts) {
             // Book owner successfully returns the book
             await lms.returnBook(1, {from: accounts[1]});
         });
+        it("should generate Return event log", async function() {
+            await lms.addBook("1984", "Orwell", "Classic Publishers");
+            await lms.addMember('Johnny', accounts[1]);
+            await lms.borrowBook(1, {from: accounts[1]});
+            await lms.returnBook(1);
+            let returnEvent = lms.Return({fromBlock: 0});
+            returnEvent.watch(function(err, result) {
+                returnEvent.stopWatching();
+                if (err) { throw err; }
+                assert.equal(result.args.bookId, 1);
+                assert.equal(result.args.borrower, accounts[1]);
+                assert.isAtMost(result.args.timestamp, Math.floor(Date.now() / 1000));
+                assert.isAbove(result.args.timestamp, Math.floor(Date.now() / 1000) - 300);
+            });
+        });
     });
+
+    describe('rateBook', function() {
+        it('should allow a member to rate and write descriptive reviews of a book', async function() {
+            await lms.addBook("1984", "Orwell", "Classic Publishers");
+            await lms.rateBook(1, 5, "A must-read classic!");
+            let rateEvent = lms.Rate({fromBlock: 0});
+            rateEvent.watch(function(err, result) {
+                rateEvent.stopWatching();
+                if (err) { throw err; }
+                assert.equal(result.args.bookId, 1);
+                assert.equal(result.args.reviewer, accounts[0]);
+                assert.equal(result.args.rating, 5);
+                assert.equal(result.args.comments, "A must-read classic!");
+                assert.isAtMost(result.args.timestamp, Math.floor(Date.now() / 1000));
+                assert.isAbove(result.args.timestamp, Math.floor(Date.now() / 1000) - 300);
+            });
+        });
+    });
+
+
 });

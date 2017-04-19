@@ -28,7 +28,6 @@ contract LMS is Killable {
         State state;
         uint dateAdded;
         uint dateIssued;
-        uint8 rating;
     }
 
     struct Member {
@@ -43,6 +42,10 @@ contract LMS is Killable {
     mapping (uint => Book) catalog;                 // index 0 to be kept free since 0 is default value
     mapping (uint => Member) members;               // index 0 to be kept free since 0 is default value
     mapping (address => uint) memberIndex;
+
+    event Borrow(uint indexed bookId, address indexed borrower, uint timestamp);
+    event Return(uint indexed bookId, address indexed borrower, uint timestamp);
+    event Rate(uint indexed bookId, address indexed reviewer, uint indexed rating, string comments, uint timestamp);
 
     modifier onlyMember {
         bool member = false;
@@ -104,44 +107,12 @@ contract LMS is Killable {
             owner: msg.sender,
             state: State.Available,
             dateAdded: now,
-            dateIssued: 0,
-            rating: 0
+            dateIssued: 0
         });
     }
 
-    function addMemberWithBooks(
-        string name,
-        string speciallyConstructedBooksString,
-        string bookSeparator,
-        string fieldSeparator
-    ) returns (string) {
-        // TODO Write tests
-        // Should be called by the prospective member themselves and NOT by anybody else on their
-        // behalf.
-        // Each book string should be separated from the other by the bookSeparator e.g. semi-colon
-        // Within each book string, the three fields title, author and publisher should be
-        // separated by fieldSeparator e.g. pipe (|)
-        // e.g. Ethereum|Ben Abner|CreateSpace Independent Publishing Platform
-        // return speciallyConstructedBooksString;
-        var s = speciallyConstructedBooksString.toSlice();
-        var delim = bookSeparator.toSlice();
-        // if (s.count(delim) < 2) {       // minimum 3 books required to use this functionality:D
-        //     throw;
-        // }
-        members[numMembers++] = Member(name, msg.sender, MemberStatus.Active, now);
-        var books = new string[](s.count(delim));
-        for(uint i = 0; i < books.length; i++) {
-            var book = s.split(delim).toString().toSlice();
-            var delim2 = fieldSeparator.toSlice();
-            var title = book.split(delim2).toString();
-            var author = book.split(delim2).toString();
-            var publisher = book.toString();
-            addBook(title, author, publisher);
-        }
-    }
-
     function getBook(uint i) constant returns (string bookString) {
-        var parts = new strings.slice[](10);
+        var parts = new strings.slice[](9);
         //Iterate over the entire catalog to find my books
         parts[0] = StringLib.uintToString(catalog[i].id).toSlice();
         parts[1] = catalog[i].title.toSlice();
@@ -152,7 +123,6 @@ contract LMS is Killable {
         parts[6] = StringLib.uintToString(uint(catalog[i].state)).toSlice();
         parts[7] = StringLib.uintToString(catalog[i].dateAdded).toSlice();
         parts[8] = StringLib.uintToString(catalog[i].dateIssued).toSlice();
-        parts[9] = StringLib.uintToString(catalog[i].rating).toSlice();
         bookString = ";".toSlice().join(parts);
     }
 
@@ -188,15 +158,28 @@ contract LMS is Killable {
         catalog[id].borrower = msg.sender;
         catalog[id].dateIssued = now;
         catalog[id].state = State.Borrowed;
+        Borrow(id, msg.sender, catalog[id].dateIssued);
     }
 
     function returnBook(uint id) onlyMember {
+        address borrower;
         if (id > numBooks || catalog[id].state == State.Available || catalog[id].owner != msg.sender) {
             throw;
         }
+        borrower = catalog[id].borrower;
         catalog[id].borrower = 0x0;
         catalog[id].dateIssued = 0;
         catalog[id].state = State.Available;
+        Return(id, borrower, now);
+    }
+
+    function rateBook(uint id, uint rating, string comments) onlyMember {
+        if (id > numBooks || rating < 1 || rating > 5) {
+            throw;
+        }
+        // All reviews are logged. Applications are responsible for eliminating duplicate ratings
+        // and computing average rating.
+        Rate(id, msg.sender, rating, comments, now);
     }
 }
 

@@ -4,6 +4,7 @@ import Modal from 'react-modal'
 import * as libraryActions from '../actions/libraryActions'
 import Book from './Book'
 import BooksForm from './BooksForm'
+import Loader from './Loader'
 
 const modalStyle = {
   content : {
@@ -44,11 +45,18 @@ export class Dashboard extends React.Component {
     }
   }
   renderLoading () {
-    return (
-      <div>
-        Fetching details of the books.
-      </div>
-    )
+    const title = this.props.loading.allbooksloading
+                  ? 'Loading Books'
+                  : this.props.loading.addBooksLoading
+                    ? 'Adding book...'
+                    : this.props.loading.returnBooksLoading
+                    ? 'Returning Book'
+                    : this.props.loading.rateBookLoading
+                      ? 'Submitting Rating'
+                      : 'Fetching details from library';
+   if (this.props.loading.allbooksloading || this.props.loading.addBooksLoading || this.props.loading.returnBooksLoading ||  this.props.loading.rateBookLoading) {
+     return (<Loader text={title}/>)
+   }
   }
   renderBooks () {
     const ownerBooks = this.props.allBooks.filter((book) => book.owner === this.props.ownerDetails.account)
@@ -67,16 +75,10 @@ export class Dashboard extends React.Component {
             <BooksForm closeModal={() => this.toggleModal('addBook')}/>
           </Modal>
         </div>
+        {
+          this.renderLoading()
+        }
         <div>
-          {
-            this.props.loading.allbooksloading
-            ? <div className='row'>
-                <p className='text-center text-info'>
-                  Updating books library...
-                </p>
-              </div>
-            : ''
-          }
             {
               ownerBooks.length
               ? <Book loading = {

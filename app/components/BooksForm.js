@@ -43,6 +43,7 @@ export class BooksForm extends React.Component {
         e.preventDefault()
         this.addBook()
         this.refs.bookForm.reset()
+        this.props.closeModal()
       }}>
         <fieldset>
           <legend>

@@ -34,10 +34,6 @@ const Book = ({
   }) => (
   <div className='book'>
     <div className='lead'>{title}</div>
-    <p className='text-center text-info'>
-      {loading.borrowBooksLoading ? 'Borrowing a book' : ''}
-      {loading.returnBooksLoading ? 'Returning a book' : ''}
-    </p>
     <div className='media-list list-group' style={style.row}>
       {books.map((book, i) => {
         return (

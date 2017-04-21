@@ -12,6 +12,9 @@ const Header = ({ loginSuccess, loginFailure, session, logout }) => (
           alt = 'Pramati Technologies'
           src = 'http://www.pramati.com/wp-content/uploads/2016/11/logo_pramati_trans_152.png' />
         </a>
+        <span className='navbar-brand' style={{ lineHeight: '55px', verticalAlign: 'bottom' }}>
+          LMS ( Alpha Version )
+        </span>
       </div>
       <div id='navbar' className='navbar-collapse collapse navbar-right'>
         <ul className='nav navbar-nav'>

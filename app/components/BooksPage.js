@@ -7,6 +7,7 @@ import Banner from './Banner'
 import SearchBook from './SearchBook'
 import Modal from 'react-modal'
 import LMSAuth from './LMSAuth'
+import Loader from './Loader'
 
 const style = {
   marginTop : '15px'
@@ -49,7 +50,9 @@ export class BooksPage extends React.Component {
     if (loader) {
       loader.style.display = 'none'
     }
-    this.props.getAllBooks() 
+    if(!this.props.books.allBooks.length) {
+        this.props.getAllBooks()
+    }
   }
   toggleModal (modal, book) {
     switch (modal) {
@@ -60,20 +63,37 @@ export class BooksPage extends React.Component {
         this.setState({ authModalIsOpen: !this.state.authModalIsOpen })
       }
     }
-    
   }
   loginFailure (response) {
     console.log(response)
   }
+  renderLoader (flag) {
+    const title = this.props.loading.loginLoader
+                  ? 'Validating User'
+                  : (this.props.loading.createAccountLoader || this.props.loading.addMemberLoader)
+                    ? 'Creating Account'
+                    : this.props.loading.borrowBooksLoading
+                    ? 'Borrowing book'
+                    : this.props.loading.rateBookLoading
+                      ? 'Submitting Rating'
+                      : 'Loading Books'
+    if(this.props.loading.loginLoader || (this.props.loading.createAccountLoader || this.props.loading.addMemberLoader) || flag || this.props.loading.borrowBooksLoading ||  this.props.loading.rateBookLoading) {
+      return <Loader text={title} />
+    }
+  }
   render () {
-    const books = this.props.books.filteredBooks.length
-                  ? this.props.books.filteredBooks
+    const books = this.props.books.value
+                  ? this.props.books.filteredBooks.length
+                    ? this.props.books.filteredBooks
+                    : []
                   : (this.props.books.allBooks.length ? this.props.books.allBooks : [])
     return (
       <div>
         <Header
           loginSuccess = {
-            (response) => this.props.getMemberDetailsByEmail(response)
+            (response) => {
+              this.props.getMemberDetailsByEmail(response)
+            }
           }
           loginFailure = {
             (response) => this.loginFailure(response)
@@ -83,6 +103,9 @@ export class BooksPage extends React.Component {
             () => this.props.logout()
           } />
         <Banner />
+        {
+          this.renderLoader()
+        }
         <div className='container'>
           <div className='row'>
             <div className='col-md-7'>
@@ -97,7 +120,7 @@ export class BooksPage extends React.Component {
             </div>
           </div>
           {
-            books.length
+            this.props.books.allBooks.length
             ? <Book loading = {
                 this.props.loading
               }
@@ -121,7 +144,7 @@ export class BooksPage extends React.Component {
               rateModalIsOpen = { this.state.rateModalIsOpen }
               authenticated = { this.props.session.authenticated }
               width = '70%' />
-            : <div style={style}>Fetching details from library</div>
+            : this.renderLoader(true)
           }
         </div>
         <Modal
@@ -131,9 +154,11 @@ export class BooksPage extends React.Component {
             role='dialog'
             style={modalStyle}
             contentLabel='Create Account'>
-            <LMSAuth 
+            <LMSAuth
               closeModal={() => this.toggleModal('authModal')}
-              createAccount={(password) => this.props.createAccount(this.props.session, password)}/>
+              createAccount={(password) => {
+                this.props.createAccount(this.props.session, password)
+              }}/>
           </Modal>
       </div>)
   }

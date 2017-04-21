@@ -49,6 +49,21 @@ export const loadingReducer = (state = {}, action) => {
         ...state,
         rateBookLoading : action.payload
       }
+    case 'GET_MEMBER_DETAILS_EMAIL_LOADING':
+      return {
+        ...state,
+        loginLoader : action.payload
+      }
+    case 'CREATE_ACCOUNT_LOADING':
+      return {
+        ...state,
+        createAccountLoader : action.payload
+      }
+    case 'ADD_MEMBER_LOADING':
+      return {
+        ...state,
+        addMemberLoader : action.payload
+      }
     default:
       return state
   }
@@ -124,7 +139,8 @@ export const allBooksReducers = (state = [], action) => {
       })
       return {
         ...state,
-        filteredBooks : filteredBooks
+        filteredBooks : filteredBooks,
+        value: action.payload
       }
     }
     case 'GET_RATE_BOOK_SUCCESS': {
@@ -155,6 +171,58 @@ export const allBooksReducers = (state = [], action) => {
       return {
         ...state,
         allBooks
+      }
+    }
+    case 'GET_ADD_BOOKS_SUCCESS': {
+      const id = parseInt(state.allBooks[state.allBooks.length-1].id)
+      const books = [
+        ...state.allBooks,
+        {
+          'id' : id+1,
+          'title' : action.payload.title,
+          'author' : action.payload.author,
+          'publisher' : action.payload.publisher,
+          'owner' : action.payload.owner.account,
+          'borrower' : '0x0',
+          'state' : '0',
+          'dateAdded' : Date.now(),
+          'dateIssued' : '0',
+          'imageUrl' : action.payload.imageUrl,
+          'description' : action.payload.description,
+          'genre' : action.payload.genre
+        }
+      ]
+      return {
+        ...state,
+        allBooks : books
+      }
+    }
+    case 'GET_BORROW_BOOKS_SUCCESS': {
+      const id = parseInt(action.payload.book.id) - 1
+      action.payload.book.borrower = action.payload.owner
+      action.payload.book.dateIssued = Date.now()
+      const books = [
+        ...state.allBooks.slice(0,id),
+        action.payload.book,
+        ...state.allBooks.slice(id+1)
+      ]
+      return {
+        ...state,
+        allBooks : books
+      }
+    }
+    case 'GET_RETURN_BOOKS_SUCCESS': {
+      const id = parseInt(action.payload.id) - 1
+      action.payload.borrower = '0x0'
+      action.payload.dateIssued = '0'
+      const books = [
+        ...state.allBooks.slice(0,id),
+        action.payload,
+        ...state.allBooks.slice(id+1)
+      ]
+      return {
+        ...state,
+        allBooks : books
       }
     }
     default:

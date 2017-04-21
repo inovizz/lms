@@ -46,10 +46,10 @@ const style = {
   }
 }
 
-const Loader = () => (
+const Loader = ({ text }) => (
   <div style={style.container}>
     <div style={style.pramatiLoader}>
-      <div>Loading Books</div>
+      <div>{text}</div>
       <div className='handred' style={style.handRed}></div>
       <div className='handaqua' style={style.handAqua}></div>
       <div className='handblue' style={style.handBlue}></div>

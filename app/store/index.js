@@ -14,7 +14,10 @@ const defaultState = {
     addBooksLoading: false,
     returnBooksLoading: false,
     borrowBooksLoading: false,
-    rateBookLoading: false
+    rateBookLoading: false,
+    loginLoader: false,
+    createAccountLoader: false,
+    addMemberLoader: false
   },
   books: {
     allBooks : [],

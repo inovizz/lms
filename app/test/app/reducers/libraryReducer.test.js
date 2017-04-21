@@ -35,56 +35,56 @@ describe('Reducers', () => {
         loadingReducer(undefined, {
           type: 'GET_ACCOUNTS_LOADING',
           payload: true
-        })).toEqual({ "accountsLoading" : true })
+        })).toEqual({ 'accountsLoading' : true })
     })
     it('should handle GET_OWNERDETAILS_LOADING', () => {
       expect(
         loadingReducer(undefined, {
           type: 'GET_OWNERDETAILS_LOADING',
           payload: true
-        })).toEqual({ "ownerDetailsLoading" : true })
+        })).toEqual({ 'ownerDetailsLoading' : true })
     })
     it('should handle GET_ALL_BOOKS_LOADING', () => {
       expect(
         loadingReducer(undefined, {
           type: 'GET_ALL_BOOKS_LOADING',
           payload: true
-        })).toEqual({ "allbooksloading" : true })
+        })).toEqual({ 'allbooksloading' : true })
     })
     it('should handle GET_MY_BOOKS_LOADING', () => {
       expect(
         loadingReducer(undefined, {
           type: 'GET_MY_BOOKS_LOADING',
           payload: true
-        })).toEqual({ "myBooksLoading" : true })
+        })).toEqual({ 'myBooksLoading' : true })
     })
     it('should handle GET_ADD_BOOKS_LOADING', () => {
       expect(
         loadingReducer(undefined, {
           type: 'GET_ADD_BOOKS_LOADING',
           payload: true
-        })).toEqual({ "addBooksLoading" : true })
+        })).toEqual({ 'addBooksLoading' : true })
     })
     it('should handle GET_BORROW_BOOKS_LOADING', () => {
       expect(
         loadingReducer(undefined, {
           type: 'GET_BORROW_BOOKS_LOADING',
           payload: true
-        })).toEqual({ "borrowBooksLoading" : true })
+        })).toEqual({ 'borrowBooksLoading' : true })
     })
     it('should handle GET_RETURN_BOOKS_LOADING', () => {
       expect(
         loadingReducer(undefined, {
           type: 'GET_RETURN_BOOKS_LOADING',
           payload: true
-        })).toEqual({ "returnBooksLoading" : true })
+        })).toEqual({ 'returnBooksLoading' : true })
     })
     it('should handle RATE_BOOK_LOADING', () => {
       expect(
         loadingReducer(undefined, {
           type: 'RATE_BOOK_LOADING',
           payload: true
-        })).toEqual({ "rateBookLoading" : true })
+        })).toEqual({ 'rateBookLoading' : true })
     })
   })
   describe('errorReducer', () => {
@@ -157,17 +157,21 @@ describe('Reducers', () => {
     })
   })
   describe('allBooksReducers', () => {
-    let books = [{
-      'id': '1',
-      'title': 'Title',
-      'author': 'Author',
-      'publisher': 'Publisher',
-      'owner': '0xba21a9b09d528b2e1726d786a1d1b861032dba87',
-      'borrower': '0x0000000000000000000000000000000000000000',
-      'state': '0',
-      'dateAdded': '1493054441',
-      'dateIssued': '0'
-    }]
+    let books;
+    beforeEach(() => {
+      books = [{
+        'id': '1',
+        'title': 'Title',
+        'author': 'Author',
+        'publisher': 'Publisher',
+        'owner': '0xba21a9b09d528b2e1726d786a1d1b861032dba87',
+        'borrower': '0x0000000000000000000000000000000000000000',
+        'state': '0',
+        'dateAdded': '1493054441',
+        'dateIssued': '0'
+      }]
+      Date.now = jest.fn(() => '1493054441')
+    })
 
     it('should return initial state', () => {
       expect(allBooksReducers(undefined, {})).toEqual([])
@@ -192,7 +196,143 @@ describe('Reducers', () => {
           payload: 'Title'
         })).toEqual({
           allBooks : books,
-         filteredBooks : books
+         filteredBooks : books,
+         value: 'Title'
+        })
+    })
+    it('should handle GET_RATE_BOOK_SUCCESS when reviewer is not present', () => {
+      expect(
+        allBooksReducers({
+          allBooks : books
+        }, {
+          type: 'GET_RATE_BOOK_SUCCESS',
+          payload: {
+            'bookId': '1',
+            'reviewer': '0xeeffa82fb768e9057d7967f672a3d0a6116d2528',
+            'rating': 3,
+            'comments': 'Awesome',
+            'timestamp': '1494410074'
+          }
+        })).toEqual({
+          allBooks : [{
+            'id': '1',
+            'title': 'Title',
+            'author': 'Author',
+            'publisher': 'Publisher',
+            'owner': '0xba21a9b09d528b2e1726d786a1d1b861032dba87',
+            'borrower': '0x0000000000000000000000000000000000000000',
+            'state': '0',
+            'dateAdded': '1493054441',
+            'dateIssued': '0',
+            'reviewers': ['0xeeffa82fb768e9057d7967f672a3d0a6116d2528'],
+            'ratings': [3],
+            'rating': 3,
+            'totalRating': 3
+          }]
+        })
+    })
+    it('should handle GET_RATE_BOOK_SUCCESS when reviewer is already present', () => {
+      books[0].reviewers = ['0xeeffa82fb768e9057d7967f672a3d0a6116d2528']
+      books[0].ratings = [3]
+      books[0].rating = 3
+      books[0].totalRating = 3
+      expect(
+        allBooksReducers({
+          allBooks : books
+        }, {
+          type: 'GET_RATE_BOOK_SUCCESS',
+          payload: {
+            'bookId': '1',
+            'reviewer': '0xeeffa82fb768e9057d7967f672a3d0a6116d2528',
+            'rating': 3,
+            'comments': 'Awesome',
+            'timestamp': '1494410074'
+          }
+        })).toEqual({
+          allBooks : books
+        })
+    })
+    it('should handle GET_ADD_BOOKS_SUCCESS', () => {
+      const book = {
+        'title': 'Title',
+        'author': 'Author',
+        'publisher': 'Publisher',
+        'owner': {
+            'account': '0xba21a9b09d528b2e1726d786a1d1b861032dba87',
+        },
+        'imageUrl' : 'url',
+        'description' : 'description',
+        'genre' : 'genre'
+      }
+      expect(
+        allBooksReducers({
+          allBooks : books
+        }, {
+          type: 'GET_ADD_BOOKS_SUCCESS',
+          payload: book
+        })).toEqual({
+          allBooks : [
+            ...books,
+            {
+              'id' : 2,
+              'title' : book.title,
+              'author' : book.author,
+              'publisher' : book.publisher,
+              'owner' : book.owner.account,
+              'borrower' : '0x0',
+              'state' : '0',
+              'dateAdded' : '1493054441',
+              'dateIssued' : '0',
+              'imageUrl' : book.imageUrl,
+              'description' : book.description,
+              'genre' : book.genre
+            }
+          ]
+        })
+    })
+    it('should handle GET_BORROW_BOOKS_SUCCESS', () => {
+      expect(
+        allBooksReducers({
+          allBooks : books
+        }, {
+          type: 'GET_BORROW_BOOKS_SUCCESS',
+          payload: {
+            book: books[0],
+            owner: '0xba21a9b09d528b2e1726d786a1d1b861032dba87'
+          }
+        })).toEqual({
+          allBooks : [{
+            'id': '1',
+            'title': 'Title',
+            'author': 'Author',
+            'publisher': 'Publisher',
+            'owner': '0xba21a9b09d528b2e1726d786a1d1b861032dba87',
+            'borrower': '0xba21a9b09d528b2e1726d786a1d1b861032dba87',
+            'state': '0',
+            'dateAdded': '1493054441',
+            'dateIssued': '1493054441'
+          }]
+        })
+    })
+    it('should handle GET_RETURN_BOOKS_SUCCESS', () => {
+      expect(
+        allBooksReducers({
+          allBooks : books
+        }, {
+          type: 'GET_RETURN_BOOKS_SUCCESS',
+          payload: books[0]
+        })).toEqual({
+          allBooks : [{
+            'id': '1',
+            'title': 'Title',
+            'author': 'Author',
+            'publisher': 'Publisher',
+            'owner': '0xba21a9b09d528b2e1726d786a1d1b861032dba87',
+            'borrower': '0x0',
+            'state': '0',
+            'dateAdded': '1493054441',
+            'dateIssued': '0'
+          }]
         })
     })
   })

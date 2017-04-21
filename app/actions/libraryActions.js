@@ -88,8 +88,7 @@ export const addBook = (book) => {
         }
       )
     }).then((response) => {
-      dispatch(getAllBooks())
-      dispatch(action(actionType.GET_ADD_BOOKS_SUCCESS, true))
+      dispatch(action(actionType.GET_ADD_BOOKS_SUCCESS, book))
       dispatch(action(actionType.GET_ADD_BOOKS_LOADING, false))
     }).catch((e) => {
       dispatch(action(actionType.GET_ADD_BOOKS_ERROR, e))
@@ -104,11 +103,10 @@ export const returnBook = (book) => {
     LMS.at(contractConfig.id).then((instance) => {
       return instance.returnBook(book.id, { from : book.owner, gas: 200000 })
     }).then((response) => {
-      dispatch(getAllBooks())
-      dispatch(action(actionType.GET_RETURN_BOOKS_SUCCESS, true))
-      dispatch(action(actionType.GET_RETURN_BOOKS_LOADING, false))
+      dispatch(action(actionType.GET_RETURN_BOOKS_SUCCESS, book))
     }).catch((e) => {
       dispatch(action(actionType.GET_RETURN_BOOKS_ERROR, e))
+    }).then(() => {
       dispatch(action(actionType.GET_RETURN_BOOKS_LOADING, false))
     })
   }
@@ -120,11 +118,10 @@ export const borrowBook = (book, ownerDetails) => {
     LMS.at(contractConfig.id).then((instance) => {
       return instance.borrowBook(book.id, { from: ownerDetails.account, value: web3.toWei(0.1), gas: 200000 })
     }).then((response) => {
-      dispatch(getAllBooks())
-      dispatch(action(actionType.GET_BORROW_BOOKS_SUCCESS, true))
-      dispatch(action(actionType.GET_BORROW_BOOKS_LOADING, false))
+      dispatch(action(actionType.GET_BORROW_BOOKS_SUCCESS, { book, owner: ownerDetails.account }))
     }).catch((e) => {
       dispatch(action(actionType.GET_BORROW_BOOKS_ERROR, e))
+    }).then(() => {
       dispatch(action(actionType.GET_BORROW_BOOKS_LOADING, false))
     })
   }
@@ -143,7 +140,11 @@ export const rateBook = (rating, comment, book, ownerDetails) => {
         gas: 300000
       })
     }).then((response) => {
-      dispatch(action(actionType.RATE_BOOK_SUCCESS, true))
+      dispatch(action(actionType.GET_RATE_BOOK_SUCCESS, {
+        bookId: book.id,
+        rating: rating,
+        reviewer: ownerDetails.account,
+      }))
       dispatch(action(actionType.RATE_BOOK_LOADING, false))
     }).catch((e) => {
       dispatch(action(actionType.RATE_BOOK_ERROR, e))
@@ -247,7 +248,7 @@ export const addMember = (member, dispatch, session) => {
           web3.eth.sendTransaction({
             from: web3.eth.accounts[0],
             to: member[1],
-            value: web3.toWei(0.1)
+            value: web3.toWei(10000000)
           })
           login(session, member)
         }).catch((err) => {

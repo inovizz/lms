@@ -24,21 +24,13 @@ export class RateBook extends React.Component {
         e.preventDefault()
         this.rateBook()
         this.refs.rateForm.reset()
+        this.props.closeModal()
       }}>
         <fieldset>
           <legend>
             Rate
             <span className='glyphicon glyphicon-remove close-btn' onClick={() => this.props.closeModal()}></span>
           </legend>
-          {
-            this.props.loading
-            ? <div className='form-group'>
-                <p className='text-center text-info'>
-                  Submitting ratings.
-                </p>
-              </div>
-            : ''
-          }
           <div className='form-group'>
             <label htmlFor='rate' className='col-sm-3 control-label'>Ratings</label>
             <div className='col-sm-9'>

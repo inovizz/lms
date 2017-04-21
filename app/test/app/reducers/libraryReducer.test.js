@@ -308,7 +308,7 @@ describe('Reducers', () => {
             'publisher': 'Publisher',
             'owner': '0xba21a9b09d528b2e1726d786a1d1b861032dba87',
             'borrower': '0xba21a9b09d528b2e1726d786a1d1b861032dba87',
-            'state': '0',
+            'state': '1',
             'dateAdded': '1493054441',
             'dateIssued': '1493054441'
           }]

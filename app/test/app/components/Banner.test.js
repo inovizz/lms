@@ -11,7 +11,7 @@ describe('Banner', () => {
     expect(component.find('.yogalogo').exists()).toEqual(true)
   })
   it('has a company logo', () => {
-    expect(component.find('img').props().src).toEqual('http://www.pramati.com/wp-content/uploads/2017/03/Triad-01.png')
+    expect(component.find('img').props().src).toEqual('test_file_stub')
   })
   it('has a header',() => {
     expect(component.find('h1').text()).toEqual('Yoga for the mind')

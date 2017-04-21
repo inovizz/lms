@@ -122,7 +122,7 @@ export class BooksForm extends React.Component {
           <div className='form-group'>
             <label htmlFor='description' className='col-sm-3 control-label'>Description</label>
             <div className='col-sm-9'>
-              < input type = 'text'
+              <textarea
               className = 'form-control'
               id = 'description'
               placeholder = 'Description'
@@ -131,7 +131,8 @@ export class BooksForm extends React.Component {
                   this.newBook.description = node
                 }
               }
-              required / >
+              rows='9'
+              required />
             </div>
           </div>
           <div className='form-group'>

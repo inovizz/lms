@@ -19,7 +19,7 @@ describe('Header', () => {
     expect(component.find('.navbar-brand').exists()).toEqual(true)
   })
   it('has a company logo', () => {
-    expect(component.find('img').props().src).toEqual('http://www.pramati.com/wp-content/uploads/2016/11/logo_pramati_trans_152.png')
+    expect(component.find('img').props().src).toEqual('test_file_stub')
   })
   it('has a li',() => {
     expect(component.find('li').length).toEqual(2)

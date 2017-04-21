@@ -1,4 +1,5 @@
 import React from 'react'
+import BannerImage from '../img/Triad-01.png'
 
 const Banner = () => (
   <div className='row yogalogo'>
@@ -6,7 +7,7 @@ const Banner = () => (
       <div className='yoga-wrapper'>
         <img width = '1016'
         height = '590'
-        src = 'http://www.pramati.com/wp-content/uploads/2017/03/Triad-01.png'
+        src = {BannerImage}
         className = 'vc_single_image-img attachment-large'
         alt = ''
         sizes = '(max-width: 1016px) 100vw, 1016px' />

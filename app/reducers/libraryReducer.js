@@ -201,6 +201,7 @@ export const allBooksReducers = (state = [], action) => {
       const id = parseInt(action.payload.book.id) - 1
       action.payload.book.borrower = action.payload.owner
       action.payload.book.dateIssued = Date.now()
+      action.payload.book.state = '1'
       const books = [
         ...state.allBooks.slice(0,id),
         action.payload.book,
@@ -215,6 +216,7 @@ export const allBooksReducers = (state = [], action) => {
       const id = parseInt(action.payload.id) - 1
       action.payload.borrower = '0x0'
       action.payload.dateIssued = '0'
+      action.payload.state = '0'
       const books = [
         ...state.allBooks.slice(0,id),
         action.payload,

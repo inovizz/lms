@@ -15,7 +15,7 @@ const modalStyle = {
     left                  : '50%',
     right                 : 'auto',
     bottom                : 'auto',
-    marginRight           : '-50%',
+    width                 : '30%',
     transform             : 'translate(-50%, -50%)'
   }
 }
@@ -36,11 +36,12 @@ const Book = ({
     <div className='lead'>{title}</div>
     <div className='media-list list-group' style={style.row}>
       {books.map((book, i) => {
+        let imageEl;
         return (
           <div key={i} className='list-group-item'>
             <div className='media-left'>
               <div className='imgContainer'>
-                <img className={btnTitle ? 'imgLarge' : 'imgMedium'} src={book.imageUrl} />
+                <img className={btnTitle ? 'imgLarge' : 'imgMedium'} src={book.imageUrl} ref={img => imageEl = img} onError={() => { imageEl.src = 'https://placehold.it/400x500' }} />
               </div>
             </div>
             <div className='media-body'>
@@ -69,7 +70,7 @@ const Book = ({
               authenticated
               ? <div className='media-bottom'>
                   {
-                    btnTitle
+                    (btnTitle === 'Borrow' && book.state === '0') || (btnTitle === 'Return' && book.state === '1')
                     ? <button
                         className='btn btn-default'
                         style={ { 'marginLeft': '15px' }}

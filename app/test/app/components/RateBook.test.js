@@ -32,8 +32,8 @@ describe('RateBook', () => {
       expect(component.find('select').exists()).toEqual(true)
     })
 
-    it('has a input for comment',() => {
-      expect(component.find('input').exists()).toEqual(true)
+    it('has a textarea for comment',() => {
+      expect(component.find('textarea').exists()).toEqual(true)
     })
 
     it('has a submit button',() => {

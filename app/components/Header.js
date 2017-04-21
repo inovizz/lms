@@ -2,6 +2,7 @@ import React from 'react'
 import OwnerDetails from './OwnerDetails'
 import GoogleLogin from 'react-google-login'
 import { NavLink } from 'react-router-dom'
+import LogoImg from '../img/logo_pramati_trans_152.png'
 
 const Header = ({ loginSuccess, loginFailure, session, logout }) => (
   <nav className='navbar'>
@@ -10,10 +11,10 @@ const Header = ({ loginSuccess, loginFailure, session, logout }) => (
         <a href='http://www.pramati.com/' className='navbar-brand'>
           <img className = 'logo logo-light'
           alt = 'Pramati Technologies'
-          src = 'http://www.pramati.com/wp-content/uploads/2016/11/logo_pramati_trans_152.png' />
+          src = {LogoImg} />
         </a>
         <span className='navbar-brand' style={{ lineHeight: '55px', verticalAlign: 'bottom' }}>
-          LMS ( Alpha Version )
+          Library Management System
         </span>
       </div>
       <div id='navbar' className='navbar-collapse collapse navbar-right'>

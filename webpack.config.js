@@ -29,7 +29,8 @@ module.exports = {
           fallback: 'style-loader',
           use: 'css-loader'
         })
-      }
+      },
+      { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192' }
     ]
   },
   plugins: [HTMLWebpackPluginConfig, ExtractTextPluginConfig]

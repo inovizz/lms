@@ -46,7 +46,7 @@ export class RateBook extends React.Component {
           <div className='form-group'>
             <label htmlFor='comment' className='col-sm-3 control-label'>Comment</label>
             <div className='col-sm-9'>
-              <input type = 'text'
+              <textarea
                 className = 'form-control'
                 id = 'comment'
                 placeholder = 'Comment'
@@ -55,6 +55,7 @@ export class RateBook extends React.Component {
                     this.rate.comment = node
                   }
                 }
+                rows = '9'
                 required />
             </div>
           </div>

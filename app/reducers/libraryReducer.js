@@ -75,7 +75,7 @@ export const errorReducer = (state = [], action) => {
 
 export const ownerDetailsReducer = (state = {}, action) => {
   switch (action.type) {
-    case 'GET_OWNERDETAILS_SUCCESS':
+    case 'GET_OWNERDETAILS_SUCCESS': {
       let ownerDetails = {
         'name' : action.payload[0],
         'account' : action.payload[1],
@@ -83,6 +83,7 @@ export const ownerDetailsReducer = (state = {}, action) => {
         'dateAdded' : action.payload[3]
       }
       return ownerDetails
+    }
     default:
       return state
   }
@@ -90,7 +91,7 @@ export const ownerDetailsReducer = (state = {}, action) => {
 
 export const allBooksReducers = (state = [], action) => {
   switch (action.type) {
-    case 'GET_ALL_BOOKS_SUCCESS':
+    case 'GET_ALL_BOOKS_SUCCESS': {
       let books = action.payload[0]
       let myBooks = books.split('|').map((book) => {
         book = book.split(';')
@@ -103,21 +104,59 @@ export const allBooksReducers = (state = [], action) => {
           'borrower' : '0x' + book[5],
           'state' : book[6],
           'dateAdded' : book[7],
-          'dateIssued' : book[8]
+          'dateIssued' : book[8],
+          'imageUrl' : book[9],
+          'description' : book[10],
+          'genre' : book[11]
         }
       })
       return {
         ...state,
         allBooks : myBooks
       }
-    case 'SEARCH_BOOK':
+    }
+    case 'SEARCH_BOOK': {
       const filteredBooks = state.allBooks.filter((book) => {
-        return book.title.toLowerCase().includes(action.payload.toLowerCase()) || book.author.toLowerCase().includes(action.payload.toLowerCase()) || book.publisher.toLowerCase().includes(action.payload.toLowerCase())
+        return (
+          book.title.toLowerCase().includes(action.payload.toLowerCase())
+          || book.author.toLowerCase().includes(action.payload.toLowerCase())
+          || book.publisher.toLowerCase().includes(action.payload.toLowerCase()))
       })
       return {
         ...state,
         filteredBooks : filteredBooks
       }
+    }
+    case 'GET_RATE_BOOK_SUCCESS': {
+      const booksRating = action.payload
+      booksRating.bookId = booksRating.bookId.valueOf()
+      booksRating.rating = parseInt(booksRating.rating.valueOf())
+      let books = [...state.allBooks]
+      let allBooks = books.map(book => {
+        book.reviewers = book.reviewers || []
+        book.ratings = book.ratings || []
+        let rating = 0
+        let totalRating = book.totalRating || 0
+        if(book.id === booksRating.bookId) {
+          const index = book.reviewers.indexOf(booksRating.reviewer)
+          if(index !== -1) {
+            rating = booksRating.rating - book.ratings[index];
+            book.ratings[index] = booksRating.rating
+          } else {
+            rating = booksRating.rating
+            book.ratings.push(booksRating.rating);
+            book.reviewers.push(booksRating.reviewer);
+          }
+          book.totalRating = totalRating + rating
+          book.rating = book.totalRating / book.reviewers.length
+        }
+        return book;
+      })
+      return {
+        ...state,
+        allBooks
+      }
+    }
     default:
       return state
   }
@@ -125,7 +164,7 @@ export const allBooksReducers = (state = [], action) => {
 
 export const myBooksReducers = (state = [], action) => {
   switch (action.type) {
-    case 'GET_MY_BOOKS_SUCCESS':
+    case 'GET_MY_BOOKS_SUCCESS': {
       let books = action.payload[0]
       let myBooks = books.split('|').map((book) => {
         book = book.split(';')
@@ -145,6 +184,7 @@ export const myBooksReducers = (state = [], action) => {
         }
       })
       return myBooks
+    }
     default:
       return state
   }

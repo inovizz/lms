@@ -5,16 +5,9 @@ import * as libraryActions from '../actions/libraryActions'
 const mapStateToProps = (state, ownProps) => {
   return {
     isBookAdded: state.isBookAdded,
-    loading : state.loading,
-    closeModal : ownProps.closeModal
-  }
-}
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    addBook: (title, author, publisher) => {
-      dispatch(libraryActions.addBook(title, author, publisher))
-    }
+    loading: state.loading,
+    closeModal: ownProps.closeModal,
+    ownerDetails: state.session.user
   }
 }
 
@@ -33,10 +26,16 @@ export class BooksForm extends React.Component {
     }
   }
   addBook () {
-    const title = this.newBook.title.value
-    const author = this.newBook.author.value
-    const publisher = this.newBook.publisher.value
-    this.props.addBook(title, author, publisher)
+    const book = {
+      title : this.newBook.title.value,
+      author : this.newBook.author.value,
+      publisher : this.newBook.publisher.value,
+      description : this.newBook.description.value,
+      imageUrl : this.newBook.imageUrl.value,
+      genre : this.newBook.genre.value,
+      owner: this.props.ownerDetails
+    }
+    this.props.addBook(book)
   }
   render () {
     return (
@@ -160,4 +159,4 @@ export class BooksForm extends React.Component {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(BooksForm)
+export default connect(mapStateToProps, libraryActions)(BooksForm)

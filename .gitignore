@@ -1,8 +1,8 @@
 .DS_STORE
 .idea
-app/config.js
 build
 coverage
+dist/**
 installed_contracts
 node_modules
 npm-debug.log

@@ -9,29 +9,60 @@ describe('Book', () => {
     mount(<Book loading={{ borrowBooksLoading : false, returnBooksLoading: false }} title='' books={[]} btnTitle='' btnFunction='' />)
   })
   describe('render', () => {
-    //  Test : Component gets rendered individually
+    let component;
+
+    beforeEach(() => {
+        const props = {
+          title : 'My Books',
+          books : [{
+            'id': '1',
+            'title': 'Title',
+            'author': 'Author',
+            'publisher': 'Publisher',
+            'owner': '0xba21a9b09d528b2e1726d786a1d1b861032dba87',
+            'borrower': '0x0000000000000000000000000000000000000000',
+            'state': '0',
+            'dateAdded': '1493054441',
+            'dateIssued': '0',
+            'rating': 4,
+            'imageUrl': 'https://images-eu.ssl-images-amazon.com/images/I/416Hql52NCL.jpg',
+            'description': 'description'
+          }],
+          btnTitle : 'Borrow',
+          btnFunction : jest.fn(),
+          loading : {
+            borrowBooksLoading: false,
+            returnBooksLoading: false
+          },
+          rateBook : jest.fn(),
+          openModal : jest.fn(),
+          closeModal : jest.fn(),
+          rateModalIsOpen : false,
+          authenticated : true
+        }
+        component = mount(<Book {...props} />)
+    })
     it('should render the book', () => {
-      const book = [{
-        'id': '1',
-        'title': 'Title',
-        'author': 'Author',
-        'publisher': 'Publisher',
-        'owner': '0xba21a9b09d528b2e1726d786a1d1b861032dba87',
-        'borrower': '0x0000000000000000000000000000000000000000',
-        'state': '0',
-        'dateAdded': '1493054441',
-        'dateIssued': '0'
-      }]
-      const loading = {
-        borrowBooksLoading : false,
-        returnBooksLoading : false
-      }
-      const btnTitle = ''
-      const actual = shallow(<Book loading={loading} title='My Books' books={book} btnTitle='' btnFunction='' />)
       const expected = (
           <div className='lead'>My Books</div>
       )
-      expect(actual.contains(expected)).toEqual(true)
+      expect(component.contains(expected)).toEqual(true)
     })
+    it('should display book image', () => {
+      expect(component.find('img').props().src).toEqual('https://images-eu.ssl-images-amazon.com/images/I/416Hql52NCL.jpg')
+    })
+    it('should display book title', () => {
+      expect(component.find('.media-heading').text()).toEqual('Title')
+    })
+    it('should display book author', () => {
+      expect(component.find('.author').text()).toEqual('by Author')
+    })
+    it('should display book description', () => {
+      expect(component.find('.bookDescription').text()).toEqual('description')
+    })
+    it('should render 4 stars', () => {
+      expect(component.find('.active').length).toEqual(4)
+    })
+    
   })
 })

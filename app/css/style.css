@@ -47,6 +47,10 @@ a {
   color: #a7a7a7;
   cursor: pointer;
 }
+
+.hide {
+  display: none;
+}
 /* Header */
 
 .navbar {
@@ -232,20 +236,15 @@ a {
 
 .rating {
   unicode-bidi: bidi-override;
-  direction: rtl;
   color: #e7711b;
   position: absolute;
   left: 0;
 }
-.rating > span {
+
+.rating > span.active {
   display: inline-block;
-  position: relative;
   width: 1.1em;
-}
-.rating > span:hover:before,
-.rating > span:hover ~ span:before {
-   content: "\2605";
-   position: absolute;
+  font-weight: bold;
 }
 
 .book .info {

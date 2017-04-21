@@ -2,6 +2,7 @@ import contractConfig from '../config'
 import { web as web3, lms as LMS } from '../web3'
 import actionType from './actionTypes'
 import { sessionService } from 'redux-react-session'
+import axios from 'axios'
 
 export const action = (type, flag) => {
   return {
@@ -45,6 +46,7 @@ export const getAllBooks = () => {
     LMS.at(contractConfig.id).then((instance) => {
       return instance.getAllBooks.call()
     }).then((books) => {
+      getRatings(dispatch)
       dispatch(action(actionType.GET_ALL_BOOKS_SUCCESS, books))
       dispatch(action(actionType.GET_ALL_BOOKS_LOADING, false))
     }).catch((e) => {
@@ -69,24 +71,24 @@ export const getMyBooks = () => {
   }
 }
 
-export const addBook = (title, author, publisher, imageUrl, description, genre) => {
+export const addBook = (book) => {
   return (dispatch) => {
     dispatch(action(actionType.GET_ADD_BOOKS_LOADING, true))
     LMS.at(contractConfig.id).then((instance) => {
       return instance.addBook(
-        title,
-        author,
-        publisher,
-        imageUrl,
-        description,
-        genre,
+        book.title,
+        book.author,
+        book.publisher,
+        book.imageUrl,
+        book.description,
+        book.genre,
         {
-          from: web3.eth.accounts[0],
+          from: book.owner.account,
           gas: 600000
         }
       )
     }).then((response) => {
-      dispatch(getMyBooks())
+      dispatch(getAllBooks())
       dispatch(action(actionType.GET_ADD_BOOKS_SUCCESS, true))
       dispatch(action(actionType.GET_ADD_BOOKS_LOADING, false))
     }).catch((e) => {
@@ -102,7 +104,7 @@ export const returnBook = (book) => {
     LMS.at(contractConfig.id).then((instance) => {
       return instance.returnBook(book.id, { from : book.owner, gas: 200000 })
     }).then((response) => {
-      dispatch(getMyBooks())
+      dispatch(getAllBooks())
       dispatch(action(actionType.GET_RETURN_BOOKS_SUCCESS, true))
       dispatch(action(actionType.GET_RETURN_BOOKS_LOADING, false))
     }).catch((e) => {
@@ -118,7 +120,7 @@ export const borrowBook = (book, ownerDetails) => {
     LMS.at(contractConfig.id).then((instance) => {
       return instance.borrowBook(book.id, { from: ownerDetails.account, value: web3.toWei(0.1), gas: 200000 })
     }).then((response) => {
-      dispatch(getMyBooks())
+      dispatch(getAllBooks())
       dispatch(action(actionType.GET_BORROW_BOOKS_SUCCESS, true))
       dispatch(action(actionType.GET_BORROW_BOOKS_LOADING, false))
     }).catch((e) => {
@@ -136,7 +138,7 @@ export const rateBook = (rating, comment, book, ownerDetails) => {
   return (dispatch) => {
     dispatch(action(actionType.RATE_BOOK_LOADING, true))
     LMS.at(contractConfig.id).then((instance) => {
-      return instance.rateBook(book.id, rating, comment, {
+      return instance.rateBook(book.id, rating, comment,'0', {
         from: ownerDetails.account,
         gas: 300000
       })
@@ -151,13 +153,14 @@ export const rateBook = (rating, comment, book, ownerDetails) => {
 }
 
 export const login = (response, userVal) => {
-  sessionService.saveSession(response.accessToken)
+  sessionService.saveSession(response)
   .then(() => {
     const user = {
       'name' : userVal[0],
       'account' : userVal[1],
       'status' : userVal[2],
-      'dateAdded' : userVal[3]
+      'dateAdded' : userVal[3],
+      'body': response
     }
     sessionService.saveUser(user)
   }).catch(err => console.error(err))
@@ -167,5 +170,90 @@ export const logout = () => {
   return () => {
     sessionService.deleteSession()
     sessionService.deleteUser()
+  }
+}
+
+export const getMemberDetailsByEmail = (response) => {
+  return (dispatch) => {
+    dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_LOADING, true))
+    LMS.at(contractConfig.id).then((instance) => {
+      return instance.getMemberDetailsByEmail(response.profileObj.email)
+    }).then((user) => {
+      login(response, user)
+      dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_SUCCESS, user))
+    }).catch((e) => {
+      dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_ERROR, e))
+    }).then(() => {
+      dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_LOADING, false))
+    })
+  }
+}
+
+export const getRatings = (dispatch) => {
+  dispatch(action(actionType.GET_RATE_BOOK_LOADING, true))
+  LMS.at(contractConfig.id).then((instance) => {
+    return instance.Rate({}, {
+      fromBlock: 0,
+      toBlock: 'latest'
+    })
+  }).then((rateEvent) => {
+    rateEvent.watch(function(err, result) {
+      rateEvent.stopWatching();
+      if (err) {
+        dispatch(action(actionType.GET_RATE_BOOK_ERROR, err))
+      } else {
+        dispatch(action(actionType.GET_RATE_BOOK_SUCCESS, result.args))
+      }
+      dispatch(action(actionType.GET_RATE_BOOK_LOADING, false))
+    });
+  })
+}
+
+export const createAccount = (session,password) => {
+  return (dispatch) => {
+    dispatch(action(actionType.CREATE_ACCOUNT_LOADING, true))
+    const request = {
+      "jsonrpc":"2.0",
+      "method":"personal_newAccount",
+      "params":[password],
+      "id":74
+    }
+    return axios.post('/api/create_account',request)
+            .then((response) => {
+              addMember([
+                session.user.body.profileObj.name,
+                response.data.data.result,
+                session.user.body.profileObj.email,
+                password,
+              ], dispatch, session.user.body)
+            })
+            .catch((error) => {
+              dispatch(action(actionType.CREATE_ACCOUNT_ERROR, error))
+            }).then(() => {
+              dispatch(action(actionType.CREATE_ACCOUNT_LOADING, false))
+            });
+  };
+}
+
+export const addMember = (member, dispatch, session) => {
+  dispatch(action(actionType.ADD_MEMBER_LOADING, true))
+  if(web3.personal.unlockAccount(member[1],member[3],0)) {
+    LMS.at(contractConfig.id).then((instance) => {
+          return instance.addMember(member[0], member[1], member[2], member[3], {
+            from: web3.eth.accounts[0],
+            gas: 600000
+          })
+        }).then((response) => {
+          web3.eth.sendTransaction({
+            from: web3.eth.accounts[0],
+            to: member[1],
+            value: web3.toWei(0.1)
+          })
+          login(session, member)
+        }).catch((err) => {
+          dispatch(action(actionType.ADD_MEMBER_ERROR, err))
+        }).then(() => {
+          dispatch(action(actionType.ADD_MEMBER_LOADING, false))
+        })
   }
 }

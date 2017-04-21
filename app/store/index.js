@@ -1,12 +1,10 @@
 import { createStore, compose, applyMiddleware } from 'redux'
 import rootReducer from '../reducers'
 import thunk from 'redux-thunk'
-import { sessionService } from 'redux-react-session';
-
+import { sessionService } from 'redux-react-session'
 
 const defaultState = {
   accounts: null,
-  ownerDetails: null,
   error: null,
   loading: {
     accountsLoading: true,

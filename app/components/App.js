@@ -6,44 +6,34 @@ import Header from './Header'
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    ownerDetails : state.ownerDetails,
-    loading: state.loading
-  }
-}
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    getOwnerDetails: () => {
-      dispatch(libraryActions.getOwnerDetails())
-    }
+    session: state.session
   }
 }
 
 export class App extends React.Component {
-  constructor (props) {
-    super(props)
-  }
-
-  componentDidMount () {
-    if (!this.props.ownerDetails) {
-      this.props.getOwnerDetails()
-    }
-  }
-
   render () {
-    const ownerDetails = this.props.loading.ownerDetailsLoading ? '' : this.props.ownerDetails
     return (
       <div>
-        <Header ownerDetails={ownerDetails} />
+        <Header
+          loginSuccess = {
+            (response) => this.props.getMemberDetailsByEmail(response)
+          }
+          loginFailure = {
+            (response) => { console.log(response) }
+          }
+          session={ this.props.session }
+          logout = {
+            () => this.props.logout()
+          } />
         <div className='container'>
           {
-            ownerDetails
-            ? <Dashboard owner={ownerDetails}/>
-            : <div>Loading...</div>
+            this.props.session.authenticated
+            ? <Dashboard owner={this.props.session.user}/>
+            : <div>Logged out</div>
           }
         </div>
       </div>)
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(App)
+export default connect(mapStateToProps, libraryActions)(App)

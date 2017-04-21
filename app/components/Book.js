@@ -29,7 +29,8 @@ const Book = ({
     rateBook,
     openModal,
     closeModal,
-    rateModalIsOpen
+    rateModalIsOpen,
+    authenticated
   }) => (
   <div className='book'>
     <div className='lead'>{title}</div>
@@ -43,9 +44,8 @@ const Book = ({
           <div key={i} className='list-group-item'>
             <div className='media-left'>
               <div className='imgContainer'>
-                <img className={btnTitle ? 'imgLarge' : 'imgMedium'} src={book.img} />
+                <img className={btnTitle ? 'imgLarge' : 'imgMedium'} src={book.imageUrl} />
               </div>
-              <div className='imgFaker'>Image faker</div>
             </div>
             <div className='media-body'>
               <div className='taContainer'>
@@ -55,7 +55,13 @@ const Book = ({
               <div className='ratingContainer'>
                 <div className='rating'>
                   {
-                    [5, 4, 3, 2, 1].map(rate => <span key={rate} id={rate}>☆</span>)
+                    [1, 2, 3, 4, 5].map(rate => {
+                      if(rate <= book.rating) {
+                        return <span key={rate} id={rate} className='active'>★</span>
+                      } else {
+                        return <span key={rate} id={rate}>☆</span>
+                      }
+                    })
                   }
                 </div>
               </div>
@@ -63,14 +69,21 @@ const Book = ({
                 {book.description}
               </div>
             </div>
-            <div className='media-bottom'>
             {
-              btnTitle
-              ? <button className='btn btn-default' style={ { 'marginLeft': '15px' }} onClick={() => btnFunction(book)}>{btnTitle}</button>
+              authenticated
+              ? <div className='media-bottom'>
+                  {
+                    btnTitle
+                    ? <button
+                        className='btn btn-default'
+                        style={ { 'marginLeft': '15px' }}
+                        onClick={() => btnFunction(book)}>{btnTitle}</button>
+                    : ''
+                  }
+                  <button className='btn btn-default' onClick={() => openModal(book)}>Rate</button>
+                </div>
               : ''
             }
-            <button className='btn btn-default' onClick={() => openModal(book)}>Rate</button>
-            </div>
           </div>
         )
       })}
@@ -78,12 +91,11 @@ const Book = ({
     <Modal
       isOpen={rateModalIsOpen}
       onRequestClose={() => closeModal()}
-      shouldCloseOnOverlayClick={true}
       role='dialog'
       style={modalStyle}
       shouldCloseOnOverlayClick={false}
       contentLabel='Rate a Book'>
-      < RateBook closeModal = {
+      <RateBook closeModal = {
         () => closeModal()
       }
       rateBook = {

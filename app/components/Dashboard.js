@@ -18,23 +18,10 @@ const modalStyle = {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    myBooks : state.myBooks,
-    ownerDetails : state.ownerDetails,
-    loading : state.loading
-  }
-}
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    getMyBooks : () => {
-      dispatch(libraryActions.getMyBooks())
-    },
-    returnBook : (book) => {
-      dispatch(libraryActions.returnBook(book))
-    },
-    rateBook: (rating, comment, book, ownerDetails) => {
-      dispatch(libraryActions.rateBook(rating, comment, book, ownerDetails))
-    }
+    allBooks: state.books.allBooks,
+    ownerDetails: state.session.user,
+    loading: state.loading,
+    session: state.session
   }
 }
 
@@ -47,20 +34,14 @@ export class Dashboard extends React.Component {
       book: {}
     }
   }
-  openModal () {
-    this.setState({ modalIsOpen: true })
-  }
-  closeModal () {
-    this.setState({ modalIsOpen: false })
-  }
-  openRateModal (book) {
-    this.setState({ rateModalIsOpen: true, book: book })
-  }
-  closeRateModal () {
-    this.setState({ rateModalIsOpen: false })
-  }
-  componentDidMount () {
-    this.props.getMyBooks()
+  toggleModal (option, book) {
+    switch (option) {
+      case 'addBook':
+        this.setState({ modalIsOpen: !this.state.modalIsOpen })
+        break
+      case 'rateBook':
+        this.setState({ rateModalIsOpen: !this.state.rateModalIsOpen, book })
+    }
   }
   renderLoading () {
     return (
@@ -70,25 +51,25 @@ export class Dashboard extends React.Component {
     )
   }
   renderBooks () {
-    const ownerBooks = this.props.myBooks.filter((book) => book.owner === this.props.ownerDetails.account)
-    const borrowedBooks = this.props.myBooks.filter((book) => book.borrower === this.props.ownerDetails.account)
+    const ownerBooks = this.props.allBooks.filter((book) => book.owner === this.props.ownerDetails.account)
+    const borrowedBooks = this.props.allBooks.filter((book) => book.borrower === this.props.ownerDetails.account)
     return (
       <div>
         <div className='add-btn'>
-          <button className='btn btn-default' onClick={() => this.openModal()}>Add Book</button>
+          <button className='btn btn-default' onClick={() => this.toggleModal('addBook')}>Add Book</button>
           <Modal
             isOpen={this.state.modalIsOpen}
-            onRequestClose={() => this.closeModal()}
+            onRequestClose={() => this.toggleModal('addBook')}
             shouldCloseOnOverlayClick={false}
             role='dialog'
             style={modalStyle}
             contentLabel='Add a Book'>
-            <BooksForm closeModal={() => this.closeModal()}/>
+            <BooksForm closeModal={() => this.toggleModal('addBook')}/>
           </Modal>
         </div>
         <div>
           {
-            this.props.loading.myBooksLoading
+            this.props.loading.allbooksloading
             ? <div className='row'>
                 <p className='text-center text-info'>
                   Updating books library...
@@ -98,7 +79,7 @@ export class Dashboard extends React.Component {
           }
             {
               ownerBooks.length
-              ? < Book loading = {
+              ? <Book loading = {
                   this.props.loading
                 }
                 title = 'My Books'
@@ -111,17 +92,18 @@ export class Dashboard extends React.Component {
                   (rating, comment) => this.props.rateBook(rating, comment, this.state.book, this.props.ownerDetails)
                 }
                 openModal = {
-                  (book) => this.openRateModal(book)
+                  (book) => this.toggleModal('rateBook', book)
                 }
                 closeModal = {
-                  () => this.closeRateModal()
+                  () => this.toggleModal('rateBook')
                 }
-                rateModalIsOpen = { this.state.rateModalIsOpen }/ >
-              : < div > No Books Added < /div>
+                rateModalIsOpen = { this.state.rateModalIsOpen }
+                authenticated = { this.props.session.authenticated} />
+              : <div> No Books Added </div>
             }
             {
               borrowedBooks.length
-              ? < Book loading = {
+              ? <Book loading = {
                   this.props.loading
                 }
                 title = 'Borrowed Books'
@@ -136,12 +118,13 @@ export class Dashboard extends React.Component {
                   (rating, comment) => this.props.rateBook(rating, comment, this.state.book, this.props.ownerDetails)
                 }
                 openModal = {
-                  (book) => this.openRateModal(book)
+                  (book) => this.toggleModal('rateBook', book)
                 }
                 closeModal = {
-                  () => this.closeRateModal()
+                  () => this.toggleModal('rateBook')
                 }
-                rateModalIsOpen = { this.state.rateModalIsOpen } />
+                rateModalIsOpen = { this.state.rateModalIsOpen }
+                authenticated = { this.props.session.authenticated} />
               : ''
             }
         </div>
@@ -150,11 +133,11 @@ export class Dashboard extends React.Component {
   }
   render () {
     return (
-        this.props.myBooks.length
+        this.props.allBooks.length
         ? this.renderBooks()
         : this.renderLoading()
     )
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Dashboard)
+export default connect(mapStateToProps, libraryActions)(Dashboard)

@@ -25,13 +25,13 @@ export class App extends React.Component {
   }
 
   componentDidMount () {
-    if(!this.props.ownerDetails) {
+    if (!this.props.ownerDetails) {
       this.props.getOwnerDetails()
     }
   }
 
   render () {
-    const ownerDetails = this.props.loading.ownerDetailsLoading ? '' : this.props.ownerDetails 
+    const ownerDetails = this.props.loading.ownerDetailsLoading ? '' : this.props.ownerDetails
     return (
       <div>
         <Header ownerDetails={ownerDetails} />

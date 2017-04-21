@@ -91,7 +91,7 @@ a {
 
 /* Yoga Logo */
 
-.yogalogo { 
+.yogalogo {
   padding: 50px 0 20px 75px;
 }
 
@@ -126,7 +126,7 @@ a {
   color: #292929;
 }
 
-@media only screen and (max-width: 768px) {
+@media (max-width: 768px) {
   .yogalogo .yoga-header h1{
     font-size: 50px;
     line-height: 60px;

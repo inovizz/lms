@@ -1,19 +1,19 @@
 import React from 'react'
 import { render } from 'react-dom'
 import { mount, shallow } from 'enzyme'
-import { BooksForm } from '../../../components/BooksForm'
+import RateBook from '../../../components/RateBook'
 
-describe('BooksForm', () => {
+describe('RateBook', () => {
   //  Test : Components and its child renders without crashing
   it('renders without crashing', () => {
-    mount(<BooksForm isBookAdded='' addBook={[]} loading={{addBooksLoading:false}}/>)
+    mount(<RateBook loading={false}/>)
   })
   describe('render', () => {
     //  Test : Component gets rendered individually
     it('should render the book form', () => {
-      const actual = shallow(<BooksForm isBookAdded='' addBook={[]} loading={{addBooksLoading:false}} />)
+      const actual = shallow(<RateBook loading={false}/>)
       const expected = (
-        <label htmlFor='title' className='col-sm-3 control-label'>Title</label>
+        <label htmlFor='comment' className='col-sm-3 control-label'>Comment</label>
       )
       expect(actual.contains(expected)).toEqual(true)
     })

@@ -6,7 +6,7 @@ import Book from '../../../components/Book'
 describe('Book', () => {
   //  Test : Components and its child renders without crashing
   it('renders without crashing', () => {
-    mount(<Book loading={{borrowBooksLoading : false, returnBooksLoading: false}} title='' books={[]} btnTitle='' btnFunction='' />)
+    mount(<Book loading={{ borrowBooksLoading : false, returnBooksLoading: false }} title='' books={[]} btnTitle='' btnFunction='' />)
   })
   describe('render', () => {
     //  Test : Component gets rendered individually
@@ -26,7 +26,7 @@ describe('Book', () => {
         borrowBooksLoading : false,
         returnBooksLoading : false
       }
-      const btnTitle = '';
+      const btnTitle = ''
       const actual = shallow(<Book loading={loading} title='My Books' books={book} btnTitle='' btnFunction='' />)
       const expected = (
           <div className='lead'>My Books</div>

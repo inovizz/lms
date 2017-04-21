@@ -1,4 +1,6 @@
-import { combineReducers } from 'redux'
+import {
+  combineReducers
+} from 'redux'
 import {
   libraryReducer,
   loadingReducer,
@@ -8,19 +10,23 @@ import {
   myBooksReducers,
   addBookReducer,
   returnBookReducer,
-  borrowBookReducer
+  borrowBookReducer,
+  rateBookReducer
 } from './libraryReducer'
+import { sessionReducer } from 'redux-react-session'
 
 const rootReducer = combineReducers({
   accounts: libraryReducer,
-  ownerDetails : ownerDetailsReducer,
+  ownerDetails: ownerDetailsReducer,
   loading: loadingReducer,
   error: errorReducer,
   books: allBooksReducers,
-  myBooks : myBooksReducers,
-  isBookAdded : addBookReducer,
-  isBookReturned : returnBookReducer,
-  isBookBorrowed : borrowBookReducer
+  myBooks: myBooksReducers,
+  isBookAdded: addBookReducer,
+  isBookReturned: returnBookReducer,
+  isBookBorrowed: borrowBookReducer,
+  ratings: rateBookReducer,
+  session: sessionReducer
 })
 
 export default rootReducer

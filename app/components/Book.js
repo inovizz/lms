@@ -1,5 +1,6 @@
 import React from 'react'
-import { mockbooks } from '../mockdata/books'
+import Modal from 'react-modal'
+import RateBook from './RateBook'
 
 const style = {
   row: {
@@ -8,7 +9,28 @@ const style = {
   }
 }
 
-const Book = ({ title, books, btnTitle, btnFunction, loading }) => (
+const modalStyle = {
+  content : {
+    top                   : '50%',
+    left                  : '50%',
+    right                 : 'auto',
+    bottom                : 'auto',
+    marginRight           : '-50%',
+    transform             : 'translate(-50%, -50%)'
+  }
+}
+
+const Book = ({
+    title,
+    books,
+    btnTitle,
+    btnFunction,
+    loading,
+    rateBook,
+    openModal,
+    closeModal,
+    rateModalIsOpen
+  }) => (
   <div className='book'>
     <div className='lead'>{title}</div>
     <p className='text-center text-info'>
@@ -21,7 +43,7 @@ const Book = ({ title, books, btnTitle, btnFunction, loading }) => (
           <div key={i} className='list-group-item'>
             <div className='media-left'>
               <div className='imgContainer'>
-                <img className={btnTitle ? 'imgLarge' : 'imgMedium'} src={book.imageUrl} />
+                <img className={btnTitle ? 'imgLarge' : 'imgMedium'} src={book.img} />
               </div>
               <div className='imgFaker'>Image faker</div>
             </div>
@@ -32,22 +54,46 @@ const Book = ({ title, books, btnTitle, btnFunction, loading }) => (
               </div>
               <div className='ratingContainer'>
                 <div className='rating'>
-                  <span>☆</span><span>☆</span><span>☆</span><span>☆</span><span>☆</span>
+                  {
+                    [5, 4, 3, 2, 1].map(rate => <span key={rate} id={rate}>☆</span>)
+                  }
                 </div>
               </div>
               <div className='bookDescription'>
                 {book.description}
               </div>
             </div>
-            {btnTitle
-              ? <div className='media-bottom'>
-                  <button className='btn btn-default' onClick={() => btnFunction(book)}>{btnTitle}</button>
-                </div>
-              : ''}
+            <div className='media-bottom'>
+            {
+              btnTitle
+              ? <button className='btn btn-default' style={ { 'marginLeft': '15px' }} onClick={() => btnFunction(book)}>{btnTitle}</button>
+              : ''
+            }
+            <button className='btn btn-default' onClick={() => openModal(book)}>Rate</button>
+            </div>
           </div>
         )
       })}
     </div>
+    <Modal
+      isOpen={rateModalIsOpen}
+      onRequestClose={() => closeModal()}
+      shouldCloseOnOverlayClick={true}
+      role='dialog'
+      style={modalStyle}
+      shouldCloseOnOverlayClick={false}
+      contentLabel='Rate a Book'>
+      < RateBook closeModal = {
+        () => closeModal()
+      }
+      rateBook = {
+        (rating, comment) => rateBook(rating, comment)
+      }
+      loading = {
+        loading.rateBookLoading
+      }
+      />
+    </Modal>
   </div>
 )
 

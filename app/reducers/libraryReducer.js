@@ -44,6 +44,11 @@ export const loadingReducer = (state = {}, action) => {
         ...state,
         borrowBooksLoading : action.payload
       }
+    case 'RATE_BOOK_LOADING':
+      return {
+        ...state,
+        rateBookLoading : action.payload
+      }
     default:
       return state
   }
@@ -60,6 +65,8 @@ export const errorReducer = (state = [], action) => {
     case 'GET_MY_BOOKS_ERROR':
       return action.payload
     case 'GET_ADD_BOOKS_ERROR':
+      return action.payload
+    case 'RATE_BOOK_ERROR':
       return action.payload
     default:
       return state
@@ -96,16 +103,13 @@ export const allBooksReducers = (state = [], action) => {
           'borrower' : '0x' + book[5],
           'state' : book[6],
           'dateAdded' : book[7],
-          'dateIssued' : book[8],
-          'imageUrl' : book[9],
-          'description' : book[10],
-          'genre' : book[11]
+          'dateIssued' : book[8]
         }
       })
       return {
         ...state,
         allBooks : myBooks
-      };
+      }
     case 'SEARCH_BOOK':
       const filteredBooks = state.allBooks.filter((book) => {
         return book.title.toLowerCase().includes(action.payload.toLowerCase()) || book.author.toLowerCase().includes(action.payload.toLowerCase()) || book.publisher.toLowerCase().includes(action.payload.toLowerCase())
@@ -113,7 +117,7 @@ export const allBooksReducers = (state = [], action) => {
       return {
         ...state,
         filteredBooks : filteredBooks
-      };
+      }
     default:
       return state
   }
@@ -167,6 +171,15 @@ export const returnBookReducer = (state = false, action) => {
 export const borrowBookReducer = (state = false, action) => {
   switch (action.type) {
     case 'GET_BORROW_BOOKS_SUCCESS':
+      return action.payload
+    default:
+      return state
+  }
+}
+
+export const rateBookReducer = (state = false, action) => {
+  switch (action.type) {
+    case 'RATE_BOOK_SUCCESS':
       return action.payload
     default:
       return state

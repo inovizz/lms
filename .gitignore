@@ -1,5 +1,7 @@
+.DS_STORE
 .idea
 build
+coverage
 installed_contracts
 node_modules
 yarn-error.log

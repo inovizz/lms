@@ -11,3 +11,4 @@ before_install:
 script:
   - testrpc > /dev/null &
   - truffle test
+  - npm test

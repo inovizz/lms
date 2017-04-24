@@ -123,3 +123,39 @@ export const getAllBooks = () => {
     })
   }
 }
+
+export const getMyBooksLoading = (flag) => {
+  return {
+    type: 'GET_MY_BOOKS_LOADING',
+    payload: flag
+  }
+}
+
+export const getMyBooksError = (err) => {
+  return {
+    type: 'GET_MY_BOOKS_ERROR',
+    payload: err
+  }
+}
+
+export const getMyBooksSuccess = (books) => {
+  return {
+    type: 'GET_MY_BOOKS_SUCCESS',
+    payload: books
+  }
+}
+
+export const getMyBooks = () => {
+  return (dispatch) => {
+    dispatch(getMyBooksLoading(true))
+    LMS.at(contractConfig.id).then((instance) => {
+      return instance.getMyBooks.call()
+    }).then((books) => {
+      dispatch(getMyBooksSuccess(books))
+      dispatch(getMyBooksLoading(false))
+    }).catch((e) => {
+      dispatch(getMyBooksError(e))
+      dispatch(getMyBooksLoading(false))
+    })
+  }
+}

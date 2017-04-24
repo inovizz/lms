@@ -6,20 +6,39 @@ import Book from '../../../components/Book'
 describe('Book', () => {
   //  Test : Components and its child renders without crashing
   it('renders without crashing', () => {
-    mount(<Book books='' />)
+    mount(<Book title='' books={[]} />)
   })
   describe('render', () => {
     //  Test : Component gets rendered individually
     it('should render the book', () => {
-      const data = 
-      '1;Title;Author;Publisher;e17272941ba48157483995d4df1746675a45f515;0000000000000000000000000000000000000000;0;1492856301;0|2;Title1;Author2;Publisher3;e17272941ba48157483995d4df1746675a45f515;0000000000000000000000000000000000000000;0;1492856394;0'
-      const actual = shallow(<Book books={data} />)
+      const book = [{
+        'id': '1',
+        'title': 'Title',
+        'author': 'Author',
+        'publisher': 'Publisher',
+        'owner': '0xba21a9b09d528b2e1726d786a1d1b861032dba87',
+        'borrower': '0x0000000000000000000000000000000000000000',
+        'state': '0',
+        'dateAdded': '1493054441',
+        'dateIssued': '0'
+      }]
+      const actual = shallow(<Book title='My Books' books={book} />)
       const expected = (
-        <div className='media-body'>
-            <h4 className='media-heading'>Title</h4>
-            <p><span>Author : </span> Author</p>
-            <p><span>Publisher : </span> Publisher</p>
-            <p></p>
+        <div>
+          <p className='lead'>My Books</p>
+          <ul className='media-list list-group'>
+            <li key={book[0].id} className='list-group-item col-sm-6 col-md-4'>
+                <div className='media-left'>
+                    <img className='media-object' src='https://placehold.it/140X100'/>
+                </div>
+                <div className='media-body'>
+                    <h4 className='media-heading'>{book[0].title}</h4>
+                    <p><span>Author : </span> {book[0].author}</p>
+                    <p><span>Publisher : </span> {book[0].publisher}</p>
+                    <p></p>
+                </div>
+            </li>
+          </ul>
         </div>
       )
       expect(actual.contains(expected)).toEqual(true)

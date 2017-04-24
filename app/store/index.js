@@ -4,10 +4,11 @@ import thunk from 'redux-thunk'
 
 const defaultState = {
   accounts: [],
-  ownerDetails : [],
+  ownerDetails : {},
   error: null,
   loading: true,
-  books: []
+  books: [],
+  myBooks : []
 }
 
 const store = createStore(rootReducer, defaultState, applyMiddleware(thunk))

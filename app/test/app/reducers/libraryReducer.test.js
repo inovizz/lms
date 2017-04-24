@@ -1,4 +1,4 @@
-import { libraryReducer, loadingReducer, errorReducer, ownerDetailsReducer, allBooksReducers } from '../../../reducers/libraryReducer'
+import { libraryReducer, loadingReducer, errorReducer, ownerDetailsReducer, allBooksReducers, myBooksReducers } from '../../../reducers/libraryReducer'
 
 describe('Reducers', () => {
   describe('libraryReducer', () => {
@@ -69,16 +69,24 @@ describe('Reducers', () => {
   })
   describe('ownerDetailsReducer', () => {
     it('should return initial state', () => {
-      expect(ownerDetailsReducer(undefined, {})).toEqual([])
+      expect(ownerDetailsReducer(undefined, {})).toEqual({})
     })
     it('should handle GET_OWNERDETAILS_SUCCESS', () => {
       expect(
         ownerDetailsReducer(undefined, {
           type: 'GET_OWNERDETAILS_SUCCESS',
           payload: [
-            '0xb'
+            'Owner',
+            'account',
+            'status',
+            'dateAdded'
           ]
-        })).toEqual(['0xb'])
+        })).toEqual({
+          'name' : 'Owner',
+          'account' : 'account',
+          'status' : 'status',
+          'dateAdded' : 'dateAdded'
+        })
     })
   })
   describe('allBooksReducers', () => {
@@ -93,6 +101,30 @@ describe('Reducers', () => {
             '0xb'
           ]
         })).toEqual(['0xb'])
+    })
+  })
+  describe('myBooksReducers', () => {
+    it('should return initial state', () => {
+      expect(myBooksReducers(undefined, {})).toEqual([])
+    })
+    it('should handle GET_MY_BOOKS_SUCCESS', () => {
+      expect(
+        myBooksReducers(undefined, {
+          type: 'GET_MY_BOOKS_SUCCESS',
+          payload: [
+            '1;Title;Author;Publisher;ba21a9b09d528b2e1726d786a1d1b861032dba87;0000000000000000000000000000000000000000;0;1493054441;0'
+          ]
+        })).toEqual([{
+          'id': '1',
+          'title': 'Title',
+          'author': 'Author',
+          'publisher': 'Publisher',
+          'owner': '0xba21a9b09d528b2e1726d786a1d1b861032dba87',
+          'borrower': '0x0000000000000000000000000000000000000000',
+          'state': '0',
+          'dateAdded': '1493054441',
+          'dateIssued': '0'
+        }])
     })
   })
 })

@@ -28,6 +28,10 @@ export class App extends React.Component {
     this.props.getOwnerDetails()
   }
 
+  isEmptyObject (obj) {
+    return Object.keys(obj).length
+  }
+
   render () {
     return (
       <div>
@@ -37,18 +41,18 @@ export class App extends React.Component {
                 <a className='navbar-brand' href='#'>LMS</a>
             </div>
             {
-              this.props.ownerDetails
+              this.isEmptyObject(this.props.ownerDetails)
               ? <OwnerDetails data={this.props.ownerDetails}/>
               : ''
             }
         </div>
         </nav>
         <div className='container'>
-          <div className='row'>
-            <div className='col-md-6'>
-              <Main />
-            </div>
-          </div>
+          {
+            this.isEmptyObject(this.props.ownerDetails)
+            ? <Main owner={this.props.ownerDetails}/>
+            : <div>Loading...</div>
+          }
         </div>
       </div>)
   }

@@ -1,19 +1,20 @@
 import React from 'react'
 
-const Book = ({ books }) => (
-    <ul className='media-list'>
+const Book = ({ title, books }) => (
+  <div>
+    <p className='lead'>{title}</p>
+    <ul className='media-list list-group'>
         {
-            books.split('|').map(book => {
-              book = book.split(';')
+            books.map((book, i) => {
               return (
-                    <li key={book[0]} className='media'>
+                    <li key={book.id} className='list-group-item col-sm-6 col-md-4'>
                         <div className='media-left'>
-                            <img className='media-object' />
+                            <img className='media-object' src='https://placehold.it/140X100'/>
                         </div>
                         <div className='media-body'>
-                            <h4 className='media-heading'>{book[1]}</h4>
-                            <p><span>Author : </span> {book[2]}</p>
-                            <p><span>Publisher : </span> {book[3]}</p>
+                            <h4 className='media-heading'>{book.title}</h4>
+                            <p><span>Author : </span> {book.author}</p>
+                            <p><span>Publisher : </span> {book.publisher}</p>
                             <p></p>
                         </div>
                     </li>
@@ -21,6 +22,7 @@ const Book = ({ books }) => (
             })
         }
     </ul>
+  </div>
 )
 
 export default Book

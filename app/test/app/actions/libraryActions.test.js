@@ -58,5 +58,29 @@ describe('libraryActions', () => {
     }
     expect(actions.getAllBooksSuccess(['0xb'])).toEqual(expected)
   })
+  // GET_MY_BOOKS_LOADING actions to be invoked when getMyBooks starts loading
+  it('should create GET_MY_BOOKS_LOADING when getMyBooks actions in invoked', () => {
+    const expected = {
+      type: 'GET_MY_BOOKS_LOADING',
+      payload: true
+    }
+    expect(actions.getMyBooksLoading(true)).toEqual(expected)
+  })
+  // GET_ACCOUNTS_ERROR actions to be invoked when getMyBooks finish loading amd throws error
+  it('should create GET_MY_BOOKS_ERROR when getMyBooks actions in invoked', () => {
+    const expected = {
+      type: 'GET_MY_BOOKS_ERROR',
+      payload: 'error'
+    }
+    expect(actions.getMyBooksError('error')).toEqual(expected)
+  })
+  // GET_MY_BOOKS_SUCCESS actions to be invoked when getMyBooks finish loading
+  it('should create GET_MY_BOOKS_SUCCESS when getMyBooks actions in invoked', () => {
+    const expected = {
+      type: 'GET_MY_BOOKS_SUCCESS',
+      payload: ['0xb']
+    }
+    expect(actions.getMyBooksSuccess(['0xb'])).toEqual(expected)
+  })
   //  TODO : Async Actions testing for web3.js
 })

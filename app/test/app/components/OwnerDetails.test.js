@@ -10,11 +10,16 @@ describe('OwnerDetails', () => {
   })
   describe('render', () => {
     //  Test : Component gets rendered individually
-    it('should render the book', () => {
-      const data = ['Anurag', 'Ox12', '', '']
+    it('should render the OwnerDetails', () => {
+      const data = {
+        'name' : 'Owner',
+        'account' : 'account',
+        'status' : 'status',
+        'dateAdded' : 'dateAdded'
+      }
       const actual = shallow(<OwnerDetails data={data} />)
       const expected = (
-        <strong>{data[0]}</strong>
+        <strong>{data.name}</strong>
       )
       expect(actual.contains(expected)).toEqual(true)
     })

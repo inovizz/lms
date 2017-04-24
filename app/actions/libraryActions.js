@@ -79,7 +79,7 @@ export const getOwnerDetails = (account) => {
   return (dispatch) => {
     dispatch(getOwnerDetailsLoading(true))
     LMS.at(contract_config.id).then((instance) => {
-      return instance.getOwnerDetails.call(account)
+      return instance.getOwnerDetails.call()
     }).then((value) => {
       dispatch(getOwnerDetailsSuccess(value))
     }).catch((e) => {

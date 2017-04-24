@@ -6,12 +6,12 @@ import { App } from '../../../components/App'
 describe('App', () => {
   //  Test : Components and its child renders without crashing
   it('renders without crashing', () => {
-    mount(<App accounts={[]} getAccounts={() => { }} />)
+    mount(<App getOwnerDetails={() => { }} getAllBooks={() => { }} books={[]} />)
   })
   describe('render', () => {
     //  Test : Component gets rendered individually
     it('should render the App', () => {
-      const actual = shallow(<App accounts={[]} getAccounts={() => { }} />)
+      const actual = shallow(<App getOwnerDetails={() => { }} getAllBooks={() => { }}  books={[]}/>)
       const expected = (
         <div>Loading...</div>
       )

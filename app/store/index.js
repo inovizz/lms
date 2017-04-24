@@ -4,6 +4,7 @@ import thunk from 'redux-thunk'
 
 const defaultState = {
   accounts: [],
+  ownerDetails : [],
   error: null,
   loading: true,
   books: []

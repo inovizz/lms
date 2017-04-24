@@ -1,19 +1,24 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import * as libraryActions from '../actions/libraryActions'
-import Main from './Main'
+import Book from './Book'
+import OwnerDetails from './OwnerDetails';
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    accounts: state.accounts,
+    books: state.books,
+    ownerDetails : state.ownerDetails,
     loading: state.loading
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    getAccounts: () => {
-      dispatch(libraryActions.getAccounts())
+    getAllBooks: () => {
+      dispatch(libraryActions.getAllBooks())
+    },
+    getOwnerDetails: () => {
+      dispatch(libraryActions.getOwnerDetails())
     }
   }
 }
@@ -24,13 +29,11 @@ export class App extends React.Component {
   }
 
   componentDidMount () {
-    this.props.getAccounts()
+    this.props.getOwnerDetails()
+    this.props.getAllBooks()
   }
 
   render () {
-    const Body = this.props.accounts.length
-      ? (<Main accounts={this.props.accounts[0]}></Main>)
-      : (<div>Loading...</div>)
     return (
       <div>
         <nav className='navbar navbar-default'>
@@ -38,10 +41,23 @@ export class App extends React.Component {
             <div className='navbar-header'>
                 <a className='navbar-brand' href='#'>LMS</a>
             </div>
+            {
+              this.props.ownerDetails
+              ? <OwnerDetails data={this.props.ownerDetails}/>
+              : ''
+            }
         </div>
         </nav>
         <div className='container'>
-            {Body}
+          <div className='row'>
+            <div className='col-md-6'>
+              {
+                this.props.books.length
+                ? <Book books={this.props.books[0]} />
+                : <div>Loading...</div>
+              }
+            </div>
+          </div>
         </div>
       </div>)
   }

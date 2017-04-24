@@ -1,18 +1,21 @@
 import React from 'react'
+import { render } from 'react-dom'
 import { mount, shallow } from 'enzyme'
-import { Main } from '../../../components/Main'
+import Dashboard from '../../../components/Dashboard'
 
-describe('Main', () => {
+describe('Dashboard', () => {
   //  Test : Components and its child renders without crashing
   it('renders without crashing', () => {
-    mount(<Main account='0xb' books={[]} getAllBooks={() => { }} />)
+    mount(<Dashboard />)
   })
   describe('render', () => {
     //  Test : Component gets rendered individually
-    it('should render the Main', () => {
-      const actual = shallow(<Main account='0xb' books={[]} getAllBooks={() => { }} />)
+    it('should render the Dashboard', () => {
+      const actual = shallow(<Dashboard />)
       const expected = (
-        <p> There are no books available </p>
+        <div>
+          Dashboard
+        </div>
       )
       expect(actual.contains(expected)).toEqual(true)
     })

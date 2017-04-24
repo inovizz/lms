@@ -15,11 +15,12 @@ describe('Book', () => {
       '1;Title;Author;Publisher;e17272941ba48157483995d4df1746675a45f515;0000000000000000000000000000000000000000;0;1492856301;0|2;Title1;Author2;Publisher3;e17272941ba48157483995d4df1746675a45f515;0000000000000000000000000000000000000000;0;1492856394;0'
       const actual = shallow(<Book books={data} />)
       const expected = (
-        <li className='list-group-item' key='1'>
-          <span>Title</span>
-          <span>Author</span>
-          <span>Publisher</span>
-        </li>
+        <div className='media-body'>
+            <h4 className='media-heading'>Title</h4>
+            <p><span>Author : </span> Author</p>
+            <p><span>Publisher : </span> Publisher</p>
+            <p></p>
+        </div>
       )
       expect(actual.contains(expected)).toEqual(true)
     })

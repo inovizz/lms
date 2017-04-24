@@ -5,7 +5,7 @@ import { default as contract } from 'truffle-contract'
 // Import our contract artifacts and turn them into usable abstractions.
 import lmsArtifacts from '../../build/contracts/LMS.json'
 
-import contract_config from '../config'
+import contractConfig from '../config'
 
 const LMS = contract(lmsArtifacts)
 // Checking if Web3 has been injected by the browser (Mist/MetaMask)
@@ -78,7 +78,7 @@ export const getOwnerDetailsSuccess = (details) => {
 export const getOwnerDetails = (account) => {
   return (dispatch) => {
     dispatch(getOwnerDetailsLoading(true))
-    LMS.at(contract_config.id).then((instance) => {
+    LMS.at(contractConfig.id).then((instance) => {
       return instance.getOwnerDetails.call()
     }).then((value) => {
       dispatch(getOwnerDetailsSuccess(value))
@@ -112,7 +112,7 @@ export const getAllBooksSuccess = (books) => {
 export const getAllBooks = () => {
   return (dispatch) => {
     dispatch(getAllBooksLoading(true))
-    LMS.at(contract_config.id).then((instance) => {
+    LMS.at(contractConfig.id).then((instance) => {
       return instance.getAllBooks.call()
     }).then((books) => {
       dispatch(getAllBooksSuccess(books))

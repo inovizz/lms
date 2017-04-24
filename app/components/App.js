@@ -1,12 +1,11 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import * as libraryActions from '../actions/libraryActions'
-import Book from './Book'
-import OwnerDetails from './OwnerDetails';
+import Main from './Main'
+import OwnerDetails from './OwnerDetails'
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    books: state.books,
     ownerDetails : state.ownerDetails,
     loading: state.loading
   }
@@ -14,9 +13,6 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    getAllBooks: () => {
-      dispatch(libraryActions.getAllBooks())
-    },
     getOwnerDetails: () => {
       dispatch(libraryActions.getOwnerDetails())
     }
@@ -30,7 +26,6 @@ export class App extends React.Component {
 
   componentDidMount () {
     this.props.getOwnerDetails()
-    this.props.getAllBooks()
   }
 
   render () {
@@ -51,11 +46,7 @@ export class App extends React.Component {
         <div className='container'>
           <div className='row'>
             <div className='col-md-6'>
-              {
-                this.props.books.length
-                ? <Book books={this.props.books[0]} />
-                : <div>Loading...</div>
-              }
+              <Main />
             </div>
           </div>
         </div>

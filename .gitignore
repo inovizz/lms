@@ -4,4 +4,5 @@ build
 coverage
 installed_contracts
 node_modules
+npm-debug.log
 yarn-error.log

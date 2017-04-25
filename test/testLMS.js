@@ -103,7 +103,6 @@ contract('LMS', function(accounts) {
             let bookCount = await lms.numBooks();
             assert.equal(bookCount.valueOf(), 4);
             let [books, count] = await lms.getMyBooks();
-            console.log(books);
             assert.equal(count.valueOf(), 3);
             books = books.split('|');
             for (let i = 0; i < count; i++) {
@@ -173,7 +172,6 @@ contract('LMS', function(accounts) {
             await lms.borrowBook(1, {from: accounts[1]});
 
             let book = await lms.getBook(1);
-            console.log(book)
             let bookAttr = book.split(';');
 
             // Changed attributes

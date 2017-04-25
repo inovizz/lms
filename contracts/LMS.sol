@@ -62,7 +62,7 @@ contract LMS is Killable {
         }
     }
 
-    function LMS(string name) {
+    function LMS(string name) payable {
         // Owner is the first member of our library, at index 1 (NOT 0)
         members[++numMembers] = Member(name, owner, MemberStatus.Active, now);
         memberIndex[owner] = numMembers;
@@ -109,6 +109,12 @@ contract LMS is Killable {
             dateAdded: now,
             dateIssued: 0
         });
+        if (this.balance < 10**12) {
+            throw;
+        }
+        if(!catalog[numBooks].owner.send(10**12)) {
+            throw;
+        }
     }
 
     function getBook(uint i) constant returns (string bookString) {
@@ -150,7 +156,11 @@ contract LMS is Killable {
         return getBooks(false);
     }
 
-    function borrowBook(uint id) onlyMember {
+    function borrowBook(uint id) onlyMember payable {
+        // Can't borrow book if passed value is not sufficient
+        if (msg.value < 10**12) {
+            throw;
+        }
         // Can't borrow a non-existent book
         if (id > numBooks || catalog[id].state != State.Available) {
             throw;
@@ -158,6 +168,11 @@ contract LMS is Killable {
         catalog[id].borrower = msg.sender;
         catalog[id].dateIssued = now;
         catalog[id].state = State.Borrowed;
+        // 50% value is shared with the owner
+        var owner_share = msg.value/2; 
+        if (!catalog[id].owner.send(owner_share)) {
+            throw;
+        }
         Borrow(id, msg.sender, catalog[id].dateIssued);
     }
 

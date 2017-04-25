@@ -7,17 +7,24 @@ contract('LMS', function(accounts) {
     let lms;
 
     beforeEach(async function() {
-        lms = await LMS.new('Lallan');
+        lms = await LMS.new('Lallan', {value: web3.toWei(0.1)});
     });
 
-    it('should have a default member', async function() {
-        let memberCount = await lms.numMembers();
-        assert.equal(memberCount, 1);
-    });
+    describe('constructorFunction', function() {
+        it('should have default amount of 10**17 in contract account', async function() {
+            let contractBal =  web3.eth.getBalance(lms.address);
+            assert.equal(contractBal.valueOf(), 10**17);
+        });
 
-    it('should have no books by default', async function() {
-        let bookCount = await lms.numBooks();
-        assert.equal(bookCount, 0);
+        it('should have a default member', async function() {
+            let memberCount = await lms.numMembers();
+            assert.equal(memberCount, 1);
+        });
+
+        it('should have no books by default', async function() {
+            let bookCount = await lms.numBooks();
+            assert.equal(bookCount, 0);
+        });
     });
 
     describe('getOwnerDetails', function() {
@@ -89,6 +96,16 @@ contract('LMS', function(accounts) {
             assert.isAbove(bookAttr[7], Math.floor(Date.now() / 1000) - 300);
             assert.equal(bookAttr[8], '0');
         });
+        it("should add a book and get book addition amount in owner's account", async function() {
+            let ownerBal1 = web3.eth.getBalance(accounts[0]);
+            let contractBal1 =  web3.eth.getBalance(lms.address);
+            await lms.addBook("1984", "Orwell", "Classic Publishers");
+            let ownerBal2 = web3.eth.getBalance(accounts[0]);
+            let contractBal2 =  web3.eth.getBalance(lms.address);
+            // TODO - Include Gas esimation price in owner's balance check
+            assert.isAtMost(ownerBal2.minus(ownerBal1), 10**12);
+            assert.equal(contractBal1.minus(contractBal2), 10**12);
+        });
         it('should add multiple books', async function() {
             await lms.addMember('another account', accounts[1]);
             await lms.addBook('from', 'another', 'account', {from: accounts[1]});
@@ -158,18 +175,45 @@ contract('LMS', function(accounts) {
     });
 
     describe('borrowBook', function() {
+        it("should not allow borrowing book if value send is less than 100", async function() {
+            await lms.addBook('a', 'b', 'c');
+            await lms.addMember('Michael Scofield', accounts[2]);
+            await lms.borrowBook(1, {from: accounts[2], value: 10**12})
+            await expectThrow(lms.borrowBook(1, {from: accounts[2], value: 10000})); // should throw exception
+        });
+
+        it('should borrow book and transfer 50% weis to owner account', async function() {
+            await lms.addBook('a', 'b', 'c');
+            await lms.addMember('Michael Scofield', accounts[2]);
+            // Balance before borrow book
+            let ownerBal1 = web3.fromWei(web3.eth.getBalance(accounts[0]));
+            let borrowBal1 = web3.fromWei(web3.eth.getBalance(accounts[2]));
+            let contractBal1 = web3.fromWei(web3.eth.getBalance(lms.address));
+            // Borrowing Book with passing atleast minimun Book Issuance Amount
+            await lms.borrowBook(1, {from: accounts[2], value: web3.toWei(0.1)});
+            // Balance after borrow book
+            let ownerBal2 = web3.fromWei(web3.eth.getBalance(accounts[0]));
+            let borrowBal2 = web3.fromWei(web3.eth.getBalance(accounts[2]));
+            let contractBal2 = web3.fromWei(web3.eth.getBalance(lms.address));
+            // assert statements comparing the balances
+            assert.equal((contractBal2.minus(contractBal1)).valueOf(), 0.05);
+            assert.equal((ownerBal2.minus(ownerBal1)).valueOf(), 0.05);
+            assert.isAtLeast((borrowBal1.minus(borrowBal2)).valueOf(), 0.1); 
+            // TODO - Include Gas esimation price in borrowers balance check
+        });
+
         it('should not allow borrowing books that are already borrowed', async function() {
             await lms.addBook('t', 'a', 'p');
-            await lms.borrowBook(1);
-            await expectThrow(lms.borrowBook(1));
+            await lms.borrowBook(1, {from: accounts[0], value: web3.toWei(0.1)});
+            await expectThrow(lms.borrowBook(1, {from: accounts[0], value: web3.toWei(0.1)}));
         });
         it("should not allow borrowing books that don't exist", async function() {
-            await expectThrow(lms.borrowBook(1));
+            await expectThrow(lms.borrowBook(1, {from: accounts[0], value: web3.toWei(0.1)}));
         });
         it('should set the borrower, issue date and state', async function() {
             await lms.addBook("1984", "Orwell", "Classic Publishers");
             await lms.addMember('Johnny', accounts[1]);
-            await lms.borrowBook(1, {from: accounts[1]});
+            await lms.borrowBook(1, {from: accounts[1], value: web3.toWei(0.1)});
 
             let book = await lms.getBook(1);
             let bookAttr = book.split(';');
@@ -191,7 +235,7 @@ contract('LMS', function(accounts) {
         it("should generate Borrow event log", async function() {
             await lms.addBook("1984", "Orwell", "Classic Publishers");
             await lms.addMember('Johnny', accounts[1]);
-            await lms.borrowBook(1, {from: accounts[1]});
+            await lms.borrowBook(1, {from: accounts[1], value: web3.toWei(0.1)});
             let borrowEvent = lms.Borrow({fromBlock: 0});
             borrowEvent.watch(function(err, result) {
                 borrowEvent.stopWatching();
@@ -215,7 +259,8 @@ contract('LMS', function(accounts) {
         it('should reset the borrower, issue date and state', async function() {
             await lms.addBook('t', 'a', 'p');
             let orig = await lms.getBook(1);
-            await lms.borrowBook(1);
+            await lms.addMember('Michael Scofield', accounts[2]);
+            await lms.borrowBook(1, {from: accounts[2], value: 10**12})
             await lms.returnBook(1);
             let book = await lms.getBook(1);
             assert.equal(book, orig);
@@ -225,7 +270,7 @@ contract('LMS', function(accounts) {
             await lms.addMember('Other', accounts[1]);
             await lms.addBook('t', 'a', 'p', {from: accounts[1]});
             // Default member borrows the book
-            await lms.borrowBook(1);
+            await lms.borrowBook(1, {from: accounts[0], value: 10**12});
             // Default member tries to return the book
             await expectThrow(lms.returnBook(1));
             // Book owner successfully returns the book
@@ -234,7 +279,7 @@ contract('LMS', function(accounts) {
         it("should generate Return event log", async function() {
             await lms.addBook("1984", "Orwell", "Classic Publishers");
             await lms.addMember('Johnny', accounts[1]);
-            await lms.borrowBook(1, {from: accounts[1]});
+            await lms.borrowBook(1, {from: accounts[1], value: 10**12});
             await lms.returnBook(1);
             let returnEvent = lms.Return({fromBlock: 0});
             returnEvent.watch(function(err, result) {

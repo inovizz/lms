@@ -172,7 +172,6 @@ contract('LMS', function(accounts) {
             await lms.borrowBook(1, {from: accounts[1]});
 
             let book = await lms.getBook(1);
-            console.log(book)
             let bookAttr = book.split(';');
 
             // Changed attributes

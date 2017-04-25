@@ -40,6 +40,13 @@ describe('Reducers', () => {
           payload: true
         })).toEqual(true)
     })
+    it('should handle GET_MY_BOOKS_LOADING', () => {
+      expect(
+        loadingReducer(undefined, {
+          type: 'GET_MY_BOOKS_LOADING',
+          payload: true
+        })).toEqual(true)
+    })
   })
   describe('errorReducer', () => {
     it('should return initial state', () => {
@@ -63,6 +70,13 @@ describe('Reducers', () => {
       expect(
         errorReducer(undefined, {
           type: 'GET_ALL_BOOKS_ERROR',
+          payload: 'ERROR'
+        })).toEqual('ERROR')
+    })
+    it('should handle GET_MY_BOOKS_ERROR', () => {
+      expect(
+        errorReducer(undefined, {
+          type: 'GET_MY_BOOKS_ERROR',
           payload: 'ERROR'
         })).toEqual('ERROR')
     })

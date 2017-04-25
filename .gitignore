@@ -1,5 +1,6 @@
 .DS_STORE
 .idea
+app/config.js
 build
 coverage
 installed_contracts

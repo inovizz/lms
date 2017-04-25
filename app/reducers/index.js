@@ -5,7 +5,7 @@ import {
   errorReducer,
   allBooksReducers,
   ownerDetailsReducer,
-  myBooksReducers 
+  myBooksReducers
 } from './libraryReducer'
 
 const rootReducer = combineReducers({

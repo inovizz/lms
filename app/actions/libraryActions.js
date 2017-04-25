@@ -82,8 +82,10 @@ export const getOwnerDetails = (account) => {
       return instance.getOwnerDetails.call()
     }).then((value) => {
       dispatch(getOwnerDetailsSuccess(value))
+      dispatch(getOwnerDetailsLoading(false))
     }).catch((e) => {
       dispatch(getOwnerDetailsError(e))
+      dispatch(getOwnerDetailsLoading(false))
     })
   }
 }

@@ -10,5 +10,6 @@ before_install:
   - npm install
 script:
   - testrpc > /dev/null &
+  - truffle compile
   - truffle test
   - npm test

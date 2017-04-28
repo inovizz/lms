@@ -1,5 +1,5 @@
 # LMS: A community library management system
-[![Build Status](https://travis-ci.org/nrchandan/lms.svg?branch=master)](https://travis-ci.org/nrchandan/lms)
+[![Build Status](https://travis-ci.org/Imaginea/lms.svg?branch=master)](https://travis-ci.org/Imaginea/lms)
 
 Pool your books to create a virtual library. Implemented on the Ethereum blockchain using Solidity, Truffle, Zeppelin and others.
 

@@ -1,0 +1,202 @@
+/* Import Fonts */
+@import url('https://fonts.googleapis.com/css?family=Raleway:100,300,400');
+
+body {
+  font-family: 'Raleway', sans-serif;
+  font-size: 14px;
+  line-height: 24px;
+  color: #666;
+}
+
+/* Common Elements */
+
+a {
+  text-decoration: none;
+  outline: none;
+}
+
+
+.container {
+  padding: 20px 75px;
+  width: 100%;
+}
+
+.row {
+  margin: 0;
+}
+
+.btn {
+  color : #4CADC9;
+  padding: 10px 15px;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid #4CADC9;
+  box-sizing: border-box;
+}
+
+.btn:hover {
+  color : #fff;
+  border-color: #4CADC9;
+  background-color: #4CADC9;
+}
+
+/* Header */
+
+.navbar {
+  padding-top: 10px;
+  line-height: 53px;
+  height: 80px;
+  max-height: 78px;
+  margin-bottom: 0;
+}
+
+.navbar .navbar-brand {
+  display: inline-block;
+  height: 55px;
+}
+
+.navbar .navbar-header {
+  padding: 0 32px;
+}
+
+.nav>li {
+  padding-right: 32px;
+}
+
+.navbar-nav>li>a {
+  padding: 0;
+  display: inline-block;
+  vertical-align: bottom;
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: 1px;
+  color: #292929;
+}
+
+.navbar-nav>li>a.active {
+  color: #e9393f;
+  font-weight: 600;
+}
+
+.nav>li>a:focus, .nav>li>a:hover {
+  background-color: #fff;
+}
+
+/* Yoga Logo */
+
+.yogalogo { 
+  padding: 50px 0 20px 75px;
+}
+
+.yogalogo .yoga-wrapper {
+  margin-bottom: 30px;
+  max-width: 100%;
+  display: inline-block;
+  vertical-align: top;
+  margin: 10px 20px 0 0;
+  text-align: center;
+}
+
+.yogalogo .yoga-wrapper img {
+  max-width: 100%;
+  height: auto;
+}
+
+.yogalogo .yoga-header {
+    padding-right: 50px;
+    padding-left: 50px;
+}
+
+
+.yogalogo .yoga-header h1{
+  opacity: 0.5;
+  font-size: 100px;
+  font-weight: 100;
+  line-height: 120px;
+  font-weight: 100;
+  text-align: center;
+  margin-bottom: 15px;
+  color: #292929;
+}
+
+@media (max-width: 768px) {
+  .yogalogo .yoga-header h1{
+    font-size: 50px;
+    line-height: 60px;  
+  }
+}
+
+.yogalogo .yoga-subheader {
+    padding-right: 50px;
+    padding-left: 50px;
+}
+
+.yogalogo .yoga-subheader h4{
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 300;
+  color: #292929;
+}
+
+/* Book list */
+.book {
+  margin-bottom: 20px;
+}
+
+.book .lead {
+  color: #292929;
+}
+
+.book .list-group-item:nth-child(odd) {
+  margin-right: 10%;
+}
+
+.book .list-group-item {
+  border: 1px solid #e7e7e7;
+  display: inline-block;
+  width: 45%;
+  margin-bottom: 20px;
+}
+
+.book .media-heading {
+  font-size: 24px;
+  font-weight: 300;
+  color: #292929;
+  padding-bottom: 5px;
+}
+
+.rating {
+  unicode-bidi: bidi-override;
+  direction: rtl;
+  color: #e7711b
+}
+.rating > span {
+  display: inline-block;
+  position: relative;
+  width: 1.1em;
+}
+.rating > span:hover:before,
+.rating > span:hover ~ span:before {
+   content: "\2605";
+   position: absolute;
+}
+
+.book .info {
+  padding-bottom: 5px;
+}
+
+.book .media-bottom {
+  margin-top: 15px;
+  border-top: 1px solid #e7e7e7;
+  padding: 10px;
+}
+
+.book .media-bottom .btn {
+  float: right;
+}
+
+.add-btn {
+  float: right;
+}

@@ -6,7 +6,7 @@ const style = {
 
 const OwnerDetails = ({ data }) => {
   return (
-    <p className='navbar-text navbar-right' style={style}>
+    <p className='navbar-text' style={style}>
       <span className='glyphicon glyphicon glyphicon-user'></span>&nbsp;&nbsp;
       <strong>{data.name}</strong>
     </p>

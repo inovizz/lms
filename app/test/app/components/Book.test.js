@@ -6,7 +6,7 @@ import Book from '../../../components/Book'
 describe('Book', () => {
   //  Test : Components and its child renders without crashing
   it('renders without crashing', () => {
-    mount(<Book title='' books={[]} />)
+    mount(<Book loading={{borrowBooksLoading : false, returnBooksLoading: false}} title='' books={[]} btnTitle='' btnFunction='' />)
   })
   describe('render', () => {
     //  Test : Component gets rendered individually
@@ -22,24 +22,14 @@ describe('Book', () => {
         'dateAdded': '1493054441',
         'dateIssued': '0'
       }]
-      const actual = shallow(<Book title='My Books' books={book} />)
+      const loading = {
+        borrowBooksLoading : false,
+        returnBooksLoading : false
+      }
+      const btnTitle = '';
+      const actual = shallow(<Book loading={loading} title='My Books' books={book} btnTitle='' btnFunction='' />)
       const expected = (
-        <div>
           <p className='lead'>My Books</p>
-          <ul className='media-list list-group'>
-            <li key={book[0].id} className='list-group-item col-sm-6 col-md-4'>
-                <div className='media-left'>
-                    <img className='media-object' src='https://placehold.it/140X100'/>
-                </div>
-                <div className='media-body'>
-                    <h4 className='media-heading'>{book[0].title}</h4>
-                    <p><span>Author : </span> {book[0].author}</p>
-                    <p><span>Publisher : </span> {book[0].publisher}</p>
-                    <p></p>
-                </div>
-            </li>
-          </ul>
-        </div>
       )
       expect(actual.contains(expected)).toEqual(true)
     })

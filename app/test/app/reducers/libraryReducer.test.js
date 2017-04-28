@@ -1,4 +1,12 @@
-import { libraryReducer, loadingReducer, errorReducer, ownerDetailsReducer, allBooksReducers, myBooksReducers } from '../../../reducers/libraryReducer'
+import {
+  libraryReducer,
+  loadingReducer,
+  errorReducer,
+  allBooksReducers,
+  ownerDetailsReducer,
+  myBooksReducers,
+  addBookReducer
+} from '../../../reducers/libraryReducer'
 
 describe('Reducers', () => {
   describe('libraryReducer', () => {
@@ -17,35 +25,56 @@ describe('Reducers', () => {
   })
   describe('loadingReducer', () => {
     it('should return initial state', () => {
-      expect(loadingReducer(undefined, {})).toEqual([])
+      expect(loadingReducer(undefined, {})).toEqual({})
     })
     it('should handle GET_ACCOUNTS_LOADING', () => {
       expect(
         loadingReducer(undefined, {
           type: 'GET_ACCOUNTS_LOADING',
           payload: true
-        })).toEqual(true)
+        })).toEqual({"accountsLoading" : true})
     })
     it('should handle GET_OWNERDETAILS_LOADING', () => {
       expect(
         loadingReducer(undefined, {
           type: 'GET_OWNERDETAILS_LOADING',
           payload: true
-        })).toEqual(true)
+        })).toEqual({"ownerDetailsLoading" : true})
     })
     it('should handle GET_ALL_BOOKS_LOADING', () => {
       expect(
         loadingReducer(undefined, {
           type: 'GET_ALL_BOOKS_LOADING',
           payload: true
-        })).toEqual(true)
+        })).toEqual({"allbooksloading" : true})
     })
     it('should handle GET_MY_BOOKS_LOADING', () => {
       expect(
         loadingReducer(undefined, {
           type: 'GET_MY_BOOKS_LOADING',
           payload: true
-        })).toEqual(true)
+        })).toEqual({"myBooksLoading" : true})
+    })
+    it('should handle GET_ADD_BOOKS_LOADING', () => {
+      expect(
+        loadingReducer(undefined, {
+          type: 'GET_ADD_BOOKS_LOADING',
+          payload: true
+        })).toEqual({"addBooksLoading" : true})
+    })
+    it('should handle GET_BORROW_BOOKS_LOADING', () => {
+      expect(
+        loadingReducer(undefined, {
+          type: 'GET_BORROW_BOOKS_LOADING',
+          payload: true
+        })).toEqual({"borrowBooksLoading" : true})
+    })
+    it('should handle GET_RETURN_BOOKS_LOADING', () => {
+      expect(
+        loadingReducer(undefined, {
+          type: 'GET_RETURN_BOOKS_LOADING',
+          payload: true
+        })).toEqual({"returnBooksLoading" : true})
     })
   })
   describe('errorReducer', () => {
@@ -77,6 +106,13 @@ describe('Reducers', () => {
       expect(
         errorReducer(undefined, {
           type: 'GET_MY_BOOKS_ERROR',
+          payload: 'ERROR'
+        })).toEqual('ERROR')
+    })
+    it('should handle GET_ADD_BOOKS_ERROR', () => {
+      expect(
+        errorReducer(undefined, {
+          type: 'GET_ADD_BOOKS_ERROR',
           payload: 'ERROR'
         })).toEqual('ERROR')
     })
@@ -112,9 +148,21 @@ describe('Reducers', () => {
         allBooksReducers(undefined, {
           type: 'GET_ALL_BOOKS_SUCCESS',
           payload: [
-            '0xb'
+            '1;Title;Author;Publisher;ba21a9b09d528b2e1726d786a1d1b861032dba87;0000000000000000000000000000000000000000;0;1493054441;0'
           ]
-        })).toEqual(['0xb'])
+        })).toEqual({
+          allBooks : [{
+            'id': '1',
+            'title': 'Title',
+            'author': 'Author',
+            'publisher': 'Publisher',
+            'owner': '0xba21a9b09d528b2e1726d786a1d1b861032dba87',
+            'borrower': '0x0000000000000000000000000000000000000000',
+            'state': '0',
+            'dateAdded': '1493054441',
+            'dateIssued': '0'
+          }]
+        })
     })
   })
   describe('myBooksReducers', () => {
@@ -139,6 +187,42 @@ describe('Reducers', () => {
           'dateAdded': '1493054441',
           'dateIssued': '0'
         }])
+    })
+  })
+  describe('myBooksReducers', () => {
+    it('should return initial state', () => {
+      expect(myBooksReducers(undefined, {})).toEqual([])
+    })
+    it('should handle GET_MY_BOOKS_SUCCESS', () => {
+      expect(
+        myBooksReducers(undefined, {
+          type: 'GET_MY_BOOKS_SUCCESS',
+          payload: [
+            '1;Title;Author;Publisher;ba21a9b09d528b2e1726d786a1d1b861032dba87;0000000000000000000000000000000000000000;0;1493054441;0'
+          ]
+        })).toEqual([{
+          'id': '1',
+          'title': 'Title',
+          'author': 'Author',
+          'publisher': 'Publisher',
+          'owner': '0xba21a9b09d528b2e1726d786a1d1b861032dba87',
+          'borrower': '0x0000000000000000000000000000000000000000',
+          'state': '0',
+          'dateAdded': '1493054441',
+          'dateIssued': '0'
+        }])
+    })
+  })
+  describe('addBookReducer', () => {
+    it('should return initial state', () => {
+      expect(addBookReducer(undefined, {})).toEqual(false)
+    })
+    it('should handle GET_ADD_BOOKS_SUCCESS', () => {
+      expect(
+        addBookReducer(undefined, {
+          type: 'GET_ADD_BOOKS_SUCCESS',
+          payload: true
+        })).toEqual(true)
     })
   })
 })

@@ -4,15 +4,11 @@ import { mount, shallow } from 'enzyme'
 import { Dashboard } from '../../../components/Dashboard'
 
 describe('Dashboard', () => {
-  //  Test : Components and its child renders without crashing
-  it('renders without crashing', () => {
-    mount(<Dashboard myBooks={[]} ownerDetails={{}} getMyBooks={() => {}}/>)
-  })
   describe('render', () => {
     //  Test : Component gets rendered individually
     it('should render the Dashboard', () => {
       const actual = shallow(<Dashboard myBooks={[]} ownerDetails={{}} getMyBooks={() => {}}/>)
-      const expected = <div>Loading...</div>
+      const expected = <div>Fetching details of the books.</div>
       expect(actual.contains(expected)).toEqual(true)
     })
   })

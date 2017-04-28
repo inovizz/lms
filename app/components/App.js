@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import * as libraryActions from '../actions/libraryActions'
-import Main from './Main'
-import OwnerDetails from './OwnerDetails'
+import Dashboard from './Dashboard'
+import Header from './Header'
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -25,32 +25,20 @@ export class App extends React.Component {
   }
 
   componentDidMount () {
-    this.props.getOwnerDetails()
-  }
-
-  isEmptyObject (obj) {
-    return Object.keys(obj).length
+    if(!this.props.ownerDetails) {
+      this.props.getOwnerDetails()
+    }
   }
 
   render () {
+    const ownerDetails = this.props.loading.ownerDetailsLoading ? '' : this.props.ownerDetails 
     return (
       <div>
-        <nav className='navbar navbar-default'>
-        <div className='container-fluid'>
-            <div className='navbar-header'>
-                <a className='navbar-brand' href='#'>LMS</a>
-            </div>
-            {
-              this.isEmptyObject(this.props.ownerDetails)
-              ? <OwnerDetails data={this.props.ownerDetails}/>
-              : ''
-            }
-        </div>
-        </nav>
+        <Header ownerDetails={ownerDetails} />
         <div className='container'>
           {
-            this.isEmptyObject(this.props.ownerDetails)
-            ? <Main owner={this.props.ownerDetails}/>
+            ownerDetails
+            ? <Dashboard owner={ownerDetails}/>
             : <div>Loading...</div>
           }
         </div>

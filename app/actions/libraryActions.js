@@ -161,3 +161,125 @@ export const getMyBooks = () => {
     })
   }
 }
+
+export const addBookLoading = (flag) => {
+  return {
+    type: 'GET_ADD_BOOKS_LOADING',
+    payload: flag
+  }
+}
+
+export const addBookError = (err) => {
+  return {
+    type: 'GET_ADD_BOOKS_ERROR',
+    payload: err
+  }
+}
+
+export const addBookSuccess = () => {
+  return {
+    type: 'GET_ADD_BOOKS_SUCCESS',
+    payload: true
+  }
+}
+
+export const addBook = (title, author, publisher) => {
+  return (dispatch) => {
+    dispatch(addBookLoading(true))
+    LMS.at(contractConfig.id).then((instance) => {
+      return instance.addBook(title, author, publisher, { from: web3.eth.accounts[0], gas: 200000 })
+    }).then((response) => {
+      dispatch(getMyBooks())
+      dispatch(addBookSuccess())
+      dispatch(addBookLoading(false))
+    }).catch((e) => {
+      dispatch(addBookError(e))
+      dispatch(addBookLoading(false))
+    })
+  }
+}
+
+export const returnBookLoading = (flag) => {
+  return {
+    type: 'GET_RETURN_BOOKS_LOADING',
+    payload: flag
+  }
+}
+
+export const returnBookError = (err) => {
+  return {
+    type: 'GET_RETURN_BOOKS_ERROR',
+    payload: err
+  }
+}
+
+export const returnBookSuccess = () => {
+  return {
+    type: 'GET_RETURN_BOOKS_SUCCESS',
+    payload: true
+  }
+}
+
+export const returnBook = (book) => {
+  return (dispatch) => {
+    dispatch(returnBookLoading(true))
+    LMS.at(contractConfig.id).then((instance) => {
+      return instance.returnBook(book.id, {from : book.owner, gas: 200000 })
+    }).then((response) => {
+      dispatch(getMyBooks())
+      dispatch(returnBookSuccess())
+      dispatch(returnBookLoading(false))
+    }).catch((e) => {
+      dispatch(returnBookError(e))
+      dispatch(returnBookLoading(false))
+    })
+  }
+}
+
+export const borrowBookLoading = (flag) => {
+  return {
+    type: 'GET_BORROW_BOOKS_LOADING',
+    payload: flag
+  }
+}
+
+export const borrowBookError = (err) => {
+  return {
+    type: 'GET_BORROW_BOOKS_ERROR',
+    payload: err
+  }
+}
+
+export const borrowBookSuccess = () => {
+  return {
+    type: 'GET_BORROW_BOOKS_SUCCESS',
+    payload: true
+  }
+}
+
+export const borrowBook = (book,ownerDetails) => {
+  return (dispatch) => {
+    dispatch(borrowBookLoading(true))
+    LMS.at(contractConfig.id).then((instance) => {
+      console.log(book,ownerDetails);
+      return instance.borrowBook(book.id, { from: ownerDetails.account, value: web3.toWei(0.1) , gas: 200000 })
+    }).then((response) => {
+      console.log(response);
+      dispatch(getMyBooks())
+      dispatch(borrowBookSuccess())
+      dispatch(borrowBookLoading(false))
+    }).catch((e) => {
+      console.log(e);
+      dispatch(borrowBookError(e))
+      dispatch(borrowBookLoading(false))
+    })
+  }
+}
+
+export const searchBook = (book) => {
+  console.log(book);
+  return {
+    type: 'SEARCH_BOOK',
+    payload: book
+  }
+}

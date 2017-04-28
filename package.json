@@ -17,6 +17,7 @@
     "babel-eslint": "^6.1.2",
     "babel-jest": "^19.0.0",
     "babel-loader": "^6.4.1",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-plugin-transform-runtime": "^6.22.0",
     "babel-polyfill": "^6.23.0",
     "babel-preset-env": "^1.1.8",
@@ -52,6 +53,7 @@
   "dependencies": {
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
+    "react-modal": "^1.7.7",
     "react-redux": "^5.0.4",
     "react-router-dom": "^4.1.1",
     "redux": "^3.6.0",

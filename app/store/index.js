@@ -3,14 +3,33 @@ import rootReducer from '../reducers'
 import thunk from 'redux-thunk'
 
 const defaultState = {
-  accounts: [],
-  ownerDetails : {},
+  accounts: null,
+  ownerDetails: null,
   error: null,
-  loading: true,
-  books: [],
-  myBooks : []
+  loading: {
+    accountsLoading: true,
+    ownerDetailsLoading: true,
+    allbooksloading: true,
+    myBooksLoading: true,
+    addBooksLoading: false,
+    returnBooksLoading: false,
+    borrowBooksLoading: false
+  },
+  books: {
+    allBooks : [],
+    filteredBooks : []  
+  },
+  myBooks: [],
+  isBookAdded: null,
+  isBookReturned: null,
+  isBookBorrowed: null
 }
 
-const store = createStore(rootReducer, defaultState, applyMiddleware(thunk))
+const enhancers = compose(
+  applyMiddleware(thunk),
+  window.devToolsExtension ? window.devToolsExtension() : f => f
+);
+
+const store = createStore(rootReducer, defaultState, enhancers)
 
 export default store

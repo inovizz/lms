@@ -5,7 +5,10 @@ import {
   errorReducer,
   allBooksReducers,
   ownerDetailsReducer,
-  myBooksReducers
+  myBooksReducers,
+  addBookReducer,
+  returnBookReducer,
+  borrowBookReducer
 } from './libraryReducer'
 
 const rootReducer = combineReducers({
@@ -14,7 +17,10 @@ const rootReducer = combineReducers({
   loading: loadingReducer,
   error: errorReducer,
   books: allBooksReducers,
-  myBooks : myBooksReducers
+  myBooks : myBooksReducers,
+  isBookAdded : addBookReducer,
+  isBookReturned : returnBookReducer,
+  isBookBorrowed : borrowBookReducer
 })
 
 export default rootReducer

@@ -1,6 +1,6 @@
 // Transaction id should be replaced in the file to connect ot the backend
 const Contract = {
-  id: '0xb28c03cf81a9dd001677102fed1b07b6d7b6d4f5'
+  id: '0x02a5bb3d9ab8c9cb0e96553e9f35cfc2ba09db9e'
 }
 
 export default Contract

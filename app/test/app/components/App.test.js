@@ -7,9 +7,9 @@ describe('App', () => {
   describe('render', () => {
     //  Test : Component gets rendered individually
     it('should render the App', () => {
-      const actual = shallow(<App getOwnerDetails={() => { }} getAllBooks={() => { }} ownerDetails={[]}/>)
+      const actual = shallow(<App getOwnerDetails={() => { }} ownerDetails={[]} loading={{ownerDetailsLoading:true}}/>)
       const expected = (
-        <a className='navbar-brand' href='#'>LMS</a>
+        <div>Loading...</div>
       )
       expect(actual.contains(expected)).toEqual(true)
     })

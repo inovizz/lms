@@ -183,16 +183,17 @@ export const addBookSuccess = () => {
   }
 }
 
-export const addBook = (title, author, publisher) => {
+export const addBook = (title, author, publisher, imageUrl, description, genre) => {
   return (dispatch) => {
     dispatch(addBookLoading(true))
     LMS.at(contractConfig.id).then((instance) => {
-      return instance.addBook(title, author, publisher, { from: web3.eth.accounts[0], gas: 200000 })
+      return instance.addBook(title, author, publisher,imageUrl, description, genre, { from: web3.eth.accounts[0], gas: 600000 })
     }).then((response) => {
       dispatch(getMyBooks())
       dispatch(addBookSuccess())
       dispatch(addBookLoading(false))
     }).catch((e) => {
+      console.log(e);
       dispatch(addBookError(e))
       dispatch(addBookLoading(false))
     })

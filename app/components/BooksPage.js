@@ -41,14 +41,21 @@ export class BooksPage extends React.Component {
   }
 
   componentDidMount () {
-    if(!this.props.ownerDetails) {
+    // disabling the Loader screen screen
+    const loader = document.getElementById('loader')
+
+    if (loader) {
+      loader.style.display = 'none'
+    }
+
+    if (!this.props.ownerDetails) {
       this.props.getOwnerDetails()
     }
     this.props.getAllBooks()
   }
 
   render () {
-    const ownerDetails = this.props.ownerDetails ? this.props.ownerDetails : '' 
+    const ownerDetails = this.props.ownerDetails ? this.props.ownerDetails : ''
     const books = this.props.loading.allbooksloading ? [] : ( this.props.books.filteredBooks.length ? this.props.books.filteredBooks : this.props.books.allBooks )
     return (
       <div>
@@ -70,11 +77,48 @@ export class BooksPage extends React.Component {
         </div>
         <div className='container'>
           <div className='row'>
-            <div className='col-md-7'>
+            <div className='col-sm-7'>
               <ul className='nav navbar-nav'>
                 <li>
                   <a href='#' className='active'>All Books</a>
                 </li>
+              </ul>
+            </div>
+            <div className='col-sm-4 col-sm-offset-1'>
+              <div className='row'>  
+                <div className='col-sm-8'>              
+                  <input
+                      type='text'
+                      className='form-control'
+                      placeholder='Search for...'
+                      ref={(node) => {
+                        this.searchVal = node
+                      }}
+                      required/>
+                  </div>
+                  <div className='col-sm-4'>
+                    <button className='btn btn-default' type='button' onClick={() => this.props.searchBook(this.searchVal.value)}>
+                      Search
+                    </button>
+                  </div>
+              </div>
+            </div>
+          </div>
+          {
+            this.props.books.allBooks.length === 0
+            ? <div style={style}>Fetching details from library</div>
+              : <Book loading={this.props.loading} title='' books={books} btnTitle='Borrow' btnFunction={(book) => this.props.borrowBook(book, this.props.ownerDetails)} width='70%' />
+          }
+        </div>
+      </div>)
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(BooksPage)
+
+
+/**
+ * 
                 <li>
                   <a href='#'>Programming</a>
                 </li>
@@ -84,36 +128,4 @@ export class BooksPage extends React.Component {
                 <li>
                   <a href='#'>Science</a>
                 </li>
-              </ul>
-            </div>
-            <div className='col-md-4 col-md-offset-1'>
-              <div className='row'>  
-                <div className='col-md-8'>              
-                  <input
-                      type='text' 
-                      className='form-control' 
-                      placeholder='Search for...'  
-                      ref={(node) => {
-                        this.searchVal = node
-                      }}
-                      required/>
-                  </div>
-                  <div className='col-md-4'>
-                    <button className='btn btn-default' type='button' onClick={() => this.props.searchBook(this.searchVal.value)}>
-                      Search
-                    </button>
-                  </div>
-              </div>
-            </div>
-          </div>
-          {
-            this.props.loading.allbooksloading
-            ? <div style={style}>Fetching details from library</div> 
-              : <Book loading={this.props.loading} title='' books={books} btnTitle='Borrow' btnFunction={(book) => this.props.borrowBook(book, this.props.ownerDetails)} />
-          }
-        </div>
-      </div>)
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(BooksPage)
+ */

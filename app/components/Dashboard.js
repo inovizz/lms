@@ -67,7 +67,9 @@ export class Dashboard extends React.Component {
           <button className='btn btn-default' onClick={() => this.openModal()}>Add Book</button>
           <Modal
             isOpen={this.state.modalIsOpen}
-            onRequestClose={this.closeModal}
+            onRequestClose={() => this.closeModal()}
+            shouldCloseOnOverlayClick={true}
+            role='dialog'
             style={modalStyle}
             contentLabel="Add a Book">
             <BooksForm closeModal={() => this.closeModal()}/>

@@ -96,7 +96,10 @@ export const allBooksReducers = (state = [], action) => {
           'borrower' : '0x' + book[5],
           'state' : book[6],
           'dateAdded' : book[7],
-          'dateIssued' : book[8]
+          'dateIssued' : book[8],
+          'imageUrl' : book[9],
+          'description' : book[10],
+          'genre' : book[11]
         }
       })
       return {
@@ -131,7 +134,10 @@ export const myBooksReducers = (state = [], action) => {
           'borrower' : '0x' + book[5],
           'state' : book[6],
           'dateAdded' : book[7],
-          'dateIssued' : book[8]
+          'dateIssued' : book[8],
+          'imageUrl' : book[9],
+          'description' : book[10],
+          'genre' : book[11]
         }
       })
       return myBooks

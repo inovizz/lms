@@ -29,7 +29,7 @@ describe('Book', () => {
       const btnTitle = '';
       const actual = shallow(<Book loading={loading} title='My Books' books={book} btnTitle='' btnFunction='' />)
       const expected = (
-          <p className='lead'>My Books</p>
+          <div className='lead'>My Books</div>
       )
       expect(actual.contains(expected)).toEqual(true)
     })

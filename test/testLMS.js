@@ -81,25 +81,30 @@ contract('LMS', function(accounts) {
 
     describe('addBook', function() {
         it('should add a book with the provided details', async function() {
-            await lms.addBook("1984", "Orwell", "Classic Publishers");
+            await lms.addBook("Life Is What You Make It", "Preeti Shenoy", "Srishti Publisher", "https://tinyurl.com/mj55qnr", "Life Is \
+What You Make It is a fictional story about a strong female", "Literature & Fiction");
             let bookCount = await lms.numBooks();
             assert.equal(bookCount, 1);
             let book = await lms.getBook(1);
             let bookAttr = book.split(';');
-            assert.equal(bookAttr[1], '1984');
-            assert.equal(bookAttr[2], 'Orwell');
-            assert.equal(bookAttr[3], 'Classic Publishers');
+            assert.equal(bookAttr[1], 'Life Is What You Make It');
+            assert.equal(bookAttr[2], 'Preeti Shenoy');
+            assert.equal(bookAttr[3], 'Srishti Publisher');
             assert.equal('0x' + bookAttr[4], web3.eth.coinbase);
             assert.equal('0x' + bookAttr[5], 0x0);
             assert.equal(bookAttr[6], '0');
             assert.isAtMost(bookAttr[7], Math.floor(Date.now() / 1000));
             assert.isAbove(bookAttr[7], Math.floor(Date.now() / 1000) - 300);
             assert.equal(bookAttr[8], '0');
+            assert.equal(bookAttr[9], 'https://tinyurl.com/mj55qnr');
+            assert.equal(bookAttr[10], 'Life Is What You Make It is a fictional story about a strong female');
+            assert.equal(bookAttr[11], 'Literature & Fiction');
         });
         it("should add a book and get book addition amount in owner's account", async function() {
             let ownerBal1 = web3.eth.getBalance(accounts[0]);
             let contractBal1 =  web3.eth.getBalance(lms.address);
-            await lms.addBook("1984", "Orwell", "Classic Publishers");
+            await lms.addBook("Life Is What You Make It", "Preeti Shenoy", "Srishti Publisher", "https://tinyurl.com/mj55qnr", "Life Is \
+                What You Make It is a fictional story about a strong female", "Literature & Fiction");
             let ownerBal2 = web3.eth.getBalance(accounts[0]);
             let contractBal2 =  web3.eth.getBalance(lms.address);
             // TODO - Include Gas esimation price in owner's balance check
@@ -108,14 +113,14 @@ contract('LMS', function(accounts) {
         });
         it('should add multiple books', async function() {
             await lms.addMember('another account', accounts[1]);
-            await lms.addBook('from', 'another', 'account', {from: accounts[1]});
+            await lms.addBook('from', 'another', 'account', 'image', 'describing', 'genre', {from: accounts[1]});
             let info = [
-                {title: 't1', author: 'a1', publisher: 'p1'},
-                {title: 't2', author: 'a2', publisher: 'p2'},
-                {title: 't3', author: 'a3', publisher: 'p3'}
+                {title: 't1', author: 'a1', publisher: 'p1', imgUrl: 'u1', description: 'd1', genre: 'g1'},
+                {title: 't2', author: 'a2', publisher: 'p2', imgUrl: 'u2', description: 'd2', genre: 'g2'},
+                {title: 't3', author: 'a3', publisher: 'p3', imgUrl: 'u3', description: 'd3', genre: 'g3'}
             ]
             for (let i = 0; i < 3; i++) {
-                await lms.addBook(info[i].title, info[i].author, info[i].publisher);
+                await lms.addBook(info[i].title, info[i].author, info[i].publisher, info[i].imgUrl, info[i].description, info[i].genre);
             }
             let bookCount = await lms.numBooks();
             assert.equal(bookCount.valueOf(), 4);
@@ -133,12 +138,15 @@ contract('LMS', function(accounts) {
                 assert.isAtMost(bookAttr[7], Math.floor(Date.now() / 1000));
                 assert.isAbove(bookAttr[7], Math.floor(Date.now() / 1000) - 300);
                 assert.equal(bookAttr[8], '0');
+                assert.equal(bookAttr[9], info[i].imgUrl);
+                assert.equal(bookAttr[10], info[i].description);
+                assert.equal(bookAttr[11], info[i].genre);
             }
         });
         it('should not allow non-members to add a book', async function() {
             await lms.removeMember(web3.eth.coinbase);
-            await expectThrow(lms.addBook("t", "a", "p"));
-            await expectThrow(lms.addBook("t", "a", "p", {from: accounts[1]}));
+            await expectThrow(lms.addBook("t", "a", "p", "u", "d", "g"));
+            await expectThrow(lms.addBook("t", "a", "p", "u", "d", "g", {from: accounts[1]}));
         });
     });
 
@@ -147,12 +155,12 @@ contract('LMS', function(accounts) {
             await lms.addMember('Other member', accounts[1]);
             await lms.addMember('Another member', accounts[2]);
             let info = [
-                {title: 't1', author: 'a1', publisher: 'p1'},
-                {title: 't2', author: 'a2', publisher: 'p2'},
-                {title: 't3', author: 'a3', publisher: 'p3'}
+                {title: 't1', author: 'a1', publisher: 'p1', imgUrl: 'u1', description: 'd1', genre: 'g1'},
+                {title: 't2', author: 'a2', publisher: 'p2', imgUrl: 'u2', description: 'd2', genre: 'g2'},
+                {title: 't3', author: 'a3', publisher: 'p3', imgUrl: 'u3', description: 'd3', genre: 'g3'}
             ]
             for (let i = 0; i < 3; i++) {
-                await lms.addBook(info[i].title, info[i].author, info[i].publisher, {from: accounts[i]});
+                await lms.addBook(info[i].title, info[i].author, info[i].publisher, info[i].imgUrl, info[i].description, info[i].genre, {from: accounts[i]});
             }
             let bookCount = await lms.numBooks();
             assert.equal(bookCount.valueOf(), 3);
@@ -170,20 +178,61 @@ contract('LMS', function(accounts) {
                 assert.isAtMost(bookAttr[7], Math.floor(Date.now() / 1000));
                 assert.isAbove(bookAttr[7], Math.floor(Date.now() / 1000) - 300);
                 assert.equal(bookAttr[8], '0');
+                assert.equal(bookAttr[9], info[i].imgUrl);
+                assert.equal(bookAttr[10], info[i].description);
+                assert.equal(bookAttr[11], info[i].genre);
+            }
+        });
+    });
+
+    describe('getMyBooks', function() {
+        it('should return owned and borrowed books, depending upon the logged in user', async function() {
+            await lms.addMember('Other member', accounts[1]);
+            await lms.addMember('Another member', accounts[2]);
+            await lms.addMember('One more member', accounts[3]);
+            let info = [
+                {title: 't1', author: 'a1', publisher: 'p1', imgUrl: 'u1', description: 'd1', genre: 'g1'},
+                {title: 't2', author: 'a2', publisher: 'p2', imgUrl: 'u2', description: 'd2', genre: 'g2'},
+                {title: 't3', author: 'a3', publisher: 'p3', imgUrl: 'u3', description: 'd3', genre: 'g3'},
+                {title: 't4', author: 'a4', publisher: 'p4', imgUrl: 'u4', description: 'd4', genre: 'g4'}
+            ]
+            for (let i = 0; i < 3; i++) {
+                await lms.addBook(info[i].title, info[i].author, info[i].publisher, info[i].imgUrl, info[i].description, info[i].genre, {from: accounts[i]});
+            }
+            await lms.addBook(info[3].title, info[3].author, info[3].publisher, info[3].imgUrl, info[3].description, info[3].genre, {from: accounts[3]});
+            await lms.borrowBook(2, {from: accounts[0], value: web3.toWei(0.1) /2 });
+            await lms.borrowBook(3, {from: accounts[0], value: web3.toWei(0.1) /2 });
+            let bookCount = await lms.numBooks();
+            assert.equal(bookCount.valueOf(), 4);
+            let [books, count] = await lms.getMyBooks({from: accounts[0]});
+            assert.equal(count.valueOf(), 3);
+            books = books.split('|');
+            for (let i = 0; i < count; i++) {
+                let bookAttr = books[i].split(';');
+                assert.equal(bookAttr[1], info[i].title);
+                assert.equal(bookAttr[2], info[i].author);
+                assert.equal(bookAttr[3], info[i].publisher);
+                assert.equal(accounts[0], ('0x' + bookAttr[5]) == 0x0 ? ('0x' + bookAttr[4]) : ('0x' + bookAttr[5]));
+                assert.equal(bookAttr[6], ('0x' + bookAttr[5]) == 0x0 ? '0' : '1');
+                assert.isAtMost(bookAttr[7], Math.floor(Date.now() / 1000));
+                assert.isAbove(bookAttr[7], Math.floor(Date.now() / 1000) - 300);
+                assert.equal(bookAttr[9], info[i].imgUrl);
+                assert.equal(bookAttr[10], info[i].description);
+                assert.equal(bookAttr[11], info[i].genre);
             }
         });
     });
 
     describe('borrowBook', function() {
         it("should not allow borrowing book if value send is less than 100", async function() {
-            await lms.addBook('a', 'b', 'c');
+            await lms.addBook('a', 'b', 'c', 'e', 'f', 'g');
             await lms.addMember('Michael Scofield', accounts[2]);
             await lms.borrowBook(1, {from: accounts[2], value: 10**12})
             await expectThrow(lms.borrowBook(1, {from: accounts[2], value: 10000})); // should throw exception
         });
 
         it('should borrow book and transfer 50% weis to owner account', async function() {
-            await lms.addBook('a', 'b', 'c');
+            await lms.addBook('a', 'b', 'c', 'e', 'f', 'g');
             await lms.addMember('Michael Scofield', accounts[2]);
             // Balance before borrow book
             let ownerBal1 = web3.fromWei(web3.eth.getBalance(accounts[0]));
@@ -203,7 +252,7 @@ contract('LMS', function(accounts) {
         });
 
         it('should not allow borrowing books that are already borrowed', async function() {
-            await lms.addBook('t', 'a', 'p');
+            await lms.addBook('t', 'a', 'p', 'u', 'd', 'g');
             await lms.borrowBook(1, {from: accounts[0], value: web3.toWei(0.1)});
             await expectThrow(lms.borrowBook(1, {from: accounts[0], value: web3.toWei(0.1)}));
         });
@@ -211,7 +260,7 @@ contract('LMS', function(accounts) {
             await expectThrow(lms.borrowBook(1, {from: accounts[0], value: web3.toWei(0.1)}));
         });
         it('should set the borrower, issue date and state', async function() {
-            await lms.addBook("1984", "Orwell", "Classic Publishers");
+            await lms.addBook("1984", "Orwell", "Classic Publishers", "image url", "description", "genre");
             await lms.addMember('Johnny', accounts[1]);
             await lms.borrowBook(1, {from: accounts[1], value: web3.toWei(0.1)});
 
@@ -231,9 +280,12 @@ contract('LMS', function(accounts) {
             assert.equal('0x' + bookAttr[4], web3.eth.coinbase);
             assert.isAtMost(bookAttr[7], Math.floor(Date.now() / 1000));
             assert.isAbove(bookAttr[7], Math.floor(Date.now() / 1000) - 300);
+            assert.equal(bookAttr[9], 'image url');
+            assert.equal(bookAttr[10], 'description');
+            assert.equal(bookAttr[11], 'genre');
         });
         it("should generate Borrow event log", async function() {
-            await lms.addBook("1984", "Orwell", "Classic Publishers");
+            await lms.addBook("1984", "Orwell", "Classic Publishers", "image url", "description", "genre");
             await lms.addMember('Johnny', accounts[1]);
             await lms.borrowBook(1, {from: accounts[1], value: web3.toWei(0.1)});
             let borrowEvent = lms.Borrow({fromBlock: 0});
@@ -253,11 +305,11 @@ contract('LMS', function(accounts) {
             await expectThrow(lms.returnBook(1));
         });
         it('should not allow returning books that have not been issued', async function() {
-            await lms.addBook('t', 'a', 'p');
+            await lms.addBook('t', 'a', 'p', 'u', 'd', 'g');
             await expectThrow(lms.returnBook(1));
         });
         it('should reset the borrower, issue date and state', async function() {
-            await lms.addBook('t', 'a', 'p');
+            await lms.addBook('t', 'a', 'p', 'u', 'd', 'g');
             let orig = await lms.getBook(1);
             await lms.addMember('Michael Scofield', accounts[2]);
             await lms.borrowBook(1, {from: accounts[2], value: 10**12})
@@ -268,7 +320,7 @@ contract('LMS', function(accounts) {
         it('should allow only the book owner to return the book', async function() {
             // Add a member with a book
             await lms.addMember('Other', accounts[1]);
-            await lms.addBook('t', 'a', 'p', {from: accounts[1]});
+            await lms.addBook('t', 'a', 'p', 'u', 'd', 'g', {from: accounts[1]});
             // Default member borrows the book
             await lms.borrowBook(1, {from: accounts[0], value: 10**12});
             // Default member tries to return the book
@@ -277,7 +329,7 @@ contract('LMS', function(accounts) {
             await lms.returnBook(1, {from: accounts[1]});
         });
         it("should generate Return event log", async function() {
-            await lms.addBook("1984", "Orwell", "Classic Publishers");
+            await lms.addBook("1984", "Orwell", "Classic Publishers", "image url", "description", "genre");
             await lms.addMember('Johnny', accounts[1]);
             await lms.borrowBook(1, {from: accounts[1], value: 10**12});
             await lms.returnBook(1);
@@ -295,7 +347,7 @@ contract('LMS', function(accounts) {
 
     describe('rateBook', function() {
         it('should allow a member to rate and write descriptive reviews of a book', async function() {
-            await lms.addBook("1984", "Orwell", "Classic Publishers");
+            await lms.addBook("1984", "Orwell", "Classic Publishers", "image url", "description", "genre");
             await lms.rateBook(1, 5, "A must-read classic!");
             let rateEvent = lms.Rate({fromBlock: 0});
             rateEvent.watch(function(err, result) {

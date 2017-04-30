@@ -18,6 +18,13 @@ contract LMS is Killable {
 
     enum MemberStatus { Active, Inactive }
 
+    struct Review {
+        uint rating;
+        string description;
+        address reviewer;
+        uint dateAdded;
+    }
+
     struct Book {
         uint id;
         string title;
@@ -31,6 +38,7 @@ contract LMS is Killable {
         string imgUrl;
         string description;
         string genre;
+        uint numRatings; // Total number of Ratings present for the book
     }
 
     struct Member {
@@ -45,6 +53,7 @@ contract LMS is Killable {
     mapping (uint => Book) catalog;                 // index 0 to be kept free since 0 is default value
     mapping (uint => Member) members;               // index 0 to be kept free since 0 is default value
     mapping (address => uint) memberIndex;
+    mapping (uint => mapping(uint => Review)) public ratings;
 
     event Borrow(uint indexed bookId, address indexed borrower, uint timestamp);
     event Return(uint indexed bookId, address indexed borrower, uint timestamp);
@@ -114,11 +123,13 @@ contract LMS is Killable {
             imgUrl: imgUrl,
             description: description,
             genre: genre,
+            numRatings: 0,
         });
-        if (this.balance < 10**12) {
+        // (1 ether/10**6) equals to 0.000001 ether
+        if (this.balance < (1 ether/10**6)) { 
             throw;
         }
-        if(!catalog[numBooks].owner.send(10**12)) {
+        if(!catalog[numBooks].owner.send(1 ether/10**6)) {
             throw;
         }
     }
@@ -167,7 +178,8 @@ contract LMS is Killable {
 
     function borrowBook(uint id) onlyMember payable {
         // Can't borrow book if passed value is not sufficient
-        if (msg.value < 10**12) {
+        // (1 ether/10**6) equals to 0.000001 ether
+        if (msg.value < 1 ether/10**6) {
             throw;
         }
         // Can't borrow a non-existent book
@@ -197,13 +209,55 @@ contract LMS is Killable {
         Return(id, borrower, now);
     }
 
-    function rateBook(uint id, uint rating, string comments) onlyMember {
+    function rateBook(uint id, uint rating, string comments, address reviewer) onlyMember {
         if (id > numBooks || rating < 1 || rating > 5) {
             throw;
         }
-        // All reviews are logged. Applications are responsible for eliminating duplicate ratings
-        // and computing average rating.
+        // All reviews are logged. Applications are responsible for 
+        // computing average rating.
+        if (this.balance < (1 ether/10**6)) {
+            throw;
+        }
+        if(!reviewer.send(1 ether/10**12)) {
+            throw;
+        }
+        // checking if reviewer has already rated the book
+        for (uint j=1; j<= catalog[id].numRatings; j++) {
+            if (ratings[id][j].reviewer == reviewer) {
+                throw;
+            }
+        }
+        // increasing the ratings counter for the book
+        catalog[id].numRatings +=1;
+        ratings[id][catalog[id].numRatings] = Review({
+            rating: rating,
+            description: comments,
+            reviewer: reviewer,
+            dateAdded: now
+            });
+
         Rate(id, msg.sender, rating, comments, now);
     }
+    // get all ratings for given book
+    function getRatings(uint id) constant onlyMember returns(uint count, string ratingString) {
+        string memory rating;
+        // looping upto the total number of ratintgs present for the given book
+        for (uint j=1; j<= catalog[id].numRatings; j++) {
+                count++;
+                var parts = new strings.slice[](4);
+                parts[0] = StringLib.uintToString(ratings[id][j].rating).toSlice();
+                parts[1] = ratings[id][j].description.toSlice();
+                parts[2] = StringLib.addressToString(ratings[id][j].reviewer).toSlice();
+                parts[3] = StringLib.uintToString(ratings[id][j].dateAdded).toSlice();
+                rating = ";".toSlice().join(parts);
+                if (ratingString.toSlice().equals("".toSlice())) {
+                    ratingString = rating;
+                } else {
+                    ratingString = ratingString.toSlice().concat('|'.toSlice()).toSlice().concat(rating.toSlice());
+                }
+        }
+    }
 }
+
+
 

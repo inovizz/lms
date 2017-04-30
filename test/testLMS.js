@@ -7,13 +7,13 @@ contract('LMS', function(accounts) {
     let lms;
 
     beforeEach(async function() {
-        lms = await LMS.new('Lallan', {value: web3.toWei(0.1)});
+        lms = await LMS.new('Lallan', {value: web3.toWei(10**-1)});
     });
 
     describe('constructorFunction', function() {
-        it('should have default amount of 10**17 in contract account', async function() {
-            let contractBal =  web3.eth.getBalance(lms.address);
-            assert.equal(contractBal.valueOf(), 10**17);
+        it('should have default amount of 10**-1 ether in contract account', async function() {
+            let contractBal =  web3.fromWei(web3.eth.getBalance(lms.address), 'ether');
+            assert.equal(contractBal.valueOf(), 10**-1);
         });
 
         it('should have a default member', async function() {
@@ -196,12 +196,11 @@ What You Make It is a fictional story about a strong female", "Literature & Fict
                 {title: 't3', author: 'a3', publisher: 'p3', imgUrl: 'u3', description: 'd3', genre: 'g3'},
                 {title: 't4', author: 'a4', publisher: 'p4', imgUrl: 'u4', description: 'd4', genre: 'g4'}
             ]
-            for (let i = 0; i < 3; i++) {
+            for (let i = 0; i < 4; i++) {
                 await lms.addBook(info[i].title, info[i].author, info[i].publisher, info[i].imgUrl, info[i].description, info[i].genre, {from: accounts[i]});
             }
-            await lms.addBook(info[3].title, info[3].author, info[3].publisher, info[3].imgUrl, info[3].description, info[3].genre, {from: accounts[3]});
-            await lms.borrowBook(2, {from: accounts[0], value: web3.toWei(0.1) /2 });
-            await lms.borrowBook(3, {from: accounts[0], value: web3.toWei(0.1) /2 });
+            await lms.borrowBook(2, {from: accounts[0], value: web3.toWei(10**-6)});
+            await lms.borrowBook(3, {from: accounts[0], value: web3.toWei(10**-6)});
             let bookCount = await lms.numBooks();
             assert.equal(bookCount.valueOf(), 4);
             let [books, count] = await lms.getMyBooks({from: accounts[0]});
@@ -227,8 +226,8 @@ What You Make It is a fictional story about a strong female", "Literature & Fict
         it("should not allow borrowing book if value send is less than 100", async function() {
             await lms.addBook('a', 'b', 'c', 'e', 'f', 'g');
             await lms.addMember('Michael Scofield', accounts[2]);
-            await lms.borrowBook(1, {from: accounts[2], value: 10**12})
-            await expectThrow(lms.borrowBook(1, {from: accounts[2], value: 10000})); // should throw exception
+            await lms.borrowBook(1, {from: accounts[2], value: web3.toWei(10**-6)})
+            await expectThrow(lms.borrowBook(1, {from: accounts[2], value: web3.toWei(10**-7)})); // should throw exception
         });
 
         it('should borrow book and transfer 50% weis to owner account', async function() {
@@ -239,30 +238,30 @@ What You Make It is a fictional story about a strong female", "Literature & Fict
             let borrowBal1 = web3.fromWei(web3.eth.getBalance(accounts[2]));
             let contractBal1 = web3.fromWei(web3.eth.getBalance(lms.address));
             // Borrowing Book with passing atleast minimun Book Issuance Amount
-            await lms.borrowBook(1, {from: accounts[2], value: web3.toWei(0.1)});
+            await lms.borrowBook(1, {from: accounts[2], value: web3.toWei(10**-1)});
             // Balance after borrow book
             let ownerBal2 = web3.fromWei(web3.eth.getBalance(accounts[0]));
             let borrowBal2 = web3.fromWei(web3.eth.getBalance(accounts[2]));
             let contractBal2 = web3.fromWei(web3.eth.getBalance(lms.address));
             // assert statements comparing the balances
-            assert.equal((contractBal2.minus(contractBal1)).valueOf(), 0.05);
-            assert.equal((ownerBal2.minus(ownerBal1)).valueOf(), 0.05);
-            assert.isAtLeast((borrowBal1.minus(borrowBal2)).valueOf(), 0.1); 
+            assert.equal((contractBal2.minus(contractBal1)).valueOf(), 5*(10**-2));
+            assert.equal((ownerBal2.minus(ownerBal1)).valueOf(), 5*(10**-2));
+            assert.isAtLeast((borrowBal1.minus(borrowBal2)).valueOf(), 10**-1); 
             // TODO - Include Gas esimation price in borrowers balance check
         });
 
         it('should not allow borrowing books that are already borrowed', async function() {
             await lms.addBook('t', 'a', 'p', 'u', 'd', 'g');
-            await lms.borrowBook(1, {from: accounts[0], value: web3.toWei(0.1)});
-            await expectThrow(lms.borrowBook(1, {from: accounts[0], value: web3.toWei(0.1)}));
+            await lms.borrowBook(1, {from: accounts[0], value: web3.toWei(10**-1)});
+            await expectThrow(lms.borrowBook(1, {from: accounts[0], value: web3.toWei(10**-1)}));
         });
         it("should not allow borrowing books that don't exist", async function() {
-            await expectThrow(lms.borrowBook(1, {from: accounts[0], value: web3.toWei(0.1)}));
+            await expectThrow(lms.borrowBook(1, {from: accounts[0], value: web3.toWei(10**-1)}));
         });
         it('should set the borrower, issue date and state', async function() {
             await lms.addBook("1984", "Orwell", "Classic Publishers", "image url", "description", "genre");
             await lms.addMember('Johnny', accounts[1]);
-            await lms.borrowBook(1, {from: accounts[1], value: web3.toWei(0.1)});
+            await lms.borrowBook(1, {from: accounts[1], value: web3.toWei(10**-1)});
 
             let book = await lms.getBook(1);
             let bookAttr = book.split(';');
@@ -287,7 +286,7 @@ What You Make It is a fictional story about a strong female", "Literature & Fict
         it("should generate Borrow event log", async function() {
             await lms.addBook("1984", "Orwell", "Classic Publishers", "image url", "description", "genre");
             await lms.addMember('Johnny', accounts[1]);
-            await lms.borrowBook(1, {from: accounts[1], value: web3.toWei(0.1)});
+            await lms.borrowBook(1, {from: accounts[1], value: web3.toWei(10**-1)});
             let borrowEvent = lms.Borrow({fromBlock: 0});
             borrowEvent.watch(function(err, result) {
                 borrowEvent.stopWatching();
@@ -312,7 +311,7 @@ What You Make It is a fictional story about a strong female", "Literature & Fict
             await lms.addBook('t', 'a', 'p', 'u', 'd', 'g');
             let orig = await lms.getBook(1);
             await lms.addMember('Michael Scofield', accounts[2]);
-            await lms.borrowBook(1, {from: accounts[2], value: 10**12})
+            await lms.borrowBook(1, {from: accounts[2], value: web3.toWei(10**-6)})
             await lms.returnBook(1);
             let book = await lms.getBook(1);
             assert.equal(book, orig);
@@ -322,7 +321,7 @@ What You Make It is a fictional story about a strong female", "Literature & Fict
             await lms.addMember('Other', accounts[1]);
             await lms.addBook('t', 'a', 'p', 'u', 'd', 'g', {from: accounts[1]});
             // Default member borrows the book
-            await lms.borrowBook(1, {from: accounts[0], value: 10**12});
+            await lms.borrowBook(1, {from: accounts[0], value: web3.toWei(10**-6)});
             // Default member tries to return the book
             await expectThrow(lms.returnBook(1));
             // Book owner successfully returns the book
@@ -331,7 +330,7 @@ What You Make It is a fictional story about a strong female", "Literature & Fict
         it("should generate Return event log", async function() {
             await lms.addBook("1984", "Orwell", "Classic Publishers", "image url", "description", "genre");
             await lms.addMember('Johnny', accounts[1]);
-            await lms.borrowBook(1, {from: accounts[1], value: 10**12});
+            await lms.borrowBook(1, {from: accounts[1], value: web3.toWei(10**-6)});
             await lms.returnBook(1);
             let returnEvent = lms.Return({fromBlock: 0});
             returnEvent.watch(function(err, result) {
@@ -346,9 +345,9 @@ What You Make It is a fictional story about a strong female", "Literature & Fict
     });
 
     describe('rateBook', function() {
-        it('should allow a member to rate and write descriptive reviews of a book', async function() {
+        it('should allow a member to rate and write descriptive reviews of a book- Event Test', async function() {
             await lms.addBook("1984", "Orwell", "Classic Publishers", "image url", "description", "genre");
-            await lms.rateBook(1, 5, "A must-read classic!");
+            await lms.rateBook(1, 5, "A must-read classic!", accounts[0]);
             let rateEvent = lms.Rate({fromBlock: 0});
             rateEvent.watch(function(err, result) {
                 rateEvent.stopWatching();
@@ -361,7 +360,50 @@ What You Make It is a fictional story about a strong female", "Literature & Fict
                 assert.isAbove(result.args.timestamp, Math.floor(Date.now() / 1000) - 300);
             });
         });
+        
+        it('should allow members to rate book and write review', async function() {
+            await lms.addBook("Clean Code", "Robert C Martin", "XYZ Publishers","","","");
+            await lms.rateBook(1, 5, "Awesome Book for coders!", accounts[0]);
+            let [count, ratings] = await lms.getRatings(1);
+            assert.equal(count.valueOf(), 1);
+            ratings = ratings.split('|');
+            for (let i = 0; i < count; i++) {
+                let ratingAttr = ratings[i].split(';');
+                assert.equal(ratingAttr[0], 5);
+                assert.equal(ratingAttr[1], "Awesome Book for coders!");
+                assert.equal('0x' + ratingAttr[2], accounts[0]);
+                assert.isAtMost(ratingAttr[3], Math.floor(Date.now() / 1000));
+            }
+        });
+
+        it('should not allow members to add more than one review', async function() {
+            await lms.addBook("Train the brain", "XYZ", "XYZ Publishers","","","");
+            await lms.rateBook(1, 5, "Damm Good Read", accounts[0]);
+            await expectThrow(lms.rateBook(1, 3, "Worst read ever!", accounts[0]));
+        });
+
+        it('should allow to add multiple ratings on a book by different members', async function() {
+            await lms.addBook("DS & A", "Karumanchi", "Indian - publisher","","","");
+            await lms.addMember("Sanchit", accounts[1]);
+            await lms.addMember("Neel", accounts[2]);
+            let reviews = [
+                {rating: 5, description: 'Nice book'},
+                {rating: 4, description: 'Good read'},
+                {rating: 3, description: 'Awesome!!'},
+            ]
+            for (let i = 0; i < 3; i++) {
+                await lms.rateBook(1, reviews[i].rating, reviews[i].description, accounts[i]);
+            }
+            let [count, ratings] = await lms.getRatings(1);
+            assert.equal(count.valueOf(), 3);
+            ratings = ratings.split('|');
+            for (let i = 0; i < count; i++) {
+                let ratingAttr = ratings[i].split(';');
+                assert.equal(ratingAttr[0], reviews[i].rating);
+                assert.equal(ratingAttr[1], reviews[i].description);
+                assert.equal('0x' + ratingAttr[2], accounts[i]);
+                assert.isAtMost(ratingAttr[3], Math.floor(Date.now() / 1000));
+            }
+        });
     });
-
-
 });

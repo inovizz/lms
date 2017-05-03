@@ -361,6 +361,63 @@ What You Make It is a fictional story about a strong female", "Literature & Fict
                 assert.isAbove(result.args.timestamp, Math.floor(Date.now() / 1000) - 300);
             });
         });
+        it('should allow a member to rate multiple times and fetch the ratings from events', async function() {
+            await lms.addBook("1984", "Orwell", "Classic Publishers", "image url", "description", "genre");
+            let reviews = [
+                {bookId: 1, rating: 5, comments: 'A must-read classic!'},
+                {bookId: 1, rating: 4, comments: 'Great Book, I loved it'},
+                {bookId: 1, rating: 3, comments: 'Decent book, not my types though'},
+                {bookId: 1, rating: 2, comments: 'Hell No!, Boring book'},
+            ]
+            for (let i = 0; i <= 3; i++) {
+                await lms.rateBook(reviews[i].bookId, reviews[i].rating, reviews[i].comments);
+            }
+            let rateEvent = lms.Rate({}, {fromBlock: 0, toBlock: 'latest'});
+            let i = 0;
+            rateEvent.watch(function(err, result) {
+                rateEvent.stopWatching();
+                if (!err) {
+                    assert.equal(reviews[i].bookId, result.args.bookId);
+                    assert.equal(reviews[i].rating, result.args.rating);
+                    assert.equal(reviews[i].comments, result.args.comments);
+                    assert.equal(result.args.reviewer, accounts[0]);
+                    assert.isAtMost(result.args.timestamp, Math.floor(Date.now() / 1000));
+                    assert.isAbove(result.args.timestamp, Math.floor(Date.now() / 1000) - 300);
+                    i++;
+                }
+            });
+        });
+
+        it('should allow multiple members to rate a book and fetch ratings of that particular book from events', async function() {
+            await lms.addBook("ABC", "author1", "Publishers1", "image url1", "description1", "genre1");
+            await lms.addBook("DEF", "author2", "Publishers2", "image url2", "description2", "genre2");
+            await lms.addMember("Sanchit", accounts[1]);
+            await lms.addMember("Chandan", accounts[2]);
+            await lms.addMember("Neel", accounts[3])
+            let reviews = [
+                {bookId: 1, rating: 5, comments: 'A must-read classic!'},
+                {bookId: 1, rating: 4, comments: 'Great Book, I loved it'},
+                {bookId: 2, rating: 3, comments: 'Decent book, not my types though'},
+                {bookId: 2, rating: 2, comments: 'Hell No!, Boring book'},
+            ]
+            for (let i = 0; i <= 3; i++) {
+                await lms.rateBook(reviews[i].bookId, reviews[i].rating, reviews[i].comments, {from: accounts[i]});
+            }
+            let rateEvent = lms.Rate({bookId: 2}, {fromBlock: 0, toBlock: 'latest'});
+            let i = 2; // checking for second book hence i starts from 2
+            rateEvent.watch(function(err, result) {
+                rateEvent.stopWatching();
+                if (!err) {
+                    assert.equal(reviews[i].bookId, result.args.bookId);
+                    assert.equal(reviews[i].rating, result.args.rating);
+                    assert.equal(reviews[i].comments, result.args.comments);
+                    assert.equal(result.args.reviewer, accounts[i]);
+                    assert.isAtMost(result.args.timestamp, Math.floor(Date.now() / 1000));
+                    assert.isAbove(result.args.timestamp, Math.floor(Date.now() / 1000) - 300);
+                    i++;
+                }
+            });
+        });
     });
 
 

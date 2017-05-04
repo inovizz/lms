@@ -1,50 +1,14 @@
 pragma solidity ^0.4.0;
 
+import "./datalayer.sol";
+import "./schema.sol";
 import "./strings.sol";
 import "./StringLib.sol";
 import "zeppelin/lifecycle/Killable.sol";
 
-contract LMS is Killable {
+contract LMS is Schema, DataLayer, Killable {
     // In order to use the third-party strings library
     using strings for *;
-
-    enum State {
-        Available,
-        Borrowed,
-        Overdue,
-        Lost,
-        Removed
-    }
-
-    enum MemberStatus { Active, Inactive }
-
-    struct Book {
-        uint id;
-        string title;
-        string author;
-        string publisher;
-        address owner;
-        address borrower;
-        State state;
-        uint dateAdded;
-        uint dateIssued;
-        string imgUrl;
-        string description;
-        string genre;
-    }
-
-    struct Member {
-        string name;
-        address account;
-        MemberStatus status;
-        uint dateAdded;
-    }
-
-    uint public numBooks;
-    uint public numMembers;
-    mapping (uint => Book) catalog;                 // index 0 to be kept free since 0 is default value
-    mapping (uint => Member) members;               // index 0 to be kept free since 0 is default value
-    mapping (address => uint) memberIndex;
 
     event Borrow(uint indexed bookId, address indexed borrower, uint timestamp);
     event Return(uint indexed bookId, address indexed borrower, uint timestamp);

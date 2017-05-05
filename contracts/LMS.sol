@@ -36,6 +36,8 @@ contract LMS is Killable {
     struct Member {
         string name;
         address account;
+        string email;
+        string password;
         MemberStatus status;
         uint dateAdded;
     }
@@ -45,6 +47,7 @@ contract LMS is Killable {
     mapping (uint => Book) catalog;                 // index 0 to be kept free since 0 is default value
     mapping (uint => Member) members;               // index 0 to be kept free since 0 is default value
     mapping (address => uint) memberIndex;
+    mapping (string => uint) emailIndex;
 
     event Borrow(uint indexed bookId, address indexed borrower, uint timestamp);
     event Return(uint indexed bookId, address indexed borrower, uint timestamp);
@@ -65,22 +68,32 @@ contract LMS is Killable {
         }
     }
 
-    function LMS(string name) payable {
+    function LMS(string name, string email) payable {
         // Owner is the first member of our library, at index 1 (NOT 0)
-        members[++numMembers] = Member(name, owner, MemberStatus.Active, now);
+        members[++numMembers] = Member(name, owner, email, "dummy", MemberStatus.Active, now);
         memberIndex[owner] = numMembers;
+        emailIndex[email] = numMembers;
     }
 
-    function addMember(string name, address account) public onlyOwner {
+    function addMember(string name, address account, string email, string password) public onlyOwner {
         // Add or activate member
         var index = memberIndex[account];
         if (index != 0) {           // This is the reason index 0 is not used
             members[index].status = MemberStatus.Active;
             return;
         }
-        members[++numMembers] = Member(name, account, MemberStatus.Active, now);
+        members[++numMembers] = Member(name, account, email, password, MemberStatus.Active, now);
         memberIndex[account] = numMembers;
+        emailIndex[email] = numMembers;
     }
+
+    function getMemberDetailsByEmail(string email) constant returns (string, address, string, MemberStatus, uint) {
+        var i = emailIndex[email];
+        if(i != 0) {
+            return (members[i].name, members[i].account, members[i].email, members[i].status, members[i].dateAdded);
+        }
+    }
+
 
     function removeMember(address account) public onlyOwner {
         // Deactivate member
@@ -90,13 +103,15 @@ contract LMS is Killable {
         }
     }
 
-    function getOwnerDetails() constant returns (string, address, MemberStatus, uint) {
-        return getMemberDetails(owner);
+    function getOwnerDetails() constant returns (string, address, string, MemberStatus, uint) {
+        return getMemberDetailsByAccount(owner);
     }
 
-    function getMemberDetails(address account) constant returns (string, address, MemberStatus, uint) {
+    function getMemberDetailsByAccount(address account) constant returns (string, address, string, MemberStatus, uint) {
         var i = memberIndex[account];
-        return (members[i].name, members[i].account, members[i].status, members[i].dateAdded);
+        if(i != 0) {
+            return (members[i].name, members[i].account, members[i].email, members[i].status, members[i].dateAdded);
+        }
     }
 
     function addBook(string title, string author, string publisher, string imgUrl, string description, string genre) public onlyMember {

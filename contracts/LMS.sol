@@ -31,13 +31,15 @@ contract LMS is Killable {
         string imgUrl;
         string description;
         string genre;
+        uint avgRating;
+        uint totalRating;
+        uint reviewersCount;
     }
 
     struct Member {
         string name;
         address account;
         string email;
-        string password;
         MemberStatus status;
         uint dateAdded;
     }
@@ -70,19 +72,19 @@ contract LMS is Killable {
 
     function LMS(string name, string email) payable {
         // Owner is the first member of our library, at index 1 (NOT 0)
-        members[++numMembers] = Member(name, owner, email, "dummy", MemberStatus.Active, now);
+        members[++numMembers] = Member(name, owner, email, MemberStatus.Active, now);
         memberIndex[owner] = numMembers;
         emailIndex[email] = numMembers;
     }
 
-    function addMember(string name, address account, string email, string password) public onlyOwner {
+    function addMember(string name, address account, string email) public onlyOwner {
         // Add or activate member
         var index = memberIndex[account];
         if (index != 0) {           // This is the reason index 0 is not used
             members[index].status = MemberStatus.Active;
             return;
         }
-        members[++numMembers] = Member(name, account, email, password, MemberStatus.Active, now);
+        members[++numMembers] = Member(name, account, email, MemberStatus.Active, now);
         memberIndex[account] = numMembers;
         emailIndex[email] = numMembers;
     }
@@ -129,6 +131,9 @@ contract LMS is Killable {
             imgUrl: imgUrl,
             description: description,
             genre: genre,
+            avgRating: 0,
+            reviewersCount: 0,
+            totalRating: 0
         });
         if (this.balance < 10**12) {
             throw;
@@ -139,7 +144,7 @@ contract LMS is Killable {
     }
 
     function getBook(uint i) constant returns (string bookString) {
-        var parts = new strings.slice[](12);
+        var parts = new strings.slice[](15);
         //Iterate over the entire catalog to find my books
         parts[0] = StringLib.uintToString(catalog[i].id).toSlice();
         parts[1] = catalog[i].title.toSlice();
@@ -153,6 +158,9 @@ contract LMS is Killable {
         parts[9] = catalog[i].imgUrl.toSlice();
         parts[10] = catalog[i].description.toSlice();
         parts[11] = catalog[i].genre.toSlice();
+        parts[12] = StringLib.uintToString(catalog[i].avgRating).toSlice();
+        parts[13] = StringLib.uintToString(catalog[i].totalRating).toSlice();
+        parts[14] = StringLib.uintToString(catalog[i].reviewersCount).toSlice();
         bookString = ";".toSlice().join(parts);
     }
 
@@ -212,13 +220,23 @@ contract LMS is Killable {
         Return(id, borrower, now);
     }
 
-    function rateBook(uint id, uint rating, string comments) onlyMember {
+    function rateBook(uint id, uint rating, string comments, uint oldrating) onlyMember {
         if (id > numBooks || rating < 1 || rating > 5) {
             throw;
         }
+        uint change = rating - oldrating;
+        if (oldrating == 0) {
+            catalog[id].reviewersCount += 1;
+            catalog[id].totalRating += change;
+            catalog[id].avgRating = catalog[id].totalRating / catalog[id].reviewersCount;
+        }
+        else {
+            catalog[id].totalRating += change;
+            catalog[id].avgRating = catalog[id].totalRating / catalog[id].reviewersCount;
+        }
+
         // All reviews are logged. Applications are responsible for eliminating duplicate ratings
         // and computing average rating.
         Rate(id, msg.sender, rating, comments, now);
     }
 }
-

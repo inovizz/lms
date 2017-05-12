@@ -16,7 +16,8 @@ describe('Dashboard', () => {
           addBooksLoading  : false,
           returnBooksLoading   : false,
           rateBookLoading : false
-        }
+        },
+        getAllBooks: jest.fn()
       }
       const actual = mount(<Dashboard {...props}/>)
       const expected = <div>Loading Books</div>

@@ -6,11 +6,7 @@ import {
   loadingReducer,
   errorReducer,
   allBooksReducers,
-  myBooksReducers,
-  addBookReducer,
-  returnBookReducer,
-  borrowBookReducer,
-  rateBookReducer
+  myBooksReducers
 } from './libraryReducer'
 import { sessionReducer } from 'redux-react-session'
 
@@ -20,10 +16,6 @@ const rootReducer = combineReducers({
   error: errorReducer,
   books: allBooksReducers,
   myBooks: myBooksReducers,
-  isBookAdded: addBookReducer,
-  isBookReturned: returnBookReducer,
-  isBookBorrowed: borrowBookReducer,
-  ratings: rateBookReducer,
   session: sessionReducer
 })
 

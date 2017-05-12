@@ -44,6 +44,11 @@ export class Dashboard extends React.Component {
         this.setState({ rateModalIsOpen: !this.state.rateModalIsOpen, book })
     }
   }
+  componentDidMount () {
+    if(!this.props.allBooks.length) {
+        this.props.getAllBooks()
+    }
+  }
   renderLoading () {
     const title = this.props.loading.allbooksloading
                   ? 'Loading Books'

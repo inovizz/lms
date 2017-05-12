@@ -252,6 +252,7 @@ export const addMember = (member, dispatch, session) => {
           })
           login(session, member)
         }).catch((err) => {
+          logout()
           dispatch(action(actionType.ADD_MEMBER_ERROR, err))
         }).then(() => {
           dispatch(action(actionType.ADD_MEMBER_LOADING, false))

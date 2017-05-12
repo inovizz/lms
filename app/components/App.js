@@ -11,6 +11,13 @@ const mapStateToProps = (state, ownProps) => {
 }
 
 export class App extends React.Component {
+  componentDidMount () {
+    // disabling the Loader screen screen
+    const loader = document.getElementById('loader')
+    if (loader) {
+      loader.style.display = 'none'
+    }
+  }
   render () {
     return (
       <div>

@@ -257,39 +257,3 @@ export const myBooksReducers = (state = [], action) => {
       return state
   }
 }
-
-export const addBookReducer = (state = false, action) => {
-  switch (action.type) {
-    case 'GET_ADD_BOOKS_SUCCESS':
-      return action.payload
-    default:
-      return state
-  }
-}
-
-export const returnBookReducer = (state = false, action) => {
-  switch (action.type) {
-    case 'GET_RETURN_BOOKS_SUCCESS':
-      return action.payload
-    default:
-      return state
-  }
-}
-
-export const borrowBookReducer = (state = false, action) => {
-  switch (action.type) {
-    case 'GET_BORROW_BOOKS_SUCCESS':
-      return action.payload
-    default:
-      return state
-  }
-}
-
-export const rateBookReducer = (state = false, action) => {
-  switch (action.type) {
-    case 'RATE_BOOK_SUCCESS':
-      return action.payload
-    default:
-      return state
-  }
-}

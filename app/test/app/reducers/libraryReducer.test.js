@@ -96,42 +96,42 @@ describe('Reducers', () => {
         errorReducer(undefined, {
           type: 'GET_ACCOUNTS_ERROR',
           payload: 'ERROR'
-        })).toEqual('ERROR')
+        })).toEqual({"message": "ERROR"})
     })
     it('should handle GET_OWNERDETAILS_ERROR', () => {
       expect(
         errorReducer(undefined, {
           type: 'GET_OWNERDETAILS_ERROR',
           payload: 'ERROR'
-        })).toEqual('ERROR')
+        })).toEqual({"message": "ERROR"})
     })
     it('should handle GET_ALL_BOOKS_ERROR', () => {
       expect(
         errorReducer(undefined, {
           type: 'GET_ALL_BOOKS_ERROR',
           payload: 'ERROR'
-        })).toEqual('ERROR')
+        })).toEqual({"message": "ERROR"})
     })
     it('should handle GET_MY_BOOKS_ERROR', () => {
       expect(
         errorReducer(undefined, {
           type: 'GET_MY_BOOKS_ERROR',
           payload: 'ERROR'
-        })).toEqual('ERROR')
+        })).toEqual({"message": "ERROR"})
     })
     it('should handle GET_ADD_BOOKS_ERROR', () => {
       expect(
         errorReducer(undefined, {
           type: 'GET_ADD_BOOKS_ERROR',
           payload: 'ERROR'
-        })).toEqual('ERROR')
+        })).toEqual({"message": "ERROR"})
     })
     it('should handle RATE_BOOK_ERROR', () => {
       expect(
         errorReducer(undefined, {
           type: 'RATE_BOOK_ERROR',
           payload: 'ERROR'
-        })).toEqual('ERROR')
+        })).toEqual({"message": "ERROR"})
     })
   })
   describe('ownerDetailsReducer', () => {

@@ -8,6 +8,7 @@ import SearchBook from './SearchBook'
 import Modal from 'react-modal'
 import LMSAuth from './LMSAuth'
 import Loader from './Loader'
+import NotifyMe from './notifications/NotifyMe'
 
 const style = {
   marginTop : '15px'
@@ -30,7 +31,8 @@ const mapStateToProps = (state, ownProps) => {
     ownerDetails: state.session.user,
     filteredBooks: state.filteredBooks,
     loading: state.loading,
-    session: state.session
+    session: state.session,
+    error: state.error
   }
 }
 
@@ -106,6 +108,7 @@ export class BooksPage extends React.Component {
         {
           this.renderLoader()
         }
+        <NotifyMe message={this.props.error}/>
         <div className='container'>
           <div className='row'>
             <div className='col-md-7'>

@@ -72,17 +72,65 @@ export const loadingReducer = (state = {}, action) => {
 export const errorReducer = (state = [], action) => {
   switch (action.type) {
     case 'GET_ACCOUNTS_ERROR':
-      return action.payload
+      return {
+        ...state,
+        message : action.payload
+      }
     case 'GET_OWNERDETAILS_ERROR':
-      return action.payload
+      return {
+        ...state,
+        message : action.payload
+      }
     case 'GET_ALL_BOOKS_ERROR':
-      return action.payload
+      return {
+        ...state,
+        message : action.payload
+      }
     case 'GET_MY_BOOKS_ERROR':
-      return action.payload
+      return {
+        ...state,
+        message : action.payload
+      }
     case 'GET_ADD_BOOKS_ERROR':
-      return action.payload
+     return {
+        ...state,
+        message : action.payload
+      }
     case 'RATE_BOOK_ERROR':
-      return action.payload
+      return {
+        ...state,
+        message : action.payload
+      }
+    case 'GET_RETURN_BOOKS_ERROR':
+      return {
+        ...state,
+        message : action.payload
+      }
+    case 'GET_BORROW_BOOKS_ERROR':
+      return {
+        ...state,
+        message : action.payload
+      }
+    case 'GET_MEMBER_DETAILS_EMAIL_ERROR':
+      return {
+        ...state,
+        message : action.payload
+      }
+    case 'GET_RATE_BOOK_ERROR':
+      return {
+        ...state,
+        message : action.payload
+      }
+    case 'CREATE_ACCOUNT_ERROR':
+      return {
+        ...state,
+        message : action.payload
+      }
+    case 'ADD_MEMBER_ERROR':
+      return {
+        ...state,
+        message : action.payload
+      }
     default:
       return state
   }

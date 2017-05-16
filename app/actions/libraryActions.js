@@ -3,6 +3,7 @@ import { web as web3, lms as LMS } from '../web3'
 import actionType from './actionTypes'
 import { sessionService } from 'redux-react-session'
 import axios from 'axios'
+import NotificationType from '../components/notifications/NotificationTypes'
 
 export const action = (type, flag) => {
   return {
@@ -16,7 +17,7 @@ export const getAccounts = () => {
     dispatch(action(actionType.GET_ACCOUNTS_LOADING, true))
     web3.eth.getAccounts((err, accs) => {
       if (err != null) {
-        dispatch(action(actionType.GET_ACCOUNTS_ERROR, err))
+        dispatch(action(actionType.GET_ACCOUNTS_ERROR, NotificationType.SHOW_ACCOUNTS_ERROR))
       }
       dispatch(action(actionType.GET_ACCOUNTS_SUCCESS, accs))
       dispatch(action(actionType.GET_ACCOUNTS_LOADING, false))
@@ -34,7 +35,7 @@ export const getOwnerDetails = (response) => {
       dispatch(action(actionType.GET_OWNERDETAILS_SUCCESS, user))
       dispatch(action(actionType.GET_OWNERDETAILS_LOADING, false))
     }).catch((e) => {
-      dispatch(action(actionType.GET_OWNERDETAILS_ERROR, e))
+      dispatch(action(actionType.GET_OWNERDETAILS_ERROR, NotificationType.SHOW_OWNERDETAILS_ERROR))
       dispatch(action(actionType.GET_OWNERDETAILS_LOADING, false))
     })
   }
@@ -50,7 +51,7 @@ export const getAllBooks = () => {
       dispatch(action(actionType.GET_ALL_BOOKS_SUCCESS, books))
       dispatch(action(actionType.GET_ALL_BOOKS_LOADING, false))
     }).catch((e) => {
-      dispatch(action(actionType.GET_ALL_BOOKS_ERROR, e))
+      dispatch(action(actionType.GET_ALL_BOOKS_ERROR, NotificationType.SHOW_ALL_BOOKS_ERROR))
       dispatch(action(actionType.GET_ALL_BOOKS_LOADING, false))
     })
   }
@@ -65,7 +66,7 @@ export const getMyBooks = () => {
       dispatch(action(actionType.GET_MY_BOOKS_SUCCESS, books))
       dispatch(action(actionType.GET_MY_BOOKS_LOADING, false))
     }).catch((e) => {
-      dispatch(action(actionType.GET_MY_BOOKS_ERROR, e))
+      dispatch(action(actionType.GET_MY_BOOKS_ERROR, NotificationType.SHOW_MY_BOOKS_ERROR))
       dispatch(action(actionType.GET_MY_BOOKS_LOADING, false))
     })
   }
@@ -91,7 +92,7 @@ export const addBook = (book) => {
       dispatch(action(actionType.GET_ADD_BOOKS_SUCCESS, book))
       dispatch(action(actionType.GET_ADD_BOOKS_LOADING, false))
     }).catch((e) => {
-      dispatch(action(actionType.GET_ADD_BOOKS_ERROR, e))
+      dispatch(action(actionType.GET_ADD_BOOKS_ERROR, NotificationType.SHOW_ADD_BOOKS_ERROR))
       dispatch(action(actionType.GET_ADD_BOOKS_LOADING, false))
     })
   }
@@ -105,7 +106,7 @@ export const returnBook = (book) => {
     }).then((response) => {
       dispatch(action(actionType.GET_RETURN_BOOKS_SUCCESS, book))
     }).catch((e) => {
-      dispatch(action(actionType.GET_RETURN_BOOKS_ERROR, e))
+      dispatch(action(actionType.GET_RETURN_BOOKS_ERROR, NotificationType.SHOW_GET_RETURN_BOOKS_ERROR))
     }).then(() => {
       dispatch(action(actionType.GET_RETURN_BOOKS_LOADING, false))
     })
@@ -120,7 +121,7 @@ export const borrowBook = (book, ownerDetails) => {
     }).then((response) => {
       dispatch(action(actionType.GET_BORROW_BOOKS_SUCCESS, { book, owner: ownerDetails.account }))
     }).catch((e) => {
-      dispatch(action(actionType.GET_BORROW_BOOKS_ERROR, e))
+      dispatch(action(actionType.GET_BORROW_BOOKS_ERROR, NotificationType.SHOW_GET_BORROW_BOOKS_ERROR))
     }).then(() => {
       dispatch(action(actionType.GET_BORROW_BOOKS_LOADING, false))
     })
@@ -147,7 +148,7 @@ export const rateBook = (rating, comment, book, ownerDetails) => {
       }))
       dispatch(action(actionType.RATE_BOOK_LOADING, false))
     }).catch((e) => {
-      dispatch(action(actionType.RATE_BOOK_ERROR, e))
+      dispatch(action(actionType.RATE_BOOK_ERROR, NotificationType.SHOW_GET_RATE_BOOK_ERROR))
       dispatch(action(actionType.RATE_BOOK_LOADING, false))
     })
   }
@@ -183,7 +184,7 @@ export const getMemberDetailsByEmail = (response) => {
       login(response, user)
       dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_SUCCESS, user))
     }).catch((e) => {
-      dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_ERROR, e))
+      dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_ERROR, NotificationType.SHOW_GET_MEMBER_DETAILS_EMAIL_ERROR))
     }).then(() => {
       dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_LOADING, false))
     })
@@ -201,7 +202,7 @@ export const getRatings = (dispatch) => {
     rateEvent.watch(function(err, result) {
       rateEvent.stopWatching();
       if (err) {
-        dispatch(action(actionType.GET_RATE_BOOK_ERROR, err))
+        dispatch(action(actionType.GET_RATE_BOOK_ERROR, NotificationType.SHOW_GET_RATE_BOOK_ERROR))
       } else {
         dispatch(action(actionType.GET_RATE_BOOK_SUCCESS, result.args))
       }
@@ -229,7 +230,7 @@ export const createAccount = (session,password) => {
               ], dispatch, session.user.body)
             })
             .catch((error) => {
-              dispatch(action(actionType.CREATE_ACCOUNT_ERROR, error))
+              dispatch(action(actionType.CREATE_ACCOUNT_ERROR, NotificationType.SHOW_CREATE_ACCOUNT_ERROR))
             }).then(() => {
               dispatch(action(actionType.CREATE_ACCOUNT_LOADING, false))
             });
@@ -253,7 +254,7 @@ export const addMember = (member, dispatch, session) => {
           login(session, member)
         }).catch((err) => {
           logout()
-          dispatch(action(actionType.ADD_MEMBER_ERROR, err))
+          dispatch(action(actionType.ADD_MEMBER_ERROR, NotificationType.SHOW_ADD_MEMBER_ERROR))
         }).then(() => {
           dispatch(action(actionType.ADD_MEMBER_LOADING, false))
         })

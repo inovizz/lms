@@ -1,6 +1,7 @@
 import React from 'react'
 import Modal from 'react-modal'
 import RateBook from './RateBook'
+import Image from './utils/Image'
 
 const style = {
   row: {
@@ -36,13 +37,10 @@ const Book = ({
     <div className='lead'>{title}</div>
     <div className='media-list list-group' style={style.row}>
       {books.map((book, i) => {
-        let imageEl;
         return (
           <div key={i} className='list-group-item'>
             <div className='media-left'>
-              <div className='imgContainer'>
-                <img className={btnTitle ? 'imgLarge' : 'imgMedium'} src={book.imageUrl} ref={img => imageEl = img} onError={() => { imageEl.src = 'https://placehold.it/400x500' }} />
-              </div>
+              <Image type={btnTitle} src={book.imageUrl}/>
             </div>
             <div className='media-body'>
               <div className='taContainer'>

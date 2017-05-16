@@ -172,6 +172,9 @@ export const logout = () => {
   return () => {
     sessionService.deleteSession()
     sessionService.deleteUser()
+    if(window.gapi) {
+        window.gapi.auth2.getAuthInstance().disconnect()
+    }
   }
 }
 
@@ -246,12 +249,12 @@ export const addMember = (member, dispatch, session) => {
             gas: 600000
           })
         }).then((response) => {
+          login(session, member)
           web3.eth.sendTransaction({
             from: web3.eth.accounts[0],
             to: member[1],
-            value: web3.toWei(10000000)
+            value: web3.toWei(1000)
           })
-          login(session, member)
         }).catch((err) => {
           logout()
           dispatch(action(actionType.ADD_MEMBER_ERROR, NotificationType.SHOW_ADD_MEMBER_ERROR))

@@ -96,8 +96,10 @@ export class Dashboard extends React.Component {
                 books = {
                   ownerBooks
                 }
-                btnTitle = ''
-                btnFunction = ''
+                btnTitle = 'Return'
+                btnFunction = {
+                  (id) => this.props.returnBook(id)
+                }
                 rateBook = {
                   (rating, comment) => this.props.rateBook(rating, comment, this.state.book, this.props.ownerDetails)
                 }
@@ -120,10 +122,8 @@ export class Dashboard extends React.Component {
                 books = {
                   borrowedBooks
                 }
-                btnTitle = 'Return'
-                btnFunction = {
-                  (id) => this.props.returnBook(id)
-                }
+                btnTitle = ''
+                btnFunction = ''
                 rateBook = {
                   (rating, comment) => this.props.rateBook(rating, comment, this.state.book, this.props.ownerDetails)
                 }

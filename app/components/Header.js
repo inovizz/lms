@@ -13,7 +13,7 @@ const Header = ({ loginSuccess, loginFailure, session, logout }) => (
           alt = 'Pramati Technologies'
           src = {LogoImg} />
         </a>
-        <span className='navbar-brand' style={{ lineHeight: '55px', verticalAlign: 'bottom' }}>
+        <span className='navbar-brand'>
           Library Management System
         </span>
       </div>

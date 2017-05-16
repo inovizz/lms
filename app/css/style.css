@@ -70,6 +70,30 @@ a {
 .hide {
   display: none;
 }
+
+.loader {
+  border: 8px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 8px solid rgba(236, 116, 112, 0.8);
+  border-bottom: 8px solid rgba(108, 205, 235, 0.8);
+  border-right: 8px solid rgba(93, 136, 198, 0.8);
+  width: 25px;
+  height: 25px;
+  -webkit-animation: spin 1s linear infinite;
+  animation: spin 1s linear infinite;
+  margin: 50% 0 0 25%; 
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 /* Header */
 
 .navbar {
@@ -87,6 +111,10 @@ a {
 
 .navbar .navbar-header {
   padding: 0 32px;
+}
+
+a.navbar-brand {
+  margin-top: -15px;
 }
 
 .nav>li {
@@ -289,6 +317,9 @@ a {
   width: 100%;
   display: block;
   color: white;
+  line-height: 400px;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .list-group-item .media-left {

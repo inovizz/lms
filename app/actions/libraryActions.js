@@ -1,5 +1,5 @@
 import contractConfig from '../config'
-import { web as web3, lms as LMS } from '../web3'
+import { web3, lms } from '../web3'
 import actionType from './actionTypes'
 import { sessionService } from 'redux-react-session'
 import axios from 'axios'
@@ -28,9 +28,7 @@ export const getAccounts = () => {
 export const getOwnerDetails = (response) => {
   return (dispatch) => {
     dispatch(action(actionType.GET_OWNERDETAILS_LOADING, true))
-    LMS.at(contractConfig.id).then((instance) => {
-      return instance.getOwnerDetails.call()
-    }).then((user) => {
+    lms.getOwnerDetails.call().then((user) => {
       login(response, user)
       dispatch(action(actionType.GET_OWNERDETAILS_SUCCESS, user))
       dispatch(action(actionType.GET_OWNERDETAILS_LOADING, false))
@@ -44,9 +42,7 @@ export const getOwnerDetails = (response) => {
 export const getAllBooks = () => {
   return (dispatch) => {
     dispatch(action(actionType.GET_ALL_BOOKS_LOADING, true))
-    LMS.at(contractConfig.id).then((instance) => {
-      return instance.getAllBooks.call()
-    }).then((books) => {
+    lms.getAllBooks.call().then((books) => {
       getRatings(dispatch)
       dispatch(action(actionType.GET_ALL_BOOKS_SUCCESS, books))
       dispatch(action(actionType.GET_ALL_BOOKS_LOADING, false))
@@ -60,9 +56,7 @@ export const getAllBooks = () => {
 export const getMyBooks = () => {
   return (dispatch) => {
     dispatch(action(actionType.GET_MY_BOOKS_LOADING, true))
-    LMS.at(contractConfig.id).then((instance) => {
-      return instance.getMyBooks.call()
-    }).then((books) => {
+    lms.getMyBooks.call().then((books) => {
       dispatch(action(actionType.GET_MY_BOOKS_SUCCESS, books))
       dispatch(action(actionType.GET_MY_BOOKS_LOADING, false))
     }).catch((e) => {
@@ -75,8 +69,7 @@ export const getMyBooks = () => {
 export const addBook = (book) => {
   return (dispatch) => {
     dispatch(action(actionType.GET_ADD_BOOKS_LOADING, true))
-    LMS.at(contractConfig.id).then((instance) => {
-      return instance.addBook(
+    lms.addBook(
         book.title,
         book.author,
         book.publisher,
@@ -87,8 +80,7 @@ export const addBook = (book) => {
           from: book.owner.account,
           gas: 600000
         }
-      )
-    }).then((response) => {
+      ).then((response) => {
       dispatch(action(actionType.GET_ADD_BOOKS_SUCCESS, book))
       dispatch(action(actionType.GET_ADD_BOOKS_LOADING, false))
     }).catch((e) => {
@@ -101,9 +93,7 @@ export const addBook = (book) => {
 export const returnBook = (book) => {
   return (dispatch) => {
     dispatch(action(actionType.GET_RETURN_BOOKS_LOADING, true))
-    LMS.at(contractConfig.id).then((instance) => {
-      return instance.returnBook(book.id, { from : book.owner, gas: 200000 })
-    }).then((response) => {
+    lms.returnBook(book.id, { from : book.owner, gas: 200000 }).then((response) => {
       dispatch(action(actionType.GET_RETURN_BOOKS_SUCCESS, book))
     }).catch((e) => {
       dispatch(action(actionType.GET_RETURN_BOOKS_ERROR, NotificationType.SHOW_GET_RETURN_BOOKS_ERROR))
@@ -116,9 +106,7 @@ export const returnBook = (book) => {
 export const borrowBook = (book, ownerDetails) => {
   return (dispatch) => {
     dispatch(action(actionType.GET_BORROW_BOOKS_LOADING, true))
-    LMS.at(contractConfig.id).then((instance) => {
-      return instance.borrowBook(book.id, { from: ownerDetails.account, value: web3.toWei(0.1), gas: 200000 })
-    }).then((response) => {
+    lms.borrowBook(book.id, { from: ownerDetails.account, value: web3.toWei(0.1), gas: 200000 }).then((response) => {
       dispatch(action(actionType.GET_BORROW_BOOKS_SUCCESS, { book, owner: ownerDetails.account }))
     }).catch((e) => {
       dispatch(action(actionType.GET_BORROW_BOOKS_ERROR, NotificationType.SHOW_GET_BORROW_BOOKS_ERROR))
@@ -135,12 +123,10 @@ export const searchBook = (book) => {
 export const rateBook = (rating, comment, book, ownerDetails) => {
   return (dispatch) => {
     dispatch(action(actionType.RATE_BOOK_LOADING, true))
-    LMS.at(contractConfig.id).then((instance) => {
-      return instance.rateBook(book.id, rating, comment,'0', {
+    lms.rateBook(book.id, rating, comment,'0', {
         from: ownerDetails.account,
         gas: 300000
-      })
-    }).then((response) => {
+      }).then((response) => {
       dispatch(action(actionType.GET_RATE_BOOK_SUCCESS, {
         bookId: book.id,
         rating: rating,
@@ -181,9 +167,7 @@ export const logout = () => {
 export const getMemberDetailsByEmail = (response) => {
   return (dispatch) => {
     dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_LOADING, true))
-    LMS.at(contractConfig.id).then((instance) => {
-      return instance.getMemberDetailsByEmail(response.profileObj.email)
-    }).then((user) => {
+    lms.getMemberDetailsByEmail(response.profileObj.email).then((user) => {
       login(response, user)
       dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_SUCCESS, user))
     }).catch((e) => {
@@ -196,22 +180,19 @@ export const getMemberDetailsByEmail = (response) => {
 
 export const getRatings = (dispatch) => {
   dispatch(action(actionType.GET_RATE_BOOK_LOADING, true))
-  LMS.at(contractConfig.id).then((instance) => {
-    return instance.Rate({}, {
-      fromBlock: 0,
-      toBlock: 'latest'
-    })
-  }).then((rateEvent) => {
-    rateEvent.watch(function(err, result) {
-      rateEvent.stopWatching();
-      if (err) {
-        dispatch(action(actionType.GET_RATE_BOOK_ERROR, NotificationType.SHOW_GET_RATE_BOOK_ERROR))
-      } else {
-        dispatch(action(actionType.GET_RATE_BOOK_SUCCESS, result.args))
-      }
-      dispatch(action(actionType.GET_RATE_BOOK_LOADING, false))
-    });
-  })
+  var rateEvent = lms.Rate({}, {
+    fromBlock: 0,
+    toBlock: 'latest'
+  });
+  rateEvent.watch(function(err, result) {
+    rateEvent.stopWatching();
+    if (err) {
+      dispatch(action(actionType.GET_RATE_BOOK_ERROR, NotificationType.SHOW_GET_RATE_BOOK_ERROR))
+    } else {
+      dispatch(action(actionType.GET_RATE_BOOK_SUCCESS, result.args))
+    }
+    dispatch(action(actionType.GET_RATE_BOOK_LOADING, false))
+  });
 }
 
 export const createAccount = (session,password) => {
@@ -243,12 +224,10 @@ export const createAccount = (session,password) => {
 export const addMember = (member, dispatch, session) => {
   dispatch(action(actionType.ADD_MEMBER_LOADING, true))
   if(web3.personal.unlockAccount(member[1],member[3],0)) {
-    LMS.at(contractConfig.id).then((instance) => {
-          return instance.addMember(member[0], member[1], member[2], member[3], {
+    lms.addMember(member[0], member[1], member[2], member[3], {
             from: web3.eth.accounts[0],
             gas: 600000
-          })
-        }).then((response) => {
+          }).then((response) => {
           login(session, member)
           web3.eth.sendTransaction({
             from: web3.eth.accounts[0],

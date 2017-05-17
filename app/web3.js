@@ -5,6 +5,9 @@ import { default as contract } from 'truffle-contract'
 // Import our contract artifacts and turn them into usable abstractions.
 import lmsArtifacts from '../build/contracts/LMS.json'
 
+// Import contract address
+import contractConfig from './config'
+
 const LMS = contract(lmsArtifacts)
 
 // Checking if Web3 has been injected by the browser (Mist/MetaMask)
@@ -19,6 +22,9 @@ if (typeof web3 !== 'undefined') {
 
 LMS.setProvider(web3.currentProvider)
 
-export const web = web3
+let lms
+LMS.at(contractConfig.id).then(instance => {
+  lms = instance
+})
 
-export const lms = LMS
+export { lms, web3 }

@@ -170,6 +170,52 @@ What You Make It is a fictional story about a strong female", "Literature & Fict
             await expectThrow(lms.addBook("t", "a", "p", "u", "d", "g", {from: accounts[1]}));
         });
     });
+    
+    describe('updateBook', function() {
+        it('should update a book with new details provided', async function() {
+            await lms.addBook("Life Is What You Make It", "Preeti Shenoy", "Srishti Publisher", "https://tinyurl.com/mj55qnr", "Life Is \
+What You Make It is a fictional story about a strong female", "Literature & Fiction");
+            await lms.updateBook(1, 't', 'a', 'p', 'imgUrl','d', 'g');
+            let bookCount = await lms.numBooks();
+            assert.equal(bookCount, 1);
+            let book = await lms.getBook(1);
+            let bookAttr = book.split(';');
+            assert.equal(bookAttr[1], 't');
+            assert.equal(bookAttr[2], 'a');
+            assert.equal(bookAttr[3], 'p');
+            assert.equal('0x' + bookAttr[4], web3.eth.coinbase);
+            assert.equal('0x' + bookAttr[5], 0x0);
+            assert.equal(bookAttr[6], '0');
+            assert.isAtMost(bookAttr[7], Math.floor(Date.now() / 1000));
+            assert.isAbove(bookAttr[7], Math.floor(Date.now() / 1000) - 300);
+            assert.equal(bookAttr[8], '0');
+            assert.equal(bookAttr[9], 'imgUrl');
+            assert.equal(bookAttr[10], 'd');
+            assert.equal(bookAttr[11], 'g');
+        });
+        it('should not update book if request sender is not book owner', async function() {
+            await lms.addMember('Other member', accounts[1], "Om@gmail.com");
+            await lms.addBook("Life Is What You Make It", "Preeti Shenoy", "Srishti Publisher", "https://tinyurl.com/mj55qnr", "Life Is \
+What You Make It is a fictional story about a strong female", "Literature & Fiction");
+            await lms.updateBook(1, 't', 'a', 'p', 'imgUrl','d', 'g',{from: accounts[1]});
+            let bookCount = await lms.numBooks();
+            assert.equal(bookCount, 1);
+            let book = await lms.getBook(1);
+            let bookAttr = book.split(';');
+            assert.equal(bookAttr[1], 'Life Is What You Make It');
+            assert.equal(bookAttr[2], 'Preeti Shenoy');
+            assert.equal(bookAttr[3], 'Srishti Publisher');
+            assert.equal('0x' + bookAttr[4], web3.eth.coinbase);
+            assert.equal('0x' + bookAttr[5], 0x0);
+            assert.equal(bookAttr[6], '0');
+            assert.isAtMost(bookAttr[7], Math.floor(Date.now() / 1000));
+            assert.isAbove(bookAttr[7], Math.floor(Date.now() / 1000) - 300);
+            assert.equal(bookAttr[8], '0');
+            assert.equal(bookAttr[9], 'https://tinyurl.com/mj55qnr');
+            assert.equal(bookAttr[10], 'Life Is What You Make It is a fictional story about a strong female');
+            assert.equal(bookAttr[11], 'Literature & Fiction');
+        });
+    });
 
     describe('getAllBooks', function() {
         it('should return all books, irrespective of who owns them', async function() {

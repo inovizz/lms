@@ -143,6 +143,18 @@ contract LMS is Killable {
         }
     }
 
+    function updateBook(uint i, string title, string author, string publisher, string imgUrl, string description, string genre) public onlyMember {
+        if(i <= numBooks && catalog[i].owner == msg.sender) {
+            catalog[i].title = title;
+            catalog[i].author = author;
+            catalog[i].publisher = publisher;
+            catalog[i].imgUrl = imgUrl;
+            catalog[i].description = description;
+            catalog[i].genre = genre;
+            catalog[i].state = State.Available;
+        }
+    }
+
     function getBook(uint i) constant returns (string bookString) {
         var parts = new strings.slice[](15);
         //Iterate over the entire catalog to find my books

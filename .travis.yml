@@ -12,4 +12,5 @@ script:
   - testrpc > /dev/null &
   - truffle compile
   - truffle test
+  - npm run build
   - npm test

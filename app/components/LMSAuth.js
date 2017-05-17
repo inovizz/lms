@@ -9,18 +9,22 @@ class LMSAuth extends React.Component {
     return (
       <form className='form-horizontal' ref='authForm' onSubmit={(e) => {
         e.preventDefault()
-        this.props.createAccount(this.password.value)
+        if(this.props.user[0]) {
+          this.props.login(this.password.value)
+        } else {
+          this.props.createAccount(this.password.value)
+        }
         this.props.closeModal()
         this.refs.authForm.reset()
       }}>
         <fieldset>
           <legend>
-            Create Account
+            Sign In
             <span className='glyphicon glyphicon-remove close-btn' onClick={() => this.props.closeModal()}></span>
           </legend>
           <div className='form-group row'>
                 <p className='text-center text-info col-sm-8 col-sm-offset-2'>
-                  Provide password to create account on blockchain
+                  Enter password to create account or log in to the existing account
                 </p>
               </div>
           <div className='form-group'>

@@ -141,26 +141,27 @@ export const rateBook = (rating, comment, book, ownerDetails) => {
 }
 
 export const login = (response, userVal) => {
-  sessionService.saveSession(response)
-  .then(() => {
-    const user = {
-      'name' : userVal[0],
-      'account' : userVal[1],
-      'status' : userVal[2],
-      'dateAdded' : userVal[3],
-      'body': response
-    }
-    sessionService.saveUser(user)
-  }).catch(err => console.error(err))
+  return (dispatch) => {
+    sessionService.saveSession(response)
+    .then(() => {
+      const user = {
+        'name' : userVal[0],
+        'account' : userVal[1],
+        'email' : userVal[2]
+      }
+      sessionService.saveUser(user)
+    }).catch(err => console.error(err))
+  }
 }
 
 export const logout = () => {
-  return () => {
+  return (dispatch) => {
     sessionService.deleteSession()
     sessionService.deleteUser()
     if(window.gapi) {
         window.gapi.auth2.getAuthInstance().disconnect()
     }
+    dispatch(action("LOGOUT",[]))
   }
 }
 
@@ -168,8 +169,7 @@ export const getMemberDetailsByEmail = (response) => {
   return (dispatch) => {
     dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_LOADING, true))
     lms.getMemberDetailsByEmail(response.profileObj.email).then((user) => {
-      login(response, user)
-      dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_SUCCESS, user))
+      dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_SUCCESS, { session: response, user }))
     }).catch((e) => {
       dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_ERROR, NotificationType.SHOW_GET_MEMBER_DETAILS_EMAIL_ERROR))
     }).then(() => {
@@ -206,12 +206,12 @@ export const createAccount = (session,password) => {
     }
     return axios.post('/api/create_account',request)
             .then((response) => {
-              addMember([
-                session.user.body.profileObj.name,
+              const user = [
+                session.profileObj.name,
                 response.data.data.result,
-                session.user.body.profileObj.email,
-                password,
-              ], dispatch, session.user.body)
+                session.profileObj.email
+              ];
+              dispatch(unlockAccount(session, user, password, true))
             })
             .catch((error) => {
               dispatch(action(actionType.CREATE_ACCOUNT_ERROR, NotificationType.SHOW_CREATE_ACCOUNT_ERROR))
@@ -221,24 +221,36 @@ export const createAccount = (session,password) => {
   };
 }
 
-export const addMember = (member, dispatch, session) => {
-  dispatch(action(actionType.ADD_MEMBER_LOADING, true))
-  if(web3.personal.unlockAccount(member[1],member[3],0)) {
-    lms.addMember(member[0], member[1], member[2], member[3], {
+export const addMember = (member) => {
+  return (dispatch) => {
+    dispatch(action(actionType.ADD_MEMBER_LOADING, true))
+    lms.addMember(member[0], member[1], member[2], {
             from: web3.eth.accounts[0],
             gas: 600000
           }).then((response) => {
-          login(session, member)
           web3.eth.sendTransaction({
             from: web3.eth.accounts[0],
             to: member[1],
             value: web3.toWei(1000)
           })
+          dispatch(action(actionType.ADD_MEMBER_SUCCESS, true))
         }).catch((err) => {
-          logout()
           dispatch(action(actionType.ADD_MEMBER_ERROR, NotificationType.SHOW_ADD_MEMBER_ERROR))
         }).then(() => {
           dispatch(action(actionType.ADD_MEMBER_LOADING, false))
         })
+  }
+}
+
+export const unlockAccount = (session, user, password, flag) => {
+  return (dispatch) => {
+    dispatch(action('UNLOCK_ACCOUNT_START'),true)
+    if(web3.personal.unlockAccount(user[1], password, 0)) {
+      if(flag) {
+        dispatch(addMember(user))
+      }
+      dispatch(login(session, user))
+    }
+    dispatch(action('UNLOCK_ACCOUNT_END'),true)
   }
 }

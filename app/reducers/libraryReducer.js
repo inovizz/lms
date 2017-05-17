@@ -307,3 +307,14 @@ export const myBooksReducers = (state = [], action) => {
       return state
   }
 }
+
+export const existingMemberReducer = (state=[], action) => {
+  switch (action.type) {
+    case 'GET_MEMBER_DETAILS_EMAIL_SUCCESS':
+      return action.payload
+    case 'LOGOUT':
+      return action.payload
+    default:
+      return state
+  }
+}

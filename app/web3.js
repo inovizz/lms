@@ -22,9 +22,6 @@ if (typeof web3 !== 'undefined') {
 
 LMS.setProvider(web3.currentProvider)
 
-let lms
-LMS.at(contractConfig.id).then(instance => {
-  lms = instance
-})
+let lms = LMS.at(contractConfig.id)
 
 export { lms, web3 }

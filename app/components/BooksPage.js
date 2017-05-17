@@ -32,7 +32,8 @@ const mapStateToProps = (state, ownProps) => {
     filteredBooks: state.filteredBooks,
     loading: state.loading,
     session: state.session,
-    error: state.error
+    error: state.error,
+    isExistingMember: state.isExistingMember
   }
 }
 
@@ -42,7 +43,7 @@ export class BooksPage extends React.Component {
     this.searchVal = ''
     this.state = {
       rateModalIsOpen: false,
-      authModalIsOpen: true,
+      authModalIsOpen: !this.props.isExistingMember.user,
       book: {}
     }
   }
@@ -56,10 +57,18 @@ export class BooksPage extends React.Component {
         this.props.getAllBooks()
     }
   }
+  componentWillReceiveProps (nextProps) {
+    if(!nextProps.isExistingMember.user) {
+      this.setState({
+        authModalIsOpen: true
+      })
+    }
+  }
   toggleModal (modal, book) {
     switch (modal) {
       case 'rateBook' : {
         this.setState({ rateModalIsOpen: !this.state.rateModalIsOpen, book })
+        break;
       }
       case 'authModal' : {
         this.setState({ authModalIsOpen: !this.state.authModalIsOpen })
@@ -68,6 +77,10 @@ export class BooksPage extends React.Component {
   }
   loginFailure (response) {
     console.log(response)
+  }
+  signIn (password) {
+    const { session, user } = this.props.isExistingMember
+    this.props.unlockAccount(session, user, password)
   }
   renderLoader (flag) {
     const title = this.props.loading.loginLoader
@@ -151,16 +164,18 @@ export class BooksPage extends React.Component {
           }
         </div>
         <Modal
-            isOpen={this.state.authModalIsOpen && this.props.session.authenticated && !this.props.session.user.name}
+            isOpen={this.state.authModalIsOpen && (this.props.isExistingMember.user ? true: false) }
             onRequestClose={() => this.toggleModal('authModal')}
             shouldCloseOnOverlayClick={false}
             role='dialog'
             style={modalStyle}
-            contentLabel='Create Account'>
+            contentLabel='Account'>
             <LMSAuth
               closeModal={() => this.toggleModal('authModal')}
+              user={this.props.isExistingMember.user}
+              login={(password) => this.signIn(password)}
               createAccount={(password) => {
-                this.props.createAccount(this.props.session, password)
+                this.props.createAccount(this.props.isExistingMember.session, password)
               }}/>
           </Modal>
       </div>)

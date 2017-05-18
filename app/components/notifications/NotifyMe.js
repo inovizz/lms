@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import ReactDOM from 'react-dom';
 import Notifications from 'react-notification-system-redux';
 
 class NotifyMe extends React.Component {
@@ -10,9 +9,11 @@ class NotifyMe extends React.Component {
             const { type } = nextProps.message.message;
             switch (type) {
                 case 'success':
-                    this.dispatchNotification(Notifications.success, 250, nextProps);
+                    this.dispatchNotification(Notifications.success, 250, nextProps)
+                    break
                 case 'error':
-                    this.dispatchNotification(Notifications.error, 250, nextProps);
+                    this.dispatchNotification(Notifications.error, 250, nextProps)
+                    break
                 default: break
             }
         }
@@ -26,7 +27,7 @@ class NotifyMe extends React.Component {
             position: 'br',
             autoDismiss: 0,
             action: {
-                label: 'Close!!',
+                label: 'Close',
                 // callback: () => alert('clicked!')
             }
         };
@@ -46,14 +47,13 @@ class NotifyMe extends React.Component {
     }
 }
 
-// export default NotifyMe;
-
 NotifyMe.contextTypes = {
     store: PropTypes.object
 };
 
 NotifyMe.propTypes = {
-    notifications: PropTypes.array
+    notifications: PropTypes.array,
+    message: PropTypes.object
 };
 
 export default connect(

@@ -17,6 +17,7 @@ export const getAccounts = () => {
     dispatch(action(actionType.GET_ACCOUNTS_LOADING, true))
     web3.eth.getAccounts((err, accs) => {
       if (err != null) {
+        console.log("Error Occured",err)
         dispatch(action(actionType.GET_ACCOUNTS_ERROR, NotificationType.SHOW_ACCOUNTS_ERROR))
       }
       dispatch(action(actionType.GET_ACCOUNTS_SUCCESS, accs))
@@ -33,6 +34,7 @@ export const getOwnerDetails = (response) => {
       dispatch(action(actionType.GET_OWNERDETAILS_SUCCESS, user))
       dispatch(action(actionType.GET_OWNERDETAILS_LOADING, false))
     }).catch((e) => {
+      console.log("Error Occured",e)
       dispatch(action(actionType.GET_OWNERDETAILS_ERROR, NotificationType.SHOW_OWNERDETAILS_ERROR))
       dispatch(action(actionType.GET_OWNERDETAILS_LOADING, false))
     })
@@ -47,6 +49,7 @@ export const getAllBooks = () => {
       dispatch(action(actionType.GET_ALL_BOOKS_SUCCESS, books))
       dispatch(action(actionType.GET_ALL_BOOKS_LOADING, false))
     }).catch((e) => {
+      console.log("Error Occured",e)
       dispatch(action(actionType.GET_ALL_BOOKS_ERROR, NotificationType.SHOW_ALL_BOOKS_ERROR))
       dispatch(action(actionType.GET_ALL_BOOKS_LOADING, false))
     })
@@ -60,6 +63,7 @@ export const getMyBooks = () => {
       dispatch(action(actionType.GET_MY_BOOKS_SUCCESS, books))
       dispatch(action(actionType.GET_MY_BOOKS_LOADING, false))
     }).catch((e) => {
+      console.log("Error Occured",e)
       dispatch(action(actionType.GET_MY_BOOKS_ERROR, NotificationType.SHOW_MY_BOOKS_ERROR))
       dispatch(action(actionType.GET_MY_BOOKS_LOADING, false))
     })
@@ -84,6 +88,7 @@ export const addBook = (book) => {
       dispatch(action(actionType.GET_ADD_BOOKS_SUCCESS, book))
       dispatch(action(actionType.GET_ADD_BOOKS_LOADING, false))
     }).catch((e) => {
+      console.log("Error Occured",e)
       dispatch(action(actionType.GET_ADD_BOOKS_ERROR, NotificationType.SHOW_ADD_BOOKS_ERROR))
       dispatch(action(actionType.GET_ADD_BOOKS_LOADING, false))
     })
@@ -96,6 +101,7 @@ export const returnBook = (book) => {
     lms.returnBook(book.id, { from : book.owner, gas: 200000 }).then((response) => {
       dispatch(action(actionType.GET_RETURN_BOOKS_SUCCESS, book))
     }).catch((e) => {
+      console.log("Error Occured",e)
       dispatch(action(actionType.GET_RETURN_BOOKS_ERROR, NotificationType.SHOW_GET_RETURN_BOOKS_ERROR))
     }).then(() => {
       dispatch(action(actionType.GET_RETURN_BOOKS_LOADING, false))
@@ -109,6 +115,7 @@ export const borrowBook = (book, ownerDetails) => {
     lms.borrowBook(book.id, { from: ownerDetails.account, value: web3.toWei(0.1), gas: 200000 }).then((response) => {
       dispatch(action(actionType.GET_BORROW_BOOKS_SUCCESS, { book, owner: ownerDetails.account }))
     }).catch((e) => {
+      console.log("Error Occured",e)
       dispatch(action(actionType.GET_BORROW_BOOKS_ERROR, NotificationType.SHOW_GET_BORROW_BOOKS_ERROR))
     }).then(() => {
       dispatch(action(actionType.GET_BORROW_BOOKS_LOADING, false))
@@ -134,6 +141,7 @@ export const rateBook = (rating, comment, book, ownerDetails) => {
       }))
       dispatch(action(actionType.RATE_BOOK_LOADING, false))
     }).catch((e) => {
+      console.log("Error Occured",e)
       dispatch(action(actionType.RATE_BOOK_ERROR, NotificationType.SHOW_GET_RATE_BOOK_ERROR))
       dispatch(action(actionType.RATE_BOOK_LOADING, false))
     })
@@ -171,6 +179,7 @@ export const getMemberDetailsByEmail = (response) => {
     lms.getMemberDetailsByEmail(response.profileObj.email).then((user) => {
       dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_SUCCESS, { session: response, user }))
     }).catch((e) => {
+      console.log("Error Occured",e)
       dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_ERROR, NotificationType.SHOW_GET_MEMBER_DETAILS_EMAIL_ERROR))
     }).then(() => {
       dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_LOADING, false))
@@ -187,6 +196,7 @@ export const getRatings = (dispatch) => {
   rateEvent.watch(function(err, result) {
     rateEvent.stopWatching();
     if (err) {
+      console.log("Error Occured",err)
       dispatch(action(actionType.GET_RATE_BOOK_ERROR, NotificationType.SHOW_GET_RATE_BOOK_ERROR))
     } else {
       dispatch(action(actionType.GET_RATE_BOOK_SUCCESS, result.args))
@@ -214,6 +224,7 @@ export const createAccount = (session,password) => {
               dispatch(unlockAccount(session, user, password, true))
             })
             .catch((error) => {
+              console.log("Error Occured",error)
               dispatch(action(actionType.CREATE_ACCOUNT_ERROR, NotificationType.SHOW_CREATE_ACCOUNT_ERROR))
             }).then(() => {
               dispatch(action(actionType.CREATE_ACCOUNT_LOADING, false))
@@ -235,6 +246,7 @@ export const addMember = (member) => {
           })
           dispatch(action(actionType.ADD_MEMBER_SUCCESS, true))
         }).catch((err) => {
+          console.log("Error Occured",err)
           dispatch(action(actionType.ADD_MEMBER_ERROR, NotificationType.SHOW_ADD_MEMBER_ERROR))
         }).then(() => {
           dispatch(action(actionType.ADD_MEMBER_LOADING, false))

@@ -5,6 +5,9 @@ class LMSAuth extends React.Component {
     super(props)
     this.password = ''
   }
+  componentDidMount () {
+    this.password.focus()
+  }
   render () {
     return (
       <form className='form-horizontal' ref='authForm' onSubmit={(e) => {

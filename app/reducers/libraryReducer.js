@@ -170,7 +170,10 @@ export const allBooksReducers = (state = [], action) => {
           'dateIssued' : book[8],
           'imageUrl' : book[9],
           'description' : book[10],
-          'genre' : book[11]
+          'genre' : book[11],
+          'avgRating': +book[12],
+          'totalRating': +book[13],
+          'reviewersCount': +book[14]
         }
       })
       return {
@@ -199,20 +202,24 @@ export const allBooksReducers = (state = [], action) => {
       let allBooks = books.map(book => {
         book.reviewers = book.reviewers || []
         book.ratings = book.ratings || []
-        let rating = 0
-        let totalRating = book.totalRating || 0
         if(book.id === booksRating.bookId) {
           const index = book.reviewers.indexOf(booksRating.reviewer)
+          let oldRating = 0
           if(index !== -1) {
-            rating = booksRating.rating - book.ratings[index];
+            oldRating = book.ratings[index]
             book.ratings[index] = booksRating.rating
+            book.reviewers[index] = booksRating.reviewer
           } else {
-            rating = booksRating.rating
-            book.ratings.push(booksRating.rating);
-            book.reviewers.push(booksRating.reviewer);
+            book.ratings.push(booksRating.rating)
+            book.reviewers.push(booksRating.reviewer)
           }
-          book.totalRating = totalRating + rating
-          book.rating = book.totalRating / book.reviewers.length
+          if(booksRating.flag) {
+            if(oldRating === 0) {
+              book.reviewersCount += 1
+            }
+            book.totalRating += booksRating.rating - oldRating
+            book.avgRating = book.totalRating / book.reviewersCount;
+          }
         }
         return book;
       })
@@ -237,7 +244,10 @@ export const allBooksReducers = (state = [], action) => {
           'dateIssued' : '0',
           'imageUrl' : action.payload.imageUrl,
           'description' : action.payload.description,
-          'genre' : action.payload.genre
+          'genre' : action.payload.genre,
+          'avgRating': 0,
+          'totalRating': 0,
+          'reviewersCount': 0
         }
       ]
       return {

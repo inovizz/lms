@@ -8,7 +8,8 @@ import {
   addBookReducer,
   returnBookReducer,
   borrowBookReducer,
-  rateBookReducer
+  rateBookReducer,
+  existingMemberReducer
 } from '../../../reducers/libraryReducer'
 
 describe('Reducers', () => {
@@ -168,7 +169,13 @@ describe('Reducers', () => {
         'borrower': '0x0000000000000000000000000000000000000000',
         'state': '0',
         'dateAdded': '1493054441',
-        'dateIssued': '0'
+        'dateIssued': '0',
+        'imageUrl' : '',
+        'description' : '',
+        'genre' : 'Literature',
+        'avgRating': +'0',
+        'totalRating': +'0',
+        'reviewersCount': +'0'
       }]
       Date.now = jest.fn(() => '1493054441')
     })
@@ -181,7 +188,7 @@ describe('Reducers', () => {
         allBooksReducers(undefined, {
           type: 'GET_ALL_BOOKS_SUCCESS',
           payload: [
-            '1;Title;Author;Publisher;ba21a9b09d528b2e1726d786a1d1b861032dba87;0000000000000000000000000000000000000000;0;1493054441;0'
+            '1;Title;Author;Publisher;ba21a9b09d528b2e1726d786a1d1b861032dba87;0000000000000000000000000000000000000000;0;1493054441;0;;;Literature;0;0;0'
           ]
         })).toEqual({
           allBooks : books
@@ -224,10 +231,14 @@ describe('Reducers', () => {
             'state': '0',
             'dateAdded': '1493054441',
             'dateIssued': '0',
+            'imageUrl' : '',
+            'description' : '',
+            'genre' : 'Literature',
+            'avgRating': 0,
+            'totalRating': 0,
+            'reviewersCount': 0,
             'reviewers': ['0xeeffa82fb768e9057d7967f672a3d0a6116d2528'],
-            'ratings': [3],
-            'rating': 3,
-            'totalRating': 3
+            'ratings': [3]
           }]
         })
     })
@@ -285,7 +296,10 @@ describe('Reducers', () => {
               'dateIssued' : '0',
               'imageUrl' : book.imageUrl,
               'description' : book.description,
-              'genre' : book.genre
+              'genre' : book.genre,
+              'avgRating': 0,
+              'totalRating': 0,
+              'reviewersCount': 0,
             }
           ]
         })
@@ -310,7 +324,13 @@ describe('Reducers', () => {
             'borrower': '0xba21a9b09d528b2e1726d786a1d1b861032dba87',
             'state': '1',
             'dateAdded': '1493054441',
-            'dateIssued': '1493054441'
+            'dateIssued': '1493054441',
+            'avgRating': 0,
+            'totalRating': 0,
+            'reviewersCount': 0,
+            'imageUrl' : '',
+            'description' : '',
+            'genre' : 'Literature'
           }]
         })
     })
@@ -331,7 +351,13 @@ describe('Reducers', () => {
             'borrower': '0x0',
             'state': '0',
             'dateAdded': '1493054441',
-            'dateIssued': '0'
+            'dateIssued': '0',
+            'avgRating': 0,
+            'totalRating': 0,
+            'reviewersCount': 0,
+            'imageUrl' : '',
+            'description' : '',
+            'genre' : 'Literature'
           }]
         })
     })
@@ -382,6 +408,25 @@ describe('Reducers', () => {
           'dateAdded': '1493054441',
           'dateIssued': '0'
         }])
+    })
+  })
+  describe('existingMemberReducer', () => {
+    it('should return initial state', () => {
+      expect(existingMemberReducer(undefined, {})).toEqual([])
+    })
+    it('should handle GET_MEMBER_DETAILS_EMAIL_SUCCESS', () => {
+      expect(
+        existingMemberReducer(undefined, {
+          type: 'GET_MEMBER_DETAILS_EMAIL_SUCCESS',
+          payload: true
+        })).toEqual(true)
+    })
+    it('should handle LOGOUT', () => {
+      expect(
+        existingMemberReducer(undefined, {
+          type: 'LOGOUT',
+          payload: []
+        })).toEqual([])
     })
   })
 })

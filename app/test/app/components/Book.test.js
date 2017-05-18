@@ -24,7 +24,7 @@ describe('Book', () => {
             'state': '0',
             'dateAdded': '1493054441',
             'dateIssued': '0',
-            'rating': 4,
+            'avgRating': 4,
             'imageUrl': 'https://images-eu.ssl-images-amazon.com/images/I/416Hql52NCL.jpg',
             'description': 'description'
           }],
@@ -63,6 +63,6 @@ describe('Book', () => {
     it('should render 4 stars', () => {
       expect(component.find('.active').length).toEqual(4)
     })
-    
+
   })
 })

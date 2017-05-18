@@ -4,7 +4,8 @@ const HTMLWebpackPlugin = require('html-webpack-plugin')
 const HTMLWebpackPluginConfig = new HTMLWebpackPlugin({
   template: './app/index.html',
   filename: 'index.html',
-  inject: 'body'
+  inject: 'body',
+  favicon: './app/img/favicon.ico'
 })
 
 const ExtractTextPlugin = require('extract-text-webpack-plugin')

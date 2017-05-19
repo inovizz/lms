@@ -156,26 +156,29 @@ export const allBooksReducers = (state = [], action) => {
   switch (action.type) {
     case 'GET_ALL_BOOKS_SUCCESS': {
       let books = action.payload[0]
-      let myBooks = books.split('|').map((book) => {
-        book = book.split(';')
-        return {
-          'id' : book[0],
-          'title' : book[1],
-          'author' : book[2],
-          'publisher' : book[3],
-          'owner' : '0x' + book[4],
-          'borrower' : '0x' + book[5],
-          'state' : book[6],
-          'dateAdded' : book[7],
-          'dateIssued' : book[8],
-          'imageUrl' : book[9],
-          'description' : book[10],
-          'genre' : book[11],
+      let myBooks = []
+      if(books !==""){
+        myBooks = books.split('|').map((book) => {
+          book = book.split(';')
+          return {
+            'id' : book[0],
+            'title' : book[1],
+            'author' : book[2],
+            'publisher' : book[3],
+            'owner' : '0x' + book[4],
+            'borrower' : '0x' + book[5],
+            'state' : book[6],
+            'dateAdded' : book[7],
+            'dateIssued' : book[8],
+            'imageUrl' : book[9],
+            'description' : book[10],
+            'genre' : book[11],
           'avgRating': +book[12],
           'totalRating': +book[13],
           'reviewersCount': +book[14]
-        }
-      })
+          }
+        })
+      }
       return {
         ...state,
         allBooks : myBooks
@@ -229,7 +232,7 @@ export const allBooksReducers = (state = [], action) => {
       }
     }
     case 'GET_ADD_BOOKS_SUCCESS': {
-      const id = parseInt(state.allBooks[state.allBooks.length-1].id)
+      const id = state.allBooks.length >0 ? parseInt(state.allBooks[state.allBooks.length-1].id) :0
       const books = [
         ...state.allBooks,
         {

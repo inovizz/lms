@@ -10,7 +10,24 @@ const style = {
     justifyContent: 'center'
   },
   pramatiLoader: {
-    position: 'relative'
+    position: 'fixed',
+    background: 'rgba(242, 242, 242,.6)',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    right: 0,
+    zIndex: 999
+  },
+  centerPramatiLoaderText: {
+    position: 'absolute',
+    margin: 'auto',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+    width: '120px',
+    height: '75px',
+    textAlign: 'center'
   },
   handRed: {
     width: '10px',
@@ -47,9 +64,9 @@ const style = {
 }
 
 const Loader = ({ text }) => (
-  <div style={style.container}>
-    <div style={style.pramatiLoader}>
-      <div>{text}</div>
+  <div style={style.pramatiLoader}>
+    <div >
+      <div style={style.centerPramatiLoaderText}>{text}</div>
       <div className='handred' style={style.handRed}></div>
       <div className='handaqua' style={style.handAqua}></div>
       <div className='handblue' style={style.handBlue}></div>

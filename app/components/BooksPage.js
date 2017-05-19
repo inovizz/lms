@@ -160,7 +160,7 @@ export class BooksPage extends React.Component {
               rateModalIsOpen = { this.state.rateModalIsOpen }
               authenticated = { this.props.session.authenticated }
               width = '70%' />
-            : this.renderLoader(true)
+            : <div className="col-md-12">No Books Added</div>
           }
         </div>
         <Modal

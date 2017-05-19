@@ -19,9 +19,8 @@ describe('Dashboard', () => {
         },
         getAllBooks: jest.fn()
       }
-      const actual = mount(<Dashboard {...props}/>)
-      const expected = <div>Loading Books</div>
-      expect(actual.contains(expected)).toEqual(true)
+      const actual = shallow(<Dashboard {...props}/>)
+      expect(actual.find('.add-btn').exists()).toEqual(true)
     })
   })
 })

@@ -1,4 +1,5 @@
 import React from 'react'
+import BookUnavailabelImg from '../../img/book-unavailable.png'
 
 export default class Image extends React.Component {
   constructor (props) {
@@ -17,7 +18,7 @@ export default class Image extends React.Component {
   handleError () {
     this.setState({
       loading: false,
-      src: 'https://placehold.it/400x500'
+      src: BookUnavailabelImg
     })
   }
   render () {

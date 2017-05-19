@@ -18,6 +18,10 @@ const modalStyle = {
   }
 }
 
+const leadStyle = {
+  paddingBottom : 0
+}
+
 const mapStateToProps = (state, ownProps) => {
   return {
     allBooks: state.books.allBooks,
@@ -111,7 +115,7 @@ export class Dashboard extends React.Component {
                 }
                 rateModalIsOpen = { this.state.rateModalIsOpen }
                 authenticated = { this.props.session.authenticated} />
-              : <div> No Books Added </div>
+              : <div className="book"><div className="lead" style={leadStyle}>My Books</div><div> No Books Added </div></div>
             }
             {
               borrowedBooks.length
@@ -143,9 +147,10 @@ export class Dashboard extends React.Component {
   }
   render () {
     return (
-        this.props.allBooks.length
-        ? this.renderBooks()
-        : this.renderLoading()
+        // this.props.allBooks.length
+        // ? 
+        this.renderBooks()
+        // : this.renderLoading()
     )
   }
 }

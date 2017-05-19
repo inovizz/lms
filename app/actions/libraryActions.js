@@ -19,9 +19,26 @@ export const getAccounts = () => {
       if (e != null) {
         console.log("Error Occured", e)
         dispatch(action(actionType.GET_ACCOUNTS_ERROR, NotificationType('error', 'Error', e.message)))
+      } else {
+        dispatch(action(actionType.GET_ACCOUNTS_SUCCESS, accs))
       }
-      dispatch(action(actionType.GET_ACCOUNTS_SUCCESS, accs))
       dispatch(action(actionType.GET_ACCOUNTS_LOADING, false))
+    })
+  }
+}
+
+export const getBalance = (ownerDetails) => {
+  return (dispatch) => {
+    dispatch(action(actionType.GET_USER_BALANCE_LOADING, true))
+    web3.eth.getBalance(ownerDetails.account, (e, balance) => {
+      if (e != null) {
+        console.log("Error Occured", e)
+        dispatch(action(actionType.GET_USER_BALANCE_ERROR, NotificationType('error', 'Error', e.message)))
+      } else {
+        balance = web3.fromWei(balance, 'ether')
+        dispatch(action(actionType.GET_USER_BALANCE_SUCCESS, balance))
+      }
+      dispatch(action(actionType.GET_USER_BALANCE_LOADING, false))
     })
   }
 }
@@ -86,11 +103,12 @@ export const addBook = (book) => {
         }
       ).then((response) => {
       dispatch(action(actionType.GET_ADD_BOOKS_SUCCESS, book))
-      dispatch(action(actionType.GET_ADD_BOOKS_LOADING, false))
     }).catch((e) => {
       console.log("Error Occured", e)
       dispatch(action(actionType.GET_ADD_BOOKS_ERROR, NotificationType('error', 'Error', e.message)))
+    }).then(() => {
       dispatch(action(actionType.GET_ADD_BOOKS_LOADING, false))
+      dispatch(getBalance(book.owner))
     })
   }
 }
@@ -105,6 +123,7 @@ export const returnBook = (book) => {
       dispatch(action(actionType.GET_RETURN_BOOKS_ERROR, NotificationType('error', 'Error', e.message)))
     }).then(() => {
       dispatch(action(actionType.GET_RETURN_BOOKS_LOADING, false))
+      dispatch(getBalance({ account: book.owner }))
     })
   }
 }
@@ -119,6 +138,7 @@ export const borrowBook = (book, ownerDetails) => {
       dispatch(action(actionType.GET_BORROW_BOOKS_ERROR, NotificationType('error', 'Error', e.message)))
     }).then(() => {
       dispatch(action(actionType.GET_BORROW_BOOKS_LOADING, false))
+      dispatch(getBalance(ownerDetails))
     })
   }
 }
@@ -148,6 +168,7 @@ export const rateBook = (rating, comment, book, ownerDetails) => {
       dispatch(action(actionType.RATE_BOOK_ERROR, NotificationType('error', 'Error', e.message)))
     }).then(() => {
       dispatch(action(actionType.RATE_BOOK_LOADING, false))
+      dispatch(getBalance(ownerDetails))
     })
   }
 }
@@ -162,6 +183,7 @@ export const login = (response, userVal) => {
         'email' : userVal[2]
       }
       sessionService.saveUser(user)
+      dispatch(getBalance(user))
     }).catch(e => dispatch(action(actionType.LOGIN_ERROR, NotificationType('error', 'Error', e.message))))
   }
 }

@@ -6,7 +6,8 @@ import Header from './Header'
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    session: state.session
+    session: state.session,
+    accounts: state.accounts
   }
 }
 
@@ -16,6 +17,11 @@ export class App extends React.Component {
     const loader = document.getElementById('loader')
     if (loader) {
       loader.style.display = 'none'
+    }
+  }
+  componentWillReceiveProps (nextProps) {
+    if(!nextProps.accounts && nextProps.session.authenticated && nextProps.session.user.account) {
+      this.props.getBalance(nextProps.session.user)
     }
   }
   render () {
@@ -29,6 +35,7 @@ export class App extends React.Component {
             (response) => { console.log(response) }
           }
           session={ this.props.session }
+          accounts={ this.props.accounts }
           logout = {
             () => this.props.logout()
           } />

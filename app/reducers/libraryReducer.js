@@ -2,6 +2,11 @@ export const libraryReducer = (state = [], action) => {
   switch (action.type) {
     case 'GET_ACCOUNTS_SUCCESS':
       return action.payload
+    case 'GET_USER_BALANCE_SUCCESS':
+      return {
+        ...state,
+        balance: action.payload.toNumber()
+      }
     default:
       return state
   }

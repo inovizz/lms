@@ -33,7 +33,8 @@ const mapStateToProps = (state, ownProps) => {
     loading: state.loading,
     session: state.session,
     error: state.error,
-    isExistingMember: state.isExistingMember
+    isExistingMember: state.isExistingMember,
+    accounts: state.accounts
   }
 }
 
@@ -62,6 +63,9 @@ export class BooksPage extends React.Component {
       this.setState({
         authModalIsOpen: true
       })
+    }
+    if(!nextProps.accounts && nextProps.session.authenticated && nextProps.session.user.account) {
+      this.props.getBalance(nextProps.session.user)
     }
   }
   toggleModal (modal, book) {
@@ -114,6 +118,7 @@ export class BooksPage extends React.Component {
             (response) => this.loginFailure(response)
           }
           session={ this.props.session }
+          accounts={ this.props.accounts }
           logout = {
             () => this.props.logout()
           } />

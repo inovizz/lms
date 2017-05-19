@@ -65,8 +65,7 @@ export class RateBook extends React.Component {
                 id = 'comment'
                 placeholder = 'Comment'
                 onChange={this.changeComment}
-                rows = '9'
-                required />
+                rows = '9'/>
             </div>
           </div>
           <div className='form-group'>

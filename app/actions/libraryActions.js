@@ -130,7 +130,8 @@ export const searchBook = (book) => {
 export const rateBook = (rating, comment, book, ownerDetails) => {
   return (dispatch) => {
     dispatch(action(actionType.RATE_BOOK_LOADING, true))
-    const index = book.reviewers.indexOf(ownerDetails.account)
+    const reviewers = book.reviewers || []
+    const index = reviewers.indexOf(ownerDetails.account)
     const oldRating = (index === -1) ? 0 : book.ratings[index]
     lms.rateBook(book.id, rating, comment, oldRating, {
         from: ownerDetails.account,
@@ -262,12 +263,17 @@ export const addMember = (member) => {
 export const unlockAccount = (session, user, password, flag) => {
   return (dispatch) => {
     dispatch(action(actionType.UNLOCK_ACCOUNT_START),true)
-    if(web3.personal.unlockAccount(user[1], password, 0)) {
-      if(flag) {
-        dispatch(addMember(user))
+    try {
+      if(web3.personal.unlockAccount(user[1], password, 0)) {
+        if(flag) {
+          dispatch(addMember(user))
+        }
+        dispatch(login(session, user))
       }
-      dispatch(login(session, user))
+    } catch(e) {
+      dispatch(action(actionType.UNLOCK_ACCOUNT_ERROR, NotificationType('error', 'Error', e.message)))
+    } finally {
+      dispatch(action(actionType.UNLOCK_ACCOUNT_END),true)
     }
-    dispatch(action(actionType.UNLOCK_ACCOUNT_END),true)
   }
 }

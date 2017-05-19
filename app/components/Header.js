@@ -14,7 +14,7 @@ const Header = ({ loginSuccess, loginFailure, session, logout }) => (
           src = {LogoImg} />
         </a>
         <span className='navbar-brand'>
-          Library Management System
+          Bookshelf
         </span>
       </div>
       <div id='navbar' className='navbar-collapse collapse navbar-right'>

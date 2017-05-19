@@ -4,47 +4,72 @@ class LMSAuth extends React.Component {
   constructor (props) {
     super(props)
     this.password = ''
+    this.confirmPassword = ''
+    this.existingUser = ''
+    this.handleSubmit = this.handleSubmit.bind(this)
+    this.closeModal = this.closeModal.bind(this)
+    this.state = {
+      error: false
+    }
   }
   componentDidMount () {
     this.password.focus()
   }
+  closeModal () {
+    this.props.closeModal()
+  }
+  handleSubmit (e) {
+    e.preventDefault()
+    if(!this.existingUser && this.password.value !== this.confirmPassword.value) {
+      this.setState({
+        error: true
+      })
+      return
+    }
+    if(this.props.user[0]) {
+      this.props.login(this.password.value)
+    } else {
+      this.props.createAccount(this.password.value)
+    }
+    this.closeModal()
+  }
   render () {
+    this.existingUser = this.props.user[0] ? true : false // true : User Exists, false : Create new Account
     return (
-      <form className='form-horizontal' ref='authForm' onSubmit={(e) => {
-        e.preventDefault()
-        if(this.props.user[0]) {
-          this.props.login(this.password.value)
-        } else {
-          this.props.createAccount(this.password.value)
-        }
-        this.props.closeModal()
-        this.refs.authForm.reset()
-      }}>
+      <form className='form-horizontal' onSubmit={this.handleSubmit}>
         <fieldset>
           <legend>
-            Sign In
-            <span className='glyphicon glyphicon-remove close-btn' onClick={() => this.props.closeModal()}></span>
+            { this.existingUser ? "Sign In" : "Sign Up" }
+            <span className='glyphicon glyphicon-remove close-btn' onClick={this.closeModal}></span>
           </legend>
-          <div className='form-group row'>
-                <p className='text-center text-info col-sm-8 col-sm-offset-2'>
-                  Enter password to create account or log in to the existing account
-                </p>
-              </div>
+          <div className='row text-center text-danger'>
+            { this.state.error && <p>Passwords do not match</p>}
+          </div>
           <div className='form-group'>
-            <label htmlFor='password' className='col-sm-3 control-label'>Password</label>
-            <div className='col-sm-9'>
+            <label htmlFor='password' className='col-sm-4 control-label'>Password</label>
+            <div className='col-sm-8'>
               <input type = 'password'
                 className = 'form-control'
                 id = 'password'
-                placeholder = 'password'
-                ref = {
-                  (node) => {
-                    this.password = node
-                  }
-                }
+                placeholder = 'Password'
+                ref = {(element) => { this.password = element }}
                 required />
             </div>
           </div>
+          {
+            !this.existingUser &&
+            <div className='form-group'>
+              <label htmlFor='confirmPassword' className='col-sm-4 control-label'>Confirm Password</label>
+              <div className='col-sm-8'>
+                <input type = 'password'
+                  className = 'form-control'
+                  id = 'confirmPassword'
+                  placeholder = 'Confirm Password'
+                  ref = {(element) => { this.confirmPassword = element }}
+                  required />
+              </div>
+            </div>
+          }
           <div className='form-group'>
             <div className='text-center'>
               <button type='submit' className='btn btn-default'>Submit</button>

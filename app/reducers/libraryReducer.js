@@ -324,6 +324,8 @@ export const existingMemberReducer = (state=[], action) => {
       return action.payload
     case 'LOGOUT':
       return action.payload
+    case 'UNLOCK_ACCOUNT_ERROR':
+      return []
     default:
       return state
   }

@@ -21,7 +21,7 @@ const OwnerDetails = ({ data, logout, accounts }) => {
         <strong>{data.email}</strong>
       </li>
       {
-        accounts && accounts.balance &&
+        accounts && (accounts.balance !== undefined) &&
         <li>
           <span className='glyphicon glyphicon glyphicon-piggy-bank'></span>
           &nbsp;&nbsp;

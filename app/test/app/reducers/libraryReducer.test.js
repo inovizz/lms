@@ -26,6 +26,19 @@ describe('Reducers', () => {
           ]
         })).toEqual(['0xb'])
     })
+    it('should handle GET_USER_BALANCE_SUCCESS', () => {
+      const payload = {
+        value: '123',
+        toNumber: () => {
+          return +payload.value
+        }
+      }
+      expect(
+        libraryReducer(undefined, {
+          type: 'GET_USER_BALANCE_SUCCESS',
+          payload
+        })).toEqual({ balance: 123 })
+    })
   })
   describe('loadingReducer', () => {
     it('should return initial state', () => {
@@ -87,6 +100,27 @@ describe('Reducers', () => {
           payload: true
         })).toEqual({ 'rateBookLoading' : true })
     })
+    it('should handle GET_MEMBER_DETAILS_EMAIL_LOADING', () => {
+      expect(
+        loadingReducer(undefined, {
+          type: 'GET_MEMBER_DETAILS_EMAIL_LOADING',
+          payload: true
+        })).toEqual({ 'loginLoader' : true })
+    })
+    it('should handle CREATE_ACCOUNT_LOADING', () => {
+      expect(
+        loadingReducer(undefined, {
+          type: 'CREATE_ACCOUNT_LOADING',
+          payload: true
+        })).toEqual({ 'createAccountLoader' : true })
+    })
+    it('should handle ADD_MEMBER_LOADING', () => {
+      expect(
+        loadingReducer(undefined, {
+          type: 'ADD_MEMBER_LOADING',
+          payload: true
+        })).toEqual({ 'addMemberLoader' : true })
+    })
   })
   describe('errorReducer', () => {
     it('should return initial state', () => {
@@ -131,6 +165,48 @@ describe('Reducers', () => {
       expect(
         errorReducer(undefined, {
           type: 'RATE_BOOK_ERROR',
+          payload: 'ERROR'
+        })).toEqual({"message": "ERROR"})
+    })
+    it('should handle GET_RETURN_BOOKS_ERROR', () => {
+      expect(
+        errorReducer(undefined, {
+          type: 'GET_RETURN_BOOKS_ERROR',
+          payload: 'ERROR'
+        })).toEqual({"message": "ERROR"})
+    })
+    it('should handle GET_BORROW_BOOKS_ERROR', () => {
+      expect(
+        errorReducer(undefined, {
+          type: 'GET_BORROW_BOOKS_ERROR',
+          payload: 'ERROR'
+        })).toEqual({"message": "ERROR"})
+    })
+    it('should handle GET_MEMBER_DETAILS_EMAIL_ERROR', () => {
+      expect(
+        errorReducer(undefined, {
+          type: 'GET_MEMBER_DETAILS_EMAIL_ERROR',
+          payload: 'ERROR'
+        })).toEqual({"message": "ERROR"})
+    })
+    it('should handle GET_RATE_BOOK_ERROR', () => {
+      expect(
+        errorReducer(undefined, {
+          type: 'GET_RATE_BOOK_ERROR',
+          payload: 'ERROR'
+        })).toEqual({"message": "ERROR"})
+    })
+    it('should handle CREATE_ACCOUNT_ERROR', () => {
+      expect(
+        errorReducer(undefined, {
+          type: 'CREATE_ACCOUNT_ERROR',
+          payload: 'ERROR'
+        })).toEqual({"message": "ERROR"})
+    })
+    it('should handle ADD_MEMBER_ERROR', () => {
+      expect(
+        errorReducer(undefined, {
+          type: 'ADD_MEMBER_ERROR',
           payload: 'ERROR'
         })).toEqual({"message": "ERROR"})
     })
@@ -218,7 +294,8 @@ describe('Reducers', () => {
             'reviewer': '0xeeffa82fb768e9057d7967f672a3d0a6116d2528',
             'rating': 3,
             'comments': 'Awesome',
-            'timestamp': '1494410074'
+            'timestamp': '1494410074',
+            'flag': true
           }
         })).toEqual({
           allBooks : [{
@@ -234,9 +311,9 @@ describe('Reducers', () => {
             'imageUrl' : '',
             'description' : '',
             'genre' : 'Literature',
-            'avgRating': 0,
-            'totalRating': 0,
-            'reviewersCount': 0,
+            'avgRating': 3,
+            'totalRating': 3,
+            'reviewersCount': 1,
             'reviewers': ['0xeeffa82fb768e9057d7967f672a3d0a6116d2528'],
             'ratings': [3]
           }]
@@ -425,6 +502,13 @@ describe('Reducers', () => {
       expect(
         existingMemberReducer(undefined, {
           type: 'LOGOUT',
+          payload: []
+        })).toEqual([])
+    })
+    it('should handle UNLOCK_ACCOUNT_ERROR', () => {
+      expect(
+        existingMemberReducer(undefined, {
+          type: 'UNLOCK_ACCOUNT_ERROR',
           payload: []
         })).toEqual([])
     })

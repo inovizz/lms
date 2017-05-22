@@ -21,6 +21,10 @@ const modalStyle = {
   }
 }
 
+const isDisabled = (book, bookAction) => {
+  return (bookAction === 'Borrow' && book.state === '1') || (bookAction === 'Return' && book.state === '0')
+}
+
 const Book = ({
     title,
     books,
@@ -68,12 +72,13 @@ const Book = ({
               authenticated
               ? <div className='media-bottom'>
                   {
-                    (btnTitle === 'Borrow' && book.state === '0') || (btnTitle === 'Return' && book.state === '1')
-                    ? <button
-                        className='btn btn-default'
-                        style={ { 'marginLeft': '15px' }}
-                        onClick={() => btnFunction(book)}>{btnTitle}</button>
-                    : ''
+                    (btnTitle === 'Borrow' || btnTitle === 'Return') &&
+                    <button
+                      className='btn btn-default'
+                      style={ { 'marginLeft': '15px' }}
+                      onClick={() => btnFunction(book)}
+                      disabled={ isDisabled(book, btnTitle) ? 'disabled' : false}>{btnTitle}</button>
+
                   }
                   <button className='btn btn-default' onClick={() => openModal(book)}>Rate</button>
                 </div>

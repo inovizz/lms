@@ -53,7 +53,7 @@ a {
   box-sizing: border-box;
 }
 
-.btn:hover {
+.btn:hover, .btn[disabled]:hover {
   color : #fff;
   border-color: #4CADC9;
   background-color: #4CADC9;

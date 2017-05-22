@@ -1,5 +1,5 @@
 import React from 'react'
-import BookUnavailabelImg from '../../img/book-unavailable.png'
+import BookUnavailabelImg from '../../img/book-unavailable.jpg'
 
 export default class Image extends React.Component {
   constructor (props) {

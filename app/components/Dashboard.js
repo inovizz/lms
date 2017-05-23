@@ -38,16 +38,21 @@ export class Dashboard extends React.Component {
     this.state = {
       modalIsOpen: false,
       rateModalIsOpen: false,
-      book: {}
+      bookModalIsOpen: false,
+      book: {},
+      isOwner: false
     }
   }
-  toggleModal (option, book) {
+  toggleModal (option, book, isOwner) {
     switch (option) {
       case 'addBook':
         this.setState({ modalIsOpen: !this.state.modalIsOpen })
         break
       case 'rateBook':
         this.setState({ rateModalIsOpen: !this.state.rateModalIsOpen, book })
+        break
+      case 'bookModal':
+        this.setState({ bookModalIsOpen: !this.state.bookModalIsOpen, book, isOwner })
     }
   }
   componentDidMount () {
@@ -100,20 +105,21 @@ export class Dashboard extends React.Component {
                 books = {
                   ownerBooks
                 }
+                ownerDetails = { this.props.ownerDetails }
+                selectedBook = { this.state.book }
                 btnTitle = 'Return'
-                btnFunction = {
-                  (id) => this.props.returnBook(id)
-                }
+                isOwner = {this.state.isOwner}
                 rateBook = {
                   (rating, comment) => this.props.rateBook(rating, comment, this.state.book, this.props.ownerDetails)
                 }
                 openModal = {
-                  (book) => this.toggleModal('rateBook', book)
+                  (modalName, book) => this.toggleModal(modalName, book, true)
                 }
                 closeModal = {
-                  () => this.toggleModal('rateBook')
+                  (modalName) => this.toggleModal(modalName)
                 }
                 rateModalIsOpen = { this.state.rateModalIsOpen }
+                bookModalIsOpen = { this.state.bookModalIsOpen }
                 authenticated = { this.props.session.authenticated} />
               : <div className="book"><div className="lead" style={leadStyle}>My Books</div><div> No Books Added </div></div>
             }
@@ -126,18 +132,21 @@ export class Dashboard extends React.Component {
                 books = {
                   borrowedBooks
                 }
+                ownerDetails = { this.props.ownerDetails }
+                selectedBook = { this.state.book }
+                isOwner = {this.state.isOwner}
                 btnTitle = ''
-                btnFunction = ''
                 rateBook = {
                   (rating, comment) => this.props.rateBook(rating, comment, this.state.book, this.props.ownerDetails)
                 }
                 openModal = {
-                  (book) => this.toggleModal('rateBook', book)
+                  (modalName, book) => this.toggleModal(modalName, book, false)
                 }
                 closeModal = {
-                  () => this.toggleModal('rateBook')
+                  (modalName) => this.toggleModal(modalName)
                 }
                 rateModalIsOpen = { this.state.rateModalIsOpen }
+                bookModalIsOpen = { this.state.bookModalIsOpen }
                 authenticated = { this.props.session.authenticated} />
               : ''
             }
@@ -148,7 +157,7 @@ export class Dashboard extends React.Component {
   render () {
     return (
         // this.props.allBooks.length
-        // ? 
+        // ?
         this.renderBooks()
         // : this.renderLoading()
     )

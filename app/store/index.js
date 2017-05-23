@@ -17,7 +17,8 @@ const defaultState = {
     rateBookLoading: false,
     loginLoader: false,
     createAccountLoader: false,
-    addMemberLoader: false
+    addMemberLoader: false,
+    getMemberDetailsLoader: true
   },
   books: {
     allBooks : [],

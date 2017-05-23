@@ -199,16 +199,30 @@ export const logout = () => {
   }
 }
 
-export const getMemberDetailsByEmail = (response, callbackFn, book) => {
+export const getMemberDetailsByEmail = (response, callbackFn, argsArr ) => {
   return (dispatch) => {
     dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_LOADING, true))
     lms.getMemberDetailsByEmail(response.profileObj.email).then((user) => {
-      dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_SUCCESS, { session: response, user, callbackFn, book }))
+      dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_SUCCESS, { session: response, user, callbackFn, argsArr }))
     }).catch((e) => {
       console.log("Error Occured", e)
       dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_ERROR, NotificationType('error', 'Error', e.message)))
     }).then(() => {
       dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_LOADING, false))
+    })
+  }
+}
+
+export const getMemberDetailsByAccount = (account) => {
+  return (dispatch) => {
+    dispatch(action(actionType.GET_MEMBER_DETAILS_LOADING, true))
+    lms.getMemberDetailsByAccount(account).then((user) => {
+      dispatch(action(actionType.GET_MEMBER_DETAILS_SUCCESS, user))
+    }).catch((e) => {
+      console.log("Error Occured", e)
+      dispatch(action(actionType.GET_MEMBER_DETAILS_ERROR, NotificationType('error', 'Error', e.message)))
+    }).then(() => {
+      dispatch(action(actionType.GET_MEMBER_DETAILS_LOADING, false))
     })
   }
 }
@@ -288,7 +302,7 @@ export const addMember = (member) => {
 
 export const unlockAccount = (session, user, password, flag) => {
   return (dispatch) => {
-    dispatch(action(actionType.UNLOCK_ACCOUNT_START),true)
+    dispatch(action(actionType.UNLOCK_ACCOUNT_LOADING, true))
     web3.personal.unlockAccount(user[1], password, 0, (e, res) => {
       if(e) {
         dispatch(action(actionType.UNLOCK_ACCOUNT_ERROR, NotificationType('error', 'Error', e.message)))
@@ -298,7 +312,7 @@ export const unlockAccount = (session, user, password, flag) => {
         dispatch(addMember(user))
       }
       dispatch(login(session, user))
-      dispatch(action(actionType.UNLOCK_ACCOUNT_END),true)
+      dispatch(action(actionType.UNLOCK_ACCOUNT_LOADING, false))
     })
   }
 }

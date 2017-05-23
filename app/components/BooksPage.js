@@ -10,10 +10,6 @@ import LMSAuth from './LMSAuth'
 import Loader from './Loader'
 import NotifyMe from './notifications/NotifyMe'
 
-const style = {
-  marginTop : '15px'
-}
-
 const modalStyle = {
   content : {
     top                   : '50%',
@@ -45,6 +41,7 @@ export class BooksPage extends React.Component {
     this.state = {
       rateModalIsOpen: false,
       authModalIsOpen: !this.props.isExistingMember.user,
+      bookModalIsOpen: false,
       book: {}
     }
   }
@@ -69,7 +66,7 @@ export class BooksPage extends React.Component {
         this.props.getBalance(nextProps.session.user)
       }
       if(nextProps.isExistingMember.callbackFn) {
-        nextProps.isExistingMember.callbackFn.call(this, nextProps.isExistingMember.book, nextProps.session.user)
+        nextProps.isExistingMember.callbackFn.apply(this, nextProps.isExistingMember.argsArr)
       }
     }
   }
@@ -81,6 +78,11 @@ export class BooksPage extends React.Component {
       }
       case 'authModal' : {
         this.setState({ authModalIsOpen: !this.state.authModalIsOpen })
+        break;
+      }
+      case 'bookModal' : {
+        this.setState({ bookModalIsOpen: !this.state.bookModalIsOpen, book })
+        break;
       }
     }
   }
@@ -155,22 +157,24 @@ export class BooksPage extends React.Component {
                 books
               }
               ownerDetails = { this.props.ownerDetails }
+              selectedBook = { this.state.book }
               btnTitle = 'Borrow'
-              btnFunction = {
-                (book,ownerDetails) => this.props.borrowBook(book, ownerDetails)
-              }
+              isOwner = {false}
               rateBook = {
                 (rating, comment) => this.props.rateBook(rating, comment, this.state.book, this.props.ownerDetails)
               }
               openModal = {
-                (book) => this.toggleModal('rateBook',book)
+                (modalName, book) => this.toggleModal(modalName, book)
               }
               closeModal = {
-                () => this.toggleModal('rateBook')
+                (modalName) => this.toggleModal(modalName)
               }
               rateModalIsOpen = { this.state.rateModalIsOpen }
+              bookModalIsOpen = { this.state.bookModalIsOpen }
               authenticated = { this.props.session.authenticated }
-              getMemberDetailsByEmail={(response, callbackFn, argsArray) => this.props.getMemberDetailsByEmail(response, callbackFn, argsArray)}
+              getMemberDetailsByEmail={
+                (response, callbackFn, argsArray) => this.props.getMemberDetailsByEmail(response, callbackFn, argsArray)
+              }
               width = '70%' />
             : <div className="col-md-12">No Books Added</div>
           }

@@ -39,7 +39,7 @@ export class RateBook extends React.Component {
   }
   render () {
     return (
-      <form className='form-horizontal' ref='rateForm' onSubmit={this.rateBook}>
+      <form className='form-horizontal' onSubmit={this.rateBook}>
         <fieldset>
           <legend>
             Rate

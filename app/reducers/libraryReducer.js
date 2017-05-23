@@ -7,6 +7,14 @@ export const libraryReducer = (state = [], action) => {
         ...state,
         balance: action.payload.toNumber()
       }
+    case 'GET_MEMBER_DETAILS_SUCCESS':
+      return {
+        ...state,
+        member: {
+          name: action.payload[0],
+          email: action.payload[2]
+        }
+      }
     default:
       return state
   }
@@ -55,6 +63,7 @@ export const loadingReducer = (state = {}, action) => {
         rateBookLoading : action.payload
       }
     case 'GET_MEMBER_DETAILS_EMAIL_LOADING':
+    case 'UNLOCK_ACCOUNT_LOADING':
       return {
         ...state,
         loginLoader : action.payload
@@ -69,6 +78,11 @@ export const loadingReducer = (state = {}, action) => {
         ...state,
         addMemberLoader : action.payload
       }
+    case 'GET_MEMBER_DETAILS_LOADING':
+      return {
+        ...state,
+        getMemberDetailsLoader : action.payload
+      }
     default:
       return state
   }
@@ -77,61 +91,18 @@ export const loadingReducer = (state = {}, action) => {
 export const errorReducer = (state = [], action) => {
   switch (action.type) {
     case 'GET_ACCOUNTS_ERROR':
-      return {
-        ...state,
-        message : action.payload
-      }
     case 'GET_OWNERDETAILS_ERROR':
-      return {
-        ...state,
-        message : action.payload
-      }
     case 'GET_ALL_BOOKS_ERROR':
-      return {
-        ...state,
-        message : action.payload
-      }
     case 'GET_MY_BOOKS_ERROR':
-      return {
-        ...state,
-        message : action.payload
-      }
     case 'GET_ADD_BOOKS_ERROR':
-     return {
-        ...state,
-        message : action.payload
-      }
     case 'RATE_BOOK_ERROR':
-      return {
-        ...state,
-        message : action.payload
-      }
     case 'GET_RETURN_BOOKS_ERROR':
-      return {
-        ...state,
-        message : action.payload
-      }
     case 'GET_BORROW_BOOKS_ERROR':
-      return {
-        ...state,
-        message : action.payload
-      }
     case 'GET_MEMBER_DETAILS_EMAIL_ERROR':
-      return {
-        ...state,
-        message : action.payload
-      }
     case 'GET_RATE_BOOK_ERROR':
-      return {
-        ...state,
-        message : action.payload
-      }
     case 'CREATE_ACCOUNT_ERROR':
-      return {
-        ...state,
-        message : action.payload
-      }
     case 'ADD_MEMBER_ERROR':
+    case 'GET_MEMBER_DETAILS_ERROR':
       return {
         ...state,
         message : action.payload
@@ -334,12 +305,12 @@ export const existingMemberReducer = (state=[], action) => {
       return action.payload
     case 'UNLOCK_ACCOUNT_ERROR':
       return []
-    case 'GET_BORROW_BOOKS_LOADING':
+    case 'GET_MEMBER_DETAILS_LOADING':
     case 'RATE_BOOK_LOADING':
       return {
         ...state,
         callbackFn: null,
-        book: null
+        argsArr: null
       }
     default:
       return state

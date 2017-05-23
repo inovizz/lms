@@ -1,6 +1,7 @@
 import React from 'react'
 import Modal from 'react-modal'
 import RateBook from './RateBook'
+import BookAction from './BookAction'
 import Image from './utils/Image'
 import LoginButton from './utils/LoginButton'
 
@@ -30,13 +31,15 @@ const Book = ({
     title,
     books,
     ownerDetails,
+    selectedBook,
     btnTitle,
-    btnFunction,
+    isOwner,
     loading,
     rateBook,
     openModal,
     closeModal,
     rateModalIsOpen,
+    bookModalIsOpen,
     authenticated,
     getMemberDetailsByEmail
   }) => (
@@ -73,27 +76,24 @@ const Book = ({
             </div>
             {
               <div className='media-bottom'>
-                {
-                  (btnTitle === 'Borrow' || btnTitle === 'Return') &&
-                  <LoginButton
-                    authenticated={authenticated}
-                    loginSuccess={(response) => {
-                      getMemberDetailsByEmail(response, btnFunction, book)
-                    }}
-                    loginFailure={(err) => console.log(err)}
-                    success = {() => btnFunction(book,ownerDetails)}
-                    className='btn btn-default borrow-btn'
-                    disabled={isDisabled(book, btnTitle) ? 'disabled' : false}
-                    buttonText={btnTitle}
-                    logo='' />
-                }
                 <LoginButton
                   authenticated={authenticated}
                   loginSuccess={(response) => {
-                    getMemberDetailsByEmail(response, openModal, book)
+                    getMemberDetailsByEmail(response, openModal, ['bookModal', book])
                   }}
                   loginFailure={(err) => console.log(err)}
-                  success = {() => openModal(book)}
+                  success = {() => openModal('bookModal', book)}
+                  className='btn btn-default borrow-btn'
+                  disabled={isDisabled(book, btnTitle) ? 'disabled' : false}
+                  buttonText={btnTitle? btnTitle : 'Return'}
+                  logo='' />
+                <LoginButton
+                  authenticated={authenticated}
+                  loginSuccess={(response) => {
+                    getMemberDetailsByEmail(response, openModal, ['rateBook', book])
+                  }}
+                  loginFailure={(err) => console.log(err)}
+                  success = {() => openModal('rateBook', book)}
                   className='btn btn-default'
                   disabled={false}
                   buttonText='Rate'
@@ -106,13 +106,13 @@ const Book = ({
     </div>
     <Modal
       isOpen={rateModalIsOpen}
-      onRequestClose={() => closeModal()}
+      onRequestClose={() => closeModal('rateBook')}
       role='dialog'
       style={modalStyle}
       shouldCloseOnOverlayClick={false}
       contentLabel='Rate a Book'>
       <RateBook closeModal = {
-        () => closeModal()
+        () => closeModal('rateBook')
       }
       rateBook = {
         (rating, comment) => rateBook(rating, comment)
@@ -120,6 +120,21 @@ const Book = ({
       loading = {
         loading.rateBookLoading
       }
+      />
+    </Modal>
+    <Modal
+      isOpen={bookModalIsOpen}
+      onRequestClose={() => closeModal('bookModal')}
+      role='dialog'
+      style={modalStyle}
+      shouldCloseOnOverlayClick={false}
+      contentLabel='Book Action'>
+      <BookAction
+        btnTitle={btnTitle}
+        isOwner={isOwner}
+        book={selectedBook}
+        ownerDetails={ownerDetails}
+        closeModal={() => closeModal('bookModal')}
       />
     </Modal>
   </div>

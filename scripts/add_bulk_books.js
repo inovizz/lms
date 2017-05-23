@@ -1,9 +1,8 @@
-/*jslint es6 */
-/*jslint for:true */
+// USAGE: "truffle exec add_bulk_books.js".
 // Add the bulk books using the addBook function.
 
 var Contract =  require("../app/config.js").default;
-var data = require("../app/mockdata/books.js");
+var data = require("../app/mockdata/books.json");
 const LMS = artifacts.require("../contracts/LMS.sol");
 
 module.exports = function(handleError) {
@@ -11,16 +10,20 @@ module.exports = function(handleError) {
     var nonceCount = web3.eth.getTransactionCount(web3.eth.accounts[0])
 
     LMS.at(Contract.id).then( function(result) {
-        for (var i = 0; i < data.mockbooks.length; i++) {
+        for (var i = 0; i < data.books.length; i++) {
             //Iterating the mock data to call the addBook function
-            result.addBook(data.mockbooks[i].title, data.mockbooks[i].author, data.mockbooks[i].publisher,
-                data.mockbooks[i].img, data.mockbooks[i].description, data.mockbooks[i].genre,
-                 {"nonce": nonceCount+i }).then(
+            result.addBook(data.books[i].title, data.books[i].author, data.books[i].publisher,
+                data.books[i].img, data.books[i].description, data.books[i].genre,
+                {"nonce": nonceCount+i }
+            ).then(
                 function(res) {
                     console.log(res)
-                }).catch(function(err) {
-                console.log(err)
-            })
+                }
+            ).catch(
+                function(err) {
+                    console.log(err)
+                }
+            )
         }
     })
 }

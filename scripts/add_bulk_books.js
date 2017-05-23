@@ -1,8 +1,9 @@
 // USAGE: "truffle exec add_bulk_books.js".
 // Add the bulk books using the addBook function.
+// TODO Write unit test for the bulk upload script.
 
 var Contract =  require("../app/config.js").default;
-var data = require("../app/mockdata/books.json");
+var data = require("./mock_data/books.json");
 const LMS = artifacts.require("../contracts/LMS.sol");
 
 module.exports = function(handleError) {

@@ -332,6 +332,10 @@ a.navbar-brand {
   float: right;
 }
 
+.borrow-btn {
+  margin-left: 15px;
+}
+
 .imgFaker {
   width: 100%;
   display: block;

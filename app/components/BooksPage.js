@@ -64,8 +64,13 @@ export class BooksPage extends React.Component {
         authModalIsOpen: true
       })
     }
-    if(!nextProps.accounts && nextProps.session.authenticated && nextProps.session.user.account) {
-      this.props.getBalance(nextProps.session.user)
+    if(nextProps.session.authenticated && nextProps.session.user.account) {
+      if(!nextProps.accounts) {
+        this.props.getBalance(nextProps.session.user)
+      }
+      if(nextProps.isExistingMember.callbackFn) {
+        nextProps.isExistingMember.callbackFn.call(this, nextProps.isExistingMember.book, nextProps.session.user)
+      }
     }
   }
   toggleModal (modal, book) {
@@ -149,9 +154,10 @@ export class BooksPage extends React.Component {
               books = {
                 books
               }
+              ownerDetails = { this.props.ownerDetails }
               btnTitle = 'Borrow'
               btnFunction = {
-                (book) => this.props.borrowBook(book, this.props.ownerDetails)
+                (book,ownerDetails) => this.props.borrowBook(book, ownerDetails)
               }
               rateBook = {
                 (rating, comment) => this.props.rateBook(rating, comment, this.state.book, this.props.ownerDetails)
@@ -164,6 +170,7 @@ export class BooksPage extends React.Component {
               }
               rateModalIsOpen = { this.state.rateModalIsOpen }
               authenticated = { this.props.session.authenticated }
+              getMemberDetailsByEmail={(response, callbackFn, argsArray) => this.props.getMemberDetailsByEmail(response, callbackFn, argsArray)}
               width = '70%' />
             : <div className="col-md-12">No Books Added</div>
           }

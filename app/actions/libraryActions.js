@@ -199,11 +199,11 @@ export const logout = () => {
   }
 }
 
-export const getMemberDetailsByEmail = (response) => {
+export const getMemberDetailsByEmail = (response, callbackFn, book) => {
   return (dispatch) => {
     dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_LOADING, true))
     lms.getMemberDetailsByEmail(response.profileObj.email).then((user) => {
-      dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_SUCCESS, { session: response, user }))
+      dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_SUCCESS, { session: response, user, callbackFn, book }))
     }).catch((e) => {
       console.log("Error Occured", e)
       dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_ERROR, NotificationType('error', 'Error', e.message)))
@@ -271,8 +271,12 @@ export const addMember = (member) => {
             from: web3.eth.accounts[0],
             to: member[1],
             value: web3.toWei(1000)
+          }, (e, res) => {
+            if(e) {
+              return dispatch(action(actionType.ADD_MEMBER_ERROR, NotificationType('error', 'Error', e.message)))
+            }
+            dispatch(action(actionType.ADD_MEMBER_SUCCESS, true))
           })
-          dispatch(action(actionType.ADD_MEMBER_SUCCESS, true))
         }).catch((e) => {
           console.log("Error Occured", e)
           dispatch(action(actionType.ADD_MEMBER_ERROR, NotificationType('error', 'Error', e.message)))
@@ -285,17 +289,16 @@ export const addMember = (member) => {
 export const unlockAccount = (session, user, password, flag) => {
   return (dispatch) => {
     dispatch(action(actionType.UNLOCK_ACCOUNT_START),true)
-    try {
-      if(web3.personal.unlockAccount(user[1], password, 0)) {
-        if(flag) {
-          dispatch(addMember(user))
-        }
-        dispatch(login(session, user))
+    web3.personal.unlockAccount(user[1], password, 0, (e, res) => {
+      if(e) {
+        dispatch(action(actionType.UNLOCK_ACCOUNT_ERROR, NotificationType('error', 'Error', e.message)))
+        return
       }
-    } catch(e) {
-      dispatch(action(actionType.UNLOCK_ACCOUNT_ERROR, NotificationType('error', 'Error', e.message)))
-    } finally {
+      if(flag) {
+        dispatch(addMember(user))
+      }
+      dispatch(login(session, user))
       dispatch(action(actionType.UNLOCK_ACCOUNT_END),true)
-    }
+    })
   }
 }

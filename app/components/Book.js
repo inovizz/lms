@@ -2,6 +2,7 @@ import React from 'react'
 import Modal from 'react-modal'
 import RateBook from './RateBook'
 import Image from './utils/Image'
+import LoginButton from './utils/LoginButton'
 
 const style = {
   row: {
@@ -28,6 +29,7 @@ const isDisabled = (book, bookAction) => {
 const Book = ({
     title,
     books,
+    ownerDetails,
     btnTitle,
     btnFunction,
     loading,
@@ -35,7 +37,8 @@ const Book = ({
     openModal,
     closeModal,
     rateModalIsOpen,
-    authenticated
+    authenticated,
+    getMemberDetailsByEmail
   }) => (
   <div className='book'>
     <div className='lead'>{title}</div>
@@ -69,20 +72,33 @@ const Book = ({
               </div>
             </div>
             {
-              authenticated
-              ? <div className='media-bottom'>
-                  {
-                    (btnTitle === 'Borrow' || btnTitle === 'Return') &&
-                    <button
-                      className='btn btn-default'
-                      style={ { 'marginLeft': '15px' }}
-                      onClick={() => btnFunction(book)}
-                      disabled={ isDisabled(book, btnTitle) ? 'disabled' : false}>{btnTitle}</button>
-
-                  }
-                  <button className='btn btn-default' onClick={() => openModal(book)}>Rate</button>
-                </div>
-              : ''
+              <div className='media-bottom'>
+                {
+                  (btnTitle === 'Borrow' || btnTitle === 'Return') &&
+                  <LoginButton
+                    authenticated={authenticated}
+                    loginSuccess={(response) => {
+                      getMemberDetailsByEmail(response, btnFunction, book)
+                    }}
+                    loginFailure={(err) => console.log(err)}
+                    success = {() => btnFunction(book,ownerDetails)}
+                    className='btn btn-default borrow-btn'
+                    disabled={isDisabled(book, btnTitle) ? 'disabled' : false}
+                    buttonText={btnTitle}
+                    logo='' />
+                }
+                <LoginButton
+                  authenticated={authenticated}
+                  loginSuccess={(response) => {
+                    getMemberDetailsByEmail(response, openModal, book)
+                  }}
+                  loginFailure={(err) => console.log(err)}
+                  success = {() => openModal(book)}
+                  className='btn btn-default'
+                  disabled={false}
+                  buttonText='Rate'
+                  logo='' />
+              </div>
             }
           </div>
         )

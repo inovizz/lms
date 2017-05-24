@@ -70,7 +70,6 @@ contract('LMS', function(accounts) {
             assert.isAtMost(dateAdded, Math.floor(Date.now() / 1000));
             assert.isAbove(dateAdded, Math.floor(Date.now() / 1000) - 300);
         });
-        
     });
 
     describe('getMemberDetailsByAccount', function() {
@@ -83,6 +82,49 @@ contract('LMS', function(accounts) {
             assert.equal(status.valueOf(), 0);
             assert.isAtMost(timestamp, Math.floor(Date.now() / 1000));
             assert.isAbove(timestamp, Math.floor(Date.now() / 1000) - 300);
+        });
+    });
+
+    describe('getMemberDetailsByIndex', function() {
+        it('should provide details of a member at given index', async function() {
+            let member = await lms.getMemberDetailsByIndex(1);        // Verify details of the default member
+            let attr = member.split(';');
+            assert.equal(attr[0], "Lallan");
+            assert.equal("0x" + attr[1], accounts[0]);
+            assert.equal(attr[2], "email");
+            assert.equal(attr[3], 0);
+            assert.isAtMost(attr[4], Math.floor(Date.now() / 1000));
+            assert.isAbove(attr[4], Math.floor(Date.now() / 1000) - 300);
+        })
+        it('should throw an error for a non-existent index', async function() {
+            await expectThrow(lms.getMemberDetailsByIndex(-1));
+            await expectThrow(lms.getMemberDetailsByIndex(0));
+            await expectThrow(lms.getMemberDetailsByIndex(2));
+        })
+    });
+
+    describe('getAllMembers', function() {
+        it('should provide details of all members', async function() {
+            let info = [
+                {name: 'John Doe', account: accounts[1], email: 'john.doe@gmail.com'},
+                {name: 'Jane Doe', account: accounts[2], email: 'jane.doe@gmail.com'},
+                {name: 'Johnny Appleseed', account: accounts[3], email: 'johnny@apple.com'},
+            ];
+            for (let i=0; i<3; i++) {
+                await lms.addMember(info[i].name, info[i].account, info[i].email);
+            }
+            let [members, count] = await lms.getAllMembers();
+            assert.equal(count, 4);     // Including the default member
+            members = members.split('|');
+            for (let i=1; i<4; i++) {
+                let attr = members[i].split(';');
+                assert.equal(attr[0], info[i-1].name);
+                assert.equal('0x' + attr[1], info[i-1].account);
+                assert.equal(attr[2], info[i-1].email);
+                assert.equal(attr[3], 0);
+                assert.isAtMost(attr[4], Math.floor(Date.now() / 1000));
+                assert.isAbove(attr[4], Math.floor(Date.now() / 1000) - 300);
+            }
         });
     });
 
@@ -128,7 +170,7 @@ What You Make It is a fictional story about a strong female", "Literature & Fict
                 What You Make It is a fictional story about a strong female", "Literature & Fiction");
             let ownerBal2 = web3.eth.getBalance(accounts[0]);
             let contractBal2 =  web3.eth.getBalance(lms.address);
-            // TODO - Include Gas esimation price in owner's balance check
+            // TODO - Include Gas estimation price in owner's balance check
             assert.isAtMost(ownerBal2.minus(ownerBal1), 10**12);
             assert.equal(contractBal1.minus(contractBal2), 10**12);
         });
@@ -170,7 +212,15 @@ What You Make It is a fictional story about a strong female", "Literature & Fict
             await expectThrow(lms.addBook("t", "a", "p", "u", "d", "g", {from: accounts[1]}));
         });
     });
-    
+
+    describe('getBook', function() {
+        it('should throw an error for a non-existent index', async function() {
+            await expectThrow(lms.getBook(-1));
+            await expectThrow(lms.getBook(0));
+            await expectThrow(lms.getBook(2));
+        })
+    });
+
     describe('updateBook', function() {
         it('should update a book with new details provided', async function() {
             await lms.addBook("Life Is What You Make It", "Preeti Shenoy", "Srishti Publisher", "https://tinyurl.com/mj55qnr", "Life Is \

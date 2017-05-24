@@ -80,6 +80,9 @@ contract LMS is Killable {
     function addMember(string name, address account, string email) public onlyOwner {
         // Add or activate member
         var index = memberIndex[account];
+        // TODO Check if the email is different for the same account hash. Return addMember failure with error as
+        // duplicate member. If the email is same, then change the memberstatus as active.
+        // Also, write tests for it.
         if (index != 0) {           // This is the reason index 0 is not used
             members[index].status = MemberStatus.Active;
             return;
@@ -87,13 +90,6 @@ contract LMS is Killable {
         members[++numMembers] = Member(name, account, email, MemberStatus.Active, now);
         memberIndex[account] = numMembers;
         emailIndex[email] = numMembers;
-    }
-
-    function getMemberDetailsByEmail(string email) constant returns (string, address, string, MemberStatus, uint) {
-        var i = emailIndex[email];
-        if(i != 0) {
-            return (members[i].name, members[i].account, members[i].email, members[i].status, members[i].dateAdded);
-        }
     }
 
 
@@ -113,6 +109,40 @@ contract LMS is Killable {
         var i = memberIndex[account];
         if(i != 0) {
             return (members[i].name, members[i].account, members[i].email, members[i].status, members[i].dateAdded);
+        }
+    }
+
+    function getMemberDetailsByEmail(string email) constant returns (string, address, string, MemberStatus, uint) {
+        var i = emailIndex[email];
+        if(i != 0) {
+            return (members[i].name, members[i].account, members[i].email, members[i].status, members[i].dateAdded);
+        }
+    }
+
+    function getMemberDetailsByIndex(uint i) constant returns (string memberString) {
+        if (i < 1 || i > numMembers) {
+            throw;
+        }
+        var parts = new strings.slice[](5);
+        //Iterate over the entire catalog to find my books
+        parts[0] = members[i].name.toSlice();
+        parts[1] = StringLib.addressToString(members[i].account).toSlice();
+        parts[2] = members[i].email.toSlice();
+        parts[3] = StringLib.uintToString(uint(members[i].status)).toSlice();
+        parts[4] = StringLib.uintToString(members[i].dateAdded).toSlice();
+        memberString = ";".toSlice().join(parts);
+    }
+
+    function getAllMembers() constant onlyMember returns (string memberString, uint8 count) {
+        string memory member;
+        for (uint i = 1; i <= numMembers; i++) {
+            member = getMemberDetailsByIndex(i);
+            count++;
+            if (memberString.toSlice().equals("".toSlice())) {
+                memberString = member;
+            } else {
+                memberString = memberString.toSlice().concat('|'.toSlice()).toSlice().concat(member.toSlice());
+            }
         }
     }
 
@@ -156,6 +186,9 @@ contract LMS is Killable {
     }
 
     function getBook(uint i) constant returns (string bookString) {
+        if (i < 1 || i > numBooks) {
+            throw;
+        }
         var parts = new strings.slice[](15);
         //Iterate over the entire catalog to find my books
         parts[0] = StringLib.uintToString(catalog[i].id).toSlice();
@@ -232,12 +265,12 @@ contract LMS is Killable {
         Return(id, borrower, now);
     }
 
-    function rateBook(uint id, uint rating, string comments, uint oldrating) onlyMember {
+    function rateBook(uint id, uint rating, string comments, uint oldRating) onlyMember {
         if (id > numBooks || rating < 1 || rating > 5) {
             throw;
         }
-        uint change = rating - oldrating;
-        if (oldrating == 0) {
+        uint change = rating - oldRating;
+        if (oldRating == 0) {
             catalog[id].reviewersCount += 1;
             catalog[id].totalRating += change;
             catalog[id].avgRating = catalog[id].totalRating / catalog[id].reviewersCount;

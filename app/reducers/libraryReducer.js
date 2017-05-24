@@ -264,6 +264,12 @@ export const allBooksReducers = (state = [], action) => {
         allBooks : books
       }
     }
+    case 'SHUFFLE_ALL_BOOKS': {
+      return {
+        ...state,
+        allBooks: action.payload
+      }
+    }
     default:
       return state
   }

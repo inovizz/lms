@@ -4,7 +4,7 @@ import actionType from './actionTypes'
 import { sessionService } from 'redux-react-session'
 import axios from 'axios'
 import NotificationType from '../components/notifications/NotificationTypes'
-
+import {shuffleArray} from './helpers'
 export const action = (type, flag) => {
   return {
     type: type,
@@ -314,5 +314,13 @@ export const unlockAccount = (session, user, password, flag) => {
       dispatch(login(session, user))
       dispatch(action(actionType.UNLOCK_ACCOUNT_LOADING, false))
     })
+  }
+}
+
+export const shuffleAllBooks = (books) =>{
+  return (dispatch) => {
+    console.log("books",books)
+    let shuffleBookList = books.length ? shuffleArray(books) : books
+    dispatch(action(actionType.SHUFFLE_ALL_BOOKS,shuffleBookList))
   }
 }

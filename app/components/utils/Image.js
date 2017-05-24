@@ -10,6 +10,14 @@ export default class Image extends React.Component {
     }
     this.imageEl = ''
   }
+  componentWillReceiveProps (nextProps) {
+    console.log(nextProps)
+    if(nextProps) {
+      this.setState({
+        src: nextProps.src
+      })
+    }
+  }
   handleLoad () {
     this.setState({
       loading: false

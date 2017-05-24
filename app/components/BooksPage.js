@@ -54,6 +54,7 @@ export class BooksPage extends React.Component {
     if(!this.props.books.allBooks.length) {
         this.props.getAllBooks()
     }
+    this.props.shuffleAllBooks(this.props.books.allBooks)
   }
   componentWillReceiveProps (nextProps) {
     if(!nextProps.isExistingMember.user) {

@@ -28,7 +28,8 @@ const mapStateToProps = (state, ownProps) => {
     ownerDetails: state.session.user,
     loading: state.loading,
     session: state.session,
-    error: state.error
+    error: state.error,
+    accounts: state.accounts
   }
 }
 
@@ -59,6 +60,9 @@ export class Dashboard extends React.Component {
     if(!this.props.allBooks.length) {
         this.props.getAllBooks()
     }
+    if(!this.props.accounts) {
+      this.props.getAllMembers()
+    }
   }
   renderLoading () {
     const title = this.props.loading.allbooksloading
@@ -77,6 +81,7 @@ export class Dashboard extends React.Component {
   renderBooks () {
     const ownerBooks = this.props.allBooks.filter((book) => book.owner === this.props.ownerDetails.account)
     const borrowedBooks = this.props.allBooks.filter((book) => book.borrower === this.props.ownerDetails.account)
+    const members = (this.props.accounts && this.props.accounts.members) ? this.props.accounts.members : ''
     return (
       <div>
         <NotifyMe message={this.props.error}/>
@@ -105,6 +110,7 @@ export class Dashboard extends React.Component {
                 books = {
                   ownerBooks
                 }
+                members = {members}
                 ownerDetails = { this.props.ownerDetails }
                 selectedBook = { this.state.book }
                 btnTitle = 'Return'
@@ -132,6 +138,7 @@ export class Dashboard extends React.Component {
                 books = {
                   borrowedBooks
                 }
+                members = {members}
                 ownerDetails = { this.props.ownerDetails }
                 selectedBook = { this.state.book }
                 isOwner = {this.state.isOwner}

@@ -55,6 +55,9 @@ export class BooksPage extends React.Component {
         this.props.getAllBooks()
     }
     this.props.shuffleAllBooks(this.props.books.allBooks)
+    if(!this.props.accounts) {
+      this.props.getAllMembers()
+    }
   }
   componentWillReceiveProps (nextProps) {
     if(!nextProps.isExistingMember.user) {
@@ -114,6 +117,7 @@ export class BooksPage extends React.Component {
                     ? this.props.books.filteredBooks
                     : []
                   : (this.props.books.allBooks.length ? this.props.books.allBooks : [])
+    const members = (this.props.accounts && this.props.accounts.members) ? this.props.accounts.members : ''
     return (
       <div>
         <Header
@@ -157,6 +161,7 @@ export class BooksPage extends React.Component {
               books = {
                 books
               }
+              members = {members}
               ownerDetails = { this.props.ownerDetails }
               selectedBook = { this.state.book }
               btnTitle = 'Borrow'

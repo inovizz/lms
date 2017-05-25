@@ -227,6 +227,20 @@ export const getMemberDetailsByAccount = (account) => {
   }
 }
 
+export const getAllMembers = () => {
+  return (dispatch) => {
+    dispatch(action(actionType.GET_ALL_MEMBERS_LOADING, true))
+    lms.getAllMembers().then((users) => {
+      dispatch(action(actionType.GET_ALL_MEMBERS_SUCCESS, users))
+    }).catch((e) => {
+      console.log("Error Occured", e)
+      dispatch(action(actionType.GET_ALL_MEMBERS_ERROR, NotificationType('error', 'Error', e.message)))
+    }).then(() => {
+      dispatch(action(actionType.GET_ALL_MEMBERS_LOADING, false))
+    })
+  }
+}
+
 export const getRatings = () => {
   return (dispatch) => {
     dispatch(action(actionType.GET_RATE_BOOK_LOADING, true))
@@ -289,6 +303,7 @@ export const addMember = (member) => {
             if(e) {
               return dispatch(action(actionType.ADD_MEMBER_ERROR, NotificationType('error', 'Error', e.message)))
             }
+            dispatch(getAllMembers())
             dispatch(action(actionType.ADD_MEMBER_SUCCESS, true))
           })
         }).catch((e) => {

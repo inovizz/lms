@@ -15,6 +15,20 @@ export const libraryReducer = (state = [], action) => {
           email: action.payload[2]
         }
       }
+    case 'GET_ALL_MEMBERS_SUCCESS': {
+      let users = action.payload[0].split('|').reduce((userMap, user) => {
+        user = user.split(';')
+        userMap['0x'+user[1]] = {
+          name: user[0].trim(),
+          email: user[2]
+        }
+        return userMap
+      }, {})
+      return {
+        ...state,
+        members: users
+      }
+    }
     default:
       return state
   }
@@ -83,6 +97,11 @@ export const loadingReducer = (state = {}, action) => {
         ...state,
         getMemberDetailsLoader : action.payload
       }
+    case 'GET_ALL_MEMBERS_LOADING':
+      return {
+        ...state,
+        allMembersLoading : action.payload
+      }
     default:
       return state
   }
@@ -103,6 +122,7 @@ export const errorReducer = (state = [], action) => {
     case 'CREATE_ACCOUNT_ERROR':
     case 'ADD_MEMBER_ERROR':
     case 'GET_MEMBER_DETAILS_ERROR':
+    case 'GET_ALL_MEMBERS_ERROR':
       return {
         ...state,
         message : action.payload

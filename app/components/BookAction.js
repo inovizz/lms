@@ -1,7 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import * as libraryActions from '../actions/libraryActions'
-import Loader from './Loader'
 
 export class BookAction extends React.Component {
   constructor (props) {
@@ -24,12 +23,7 @@ export class BookAction extends React.Component {
       return 3 // Borrower is returning book
     }
   }
-  componentDidMount () {
-    const actionType = this.checkActionType();
-    const account = (actionType === 1 || actionType === 3) ? this.props.book.owner : this.props.book.borrower
-    this.props.getMemberDetailsByAccount(account)
-  }
-  renderBookAction () {
+  render () {
     const actionType = this.checkActionType();
     const info = actionType === 1
                  ? 'Please contact the book owner for pick up.'
@@ -41,6 +35,7 @@ export class BookAction extends React.Component {
                        : actionType === 2
                           ? 'Return'
                           : 'Close'
+    const { book, members } = this.props
     return (
       <form className='form-horizontal' onSubmit={this.handleSubmit}>
         <fieldset>
@@ -50,49 +45,55 @@ export class BookAction extends React.Component {
           </legend>
           <div className='row'>
             <p className='lead'>{info}</p>
-            {
-              this.props.accounts && this.props.accounts.member &&
-              <table className='table table-striped'>
-                {
-                  actionType === 2 &&
-                  <tbody>
+            <table className='table table-striped'>
+              {
+                actionType === 2
+                ? <tbody>
                     <tr>
                       <td>Book Title</td>
-                      <td>{this.props.book.title}</td>
+                      <td>{book.title}</td>
                     </tr>
                     <tr>
                       <td>Author</td>
-                      <td>{this.props.book.author}</td>
+                      <td>{book.author}</td>
                     </tr>
                     <tr>
                       <td>Publisher</td>
-                      <td>{this.props.book.publisher}</td>
+                      <td>{book.publisher}</td>
                     </tr>
-                    <tr>
-                      <td>Borrowed By</td>
-                      <td>{this.props.accounts.member.name}</td>
-                    </tr>
-                    <tr>
-                      <td>Email</td>
-                      <td>{this.props.accounts.member.email}</td>
-                    </tr>
+                    {
+                      members[book.borrower].name !== '' &&
+                      <tr>
+                        <td>Borrowed By</td>
+                        <td>{members[book.borrower].name}</td>
+                      </tr>
+                    }
+                    {
+                      members[book.borrower].email !== '' &&
+                      <tr>
+                        <td>Email</td>
+                        <td>{members[book.borrower].email}</td>
+                      </tr>
+                    }
                   </tbody>
-                }
-                {
-                  actionType !== 2 &&
-                  <tbody>
-                    <tr>
-                      <td>Name</td>
-                      <td>{this.props.accounts.member.name}</td>
-                    </tr>
-                    <tr>
-                      <td>Email</td>
-                      <td>{this.props.accounts.member.email}</td>
-                    </tr>
+                : <tbody>
+                    {
+                      members[book.owner].name !== '' &&
+                      <tr>
+                        <td>Name</td>
+                        <td>{members[book.owner].name}</td>
+                      </tr>
+                    }
+                    {
+                      members[book.owner].email !== '' &&
+                      <tr>
+                        <td>Email</td>
+                        <td>{members[book.owner].email}</td>
+                      </tr>
+                    }
                   </tbody>
-                }
-              </table>
-            }
+              }
+            </table>
           </div>
           <div className='form-group'>
             <div className='col-sm-6 text-right'>
@@ -103,7 +104,7 @@ export class BookAction extends React.Component {
             {
               (actionType === 1 || actionType === 2) &&
               <div className='col-sm-6 text-left'>
-                <button className='btn btn-default' onClick={() => this.props.closeModal()}>
+                <button className='btn btn-default closeBtn' onClick={() => this.props.closeModal()}>
                   Close
                 </button>
               </div>
@@ -113,18 +114,6 @@ export class BookAction extends React.Component {
       </form>
     )
   }
-  render () {
-    return this.props.loading
-            ? <Loader text='Retrieving Information' />
-            : this.renderBookAction()
-  }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    accounts: state.accounts,
-    loading: state.loading.getMemberDetailsLoader
-  }
-}
-
-export default connect(mapStateToProps, libraryActions)(BookAction)
+export default connect(null, libraryActions)(BookAction)

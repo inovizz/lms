@@ -28,6 +28,7 @@ describe('Book', () => {
             'imageUrl': 'https://images-eu.ssl-images-amazon.com/images/I/416Hql52NCL.jpg',
             'description': 'description'
           }],
+          members: '',
           btnTitle : 'Borrow',
           btnFunction : jest.fn(),
           loading : {

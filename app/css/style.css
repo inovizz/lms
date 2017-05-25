@@ -267,6 +267,7 @@ a.navbar-brand {
  -webkit-box-orient: vertical;
  height: 168px;
  overflow: hidden;
+ margin-bottom: 15px;
 }
 
 /*
@@ -319,9 +320,19 @@ a.navbar-brand {
 }
 
 .book .media-bottom {
-  margin-top: 16px;
   border-top: 1px solid #e7e7e7;
   padding: 8px;
+  position: absolute;
+  width: 97%;
+  bottom: 0;
+  line-height: 24px;
+}
+
+.book .media-bottom p {
+  display: inline-block;
+  line-height: 40px;
+  vertical-align: middle;
+  margin: 0;
 }
 
 .book .media-bottom .btn {
@@ -348,10 +359,11 @@ a.navbar-brand {
 .list-group-item .media-left {
   width: 45%;
   position: relative;
+  height: 420px;
 }
 
 .imgContainer {
-  position: absolute;
+  position: relative;
   width: 100%;
   display: flex;
   align-items: center;

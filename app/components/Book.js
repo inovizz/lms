@@ -30,6 +30,7 @@ const isDisabled = (book, bookAction) => {
 const Book = ({
     title,
     books,
+    members,
     ownerDetails,
     selectedBook,
     btnTitle,
@@ -76,6 +77,25 @@ const Book = ({
             </div>
             {
               <div className='media-bottom'>
+                <p>
+                {
+                  members[book.owner] !== undefined &&
+                  members[book.owner].name !== '' &&
+                  <span>
+                    Book shared by &nbsp;
+                    <strong>{members[book.owner].name}</strong>
+                    &nbsp;&nbsp;
+                  </span>
+                }
+                {
+                  members[book.borrower] !== undefined &&
+                  members[book.borrower].name !== '' &&
+                  <span>
+                    Currently with &nbsp;
+                    <strong>{members[book.borrower].name}</strong>
+                  </span>
+                }
+                </p>
                 <LoginButton
                   authenticated={authenticated}
                   loginSuccess={(response) => {
@@ -132,6 +152,7 @@ const Book = ({
       <BookAction
         btnTitle={btnTitle}
         isOwner={isOwner}
+        members={members}
         book={selectedBook}
         ownerDetails={ownerDetails}
         closeModal={() => closeModal('bookModal')}

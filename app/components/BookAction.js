@@ -96,7 +96,7 @@ export class BookAction extends React.Component {
             </table>
           </div>
           <div className='form-group'>
-            <div className='col-sm-6 text-right'>
+            <div className={'col-sm-6 text-right ' + (actionType === 3 ? 'book-close-btn' : '')}>
               <button type='submit' className='btn btn-default'>
               { buttonText }
               </button>

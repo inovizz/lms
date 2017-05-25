@@ -348,6 +348,11 @@ a.navbar-brand {
   margin-left: 15px;
 }
 
+.book-close-btn {
+  width: 100%;
+  text-align: center;
+}
+
 .imgFaker {
   width: 100%;
   display: block;

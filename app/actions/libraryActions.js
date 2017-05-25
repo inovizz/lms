@@ -319,6 +319,7 @@ export const unlockAccount = (session, user, password, flag) => {
   return (dispatch) => {
     dispatch(action(actionType.UNLOCK_ACCOUNT_LOADING, true))
     web3.personal.unlockAccount(user[1], password, 0, (e, res) => {
+      dispatch(action(actionType.UNLOCK_ACCOUNT_LOADING, false))
       if(e) {
         dispatch(action(actionType.UNLOCK_ACCOUNT_ERROR, NotificationType('error', 'Error', e.message)))
         return
@@ -327,7 +328,6 @@ export const unlockAccount = (session, user, password, flag) => {
         dispatch(addMember(user))
       }
       dispatch(login(session, user))
-      dispatch(action(actionType.UNLOCK_ACCOUNT_LOADING, false))
     })
   }
 }

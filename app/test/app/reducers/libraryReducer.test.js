@@ -39,6 +39,31 @@ describe('Reducers', () => {
           payload
         })).toEqual({ balance: 123 })
     })
+    it('should handle GET_MEMBER_DETAILS_SUCCESS', () => {
+      const payload = ['user', '0x1', 'email']
+      expect(
+        libraryReducer(undefined, {
+          type: 'GET_MEMBER_DETAILS_SUCCESS',
+          payload
+        })).toEqual({ member: { name: 'user', email: 'email' } })
+    })
+    it('should handle GET_ALL_MEMBERS_SUCCESS', () => {
+      const payload = ["User1;0;example@email1;0;1495688952|User2;1;example@email2;0;1495689199"]
+      expect(
+        libraryReducer(undefined, {
+          type: 'GET_ALL_MEMBERS_SUCCESS',
+          payload
+        })).toEqual({ members: {
+          '0x0' : {
+            name: 'User1',
+            email: 'example@email1'
+          },
+          '0x1' : {
+            name: 'User2',
+            email: 'example@email2'
+          }
+        } })
+    })
   })
   describe('loadingReducer', () => {
     it('should return initial state', () => {
@@ -120,6 +145,20 @@ describe('Reducers', () => {
           type: 'ADD_MEMBER_LOADING',
           payload: true
         })).toEqual({ 'addMemberLoader' : true })
+    })
+    it('should handle GET_MEMBER_DETAILS_LOADING', () => {
+      expect(
+        loadingReducer(undefined, {
+          type: 'GET_MEMBER_DETAILS_LOADING',
+          payload: true
+        })).toEqual({ 'getMemberDetailsLoader' : true })
+    })
+    it('should handle GET_ALL_MEMBERS_LOADING', () => {
+      expect(
+        loadingReducer(undefined, {
+          type: 'GET_ALL_MEMBERS_LOADING',
+          payload: true
+        })).toEqual({ 'allMembersLoading' : true })
     })
   })
   describe('errorReducer', () => {
@@ -438,29 +477,16 @@ describe('Reducers', () => {
           }]
         })
     })
-  })
-  describe('myBooksReducers', () => {
-    it('should return initial state', () => {
-      expect(myBooksReducers(undefined, {})).toEqual([])
-    })
-    it('should handle GET_MY_BOOKS_SUCCESS', () => {
+    it('should handle SHUFFLE_ALL_BOOKS', () => {
       expect(
-        myBooksReducers(undefined, {
-          type: 'GET_MY_BOOKS_SUCCESS',
-          payload: [
-            '1;Title;Author;Publisher;ba21a9b09d528b2e1726d786a1d1b861032dba87;0000000000000000000000000000000000000000;0;1493054441;0'
-          ]
-        })).toEqual([{
-          'id': '1',
-          'title': 'Title',
-          'author': 'Author',
-          'publisher': 'Publisher',
-          'owner': '0xba21a9b09d528b2e1726d786a1d1b861032dba87',
-          'borrower': '0x0000000000000000000000000000000000000000',
-          'state': '0',
-          'dateAdded': '1493054441',
-          'dateIssued': '0'
-        }])
+        allBooksReducers({
+          allBooks : []
+        }, {
+          type: 'SHUFFLE_ALL_BOOKS',
+          payload: books
+        })).toEqual({
+          allBooks : books
+        })
     })
   })
   describe('myBooksReducers', () => {
@@ -511,6 +537,13 @@ describe('Reducers', () => {
           type: 'UNLOCK_ACCOUNT_ERROR',
           payload: []
         })).toEqual([])
+    })
+    it('should handle RATE_BOOK_LOADING', () => {
+      expect(
+        existingMemberReducer(undefined, {
+          type: 'RATE_BOOK_LOADING',
+          payload: true
+        })).toEqual({ 'callbackFn' : null, argsArr: null })
     })
   })
 })

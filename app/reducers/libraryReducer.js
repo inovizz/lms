@@ -125,6 +125,7 @@ export const errorReducer = (state = [], action) => {
     case 'ADD_MEMBER_ERROR':
     case 'GET_MEMBER_DETAILS_ERROR':
     case 'GET_ALL_MEMBERS_ERROR':
+    case 'UNLOCK_ACCOUNT_ERROR':
       return {
         ...state,
         message : action.payload

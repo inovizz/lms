@@ -1,3 +1,5 @@
+import {shuffleArray} from './helpers'
+
 export const libraryReducer = (state = [], action) => {
   switch (action.type) {
     case 'GET_ACCOUNTS_SUCCESS':
@@ -175,6 +177,7 @@ export const allBooksReducers = (state = [], action) => {
           }
         })
       }
+      myBooks = shuffleArray(myBooks)
       return {
         ...state,
         allBooks : myBooks
@@ -285,9 +288,10 @@ export const allBooksReducers = (state = [], action) => {
       }
     }
     case 'SHUFFLE_ALL_BOOKS': {
+      let shuffleBookList = action.payload.length ? shuffleArray(action.payload) : action.payload
       return {
         ...state,
-        allBooks: action.payload
+        allBooks: shuffleBookList
       }
     }
     default:

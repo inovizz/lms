@@ -81,7 +81,8 @@ a {
   height: 25px;
   -webkit-animation: spin 1s linear infinite;
   animation: spin 1s linear infinite;
-  margin: 50% 0 0 25%;
+  margin: 45% 0 0 0;
+  position: absolute;
 }
 
 @-webkit-keyframes spin {

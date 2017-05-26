@@ -259,7 +259,7 @@ export const allBooksReducers = (state = [], action) => {
       }
     }
     case 'GET_BORROW_BOOKS_SUCCESS': {
-      const id = parseInt(action.payload.book.id) - 1
+      const id = state.allBooks.findIndex(x => x.id==action.payload.book.id)
       action.payload.book.borrower = action.payload.owner
       action.payload.book.dateIssued = Date.now()
       action.payload.book.state = '1'
@@ -274,7 +274,7 @@ export const allBooksReducers = (state = [], action) => {
       }
     }
     case 'GET_RETURN_BOOKS_SUCCESS': {
-      const id = parseInt(action.payload.id) - 1
+      const id = state.allBooks.findIndex(x => x.id==action.payload.id)
       action.payload.borrower = '0x0'
       action.payload.dateIssued = '0'
       action.payload.state = '0'

@@ -1,8 +1,8 @@
 pragma solidity ^0.4.0;
 
-import "./helper_contracts/strings.sol";
-import "./helper_contracts/StringLib.sol";
-import "./helper_contracts/zeppelin/lifecycle/Killable.sol";
+import "./strings.sol";
+import "./StringLib.sol";
+import "zeppelin/lifecycle/Killable.sol";
 
 contract LMS is Killable {
     // In order to use the third-party strings library

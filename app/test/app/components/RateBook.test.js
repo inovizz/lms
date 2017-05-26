@@ -1,43 +1,48 @@
 import React from 'react'
-import { render } from 'react-dom'
-import { mount, shallow } from 'enzyme'
+import { shallow } from 'enzyme'
 import RateBook from '../../../components/RateBook'
 
 describe('RateBook', () => {
-  //  Test : Components and its child renders without crashing
-  it('renders without crashing', () => {
-    mount(<RateBook loading={false} rate/>)
+  let component, props;
+  beforeEach(() => {
+    props = {
+      rateBook: jest.fn(),
+      closeModal: jest.fn(),
+      loading: false
+    }
+    component = shallow(<RateBook {...props} />)
   })
-  describe('render', () => {
-    let component, rating, comment;
-    beforeEach(() => {
-      const props = {
-        rateBook: (r, c) => {
-          rating = r
-          comment = c
-        },
-        loading: false
-      }
-      component = shallow(<RateBook {...props} />)
-    })
-    //  Test : Component gets rendered individually
-    it('should render the book form', () => {
-      const expected = (
-        <label htmlFor='comment' className='col-sm-3 control-label'>Comment</label>
-      )
-      expect(component.contains(expected)).toEqual(true)
-    })
-
-    it('has a select option',() => {
-      expect(component.find('select').exists()).toEqual(true)
-    })
-
-    it('has a textarea for comment',() => {
-      expect(component.find('textarea').exists()).toEqual(true)
-    })
-
-    it('has a submit button',() => {
-      expect(component.find('button').exists()).toEqual(true)
-    })
+  it('should render the book form', () => {
+    expect(component.find('form').exists()).toEqual(true)
+  })
+  it('should have a select option',() => {
+    expect(component.find('select').exists()).toEqual(true)
+  })
+  it('should have a textarea for comment',() => {
+    expect(component.find('textarea').exists()).toEqual(true)
+  })
+  it('should have a submit button',() => {
+    expect(component.find('button').exists()).toEqual(true)
+  })
+  it('should submit the form',() => {
+    const e = { preventDefault: jest.fn() }
+    component.find('form').simulate('submit', e)
+    expect(e.preventDefault.mock.calls.length).toBe(1)
+    expect(props.rateBook.mock.calls.length).toBe(1)
+    expect(props.closeModal.mock.calls.length).toBe(1)
+  })
+  it('should close on click of "X" icon',() => {
+    component.find('.close-btn').simulate('click')
+    expect(props.closeModal.mock.calls.length).toBe(1)
+  })
+  it('should change value of select',() => {
+    const e = { target: { value: '3' } }
+    component.find('select').simulate('change', e)
+    expect(component.find('select').props().value).toBe('3')
+  })
+  it('should change value of textarea',() => {
+    const e = { target: { value: 'Wonderful' } }
+    component.find('textarea').simulate('change', e)
+    expect(component.state().comment).toBe('Wonderful');
   })
 })

@@ -2,11 +2,9 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as libraryActions from '../actions/libraryActions'
 
-const mapStateToProps = (state, ownProps) => {
+export const mapStateToProps = (state) => {
   return {
-    isBookAdded: state.isBookAdded,
     loading: state.loading,
-    closeModal: ownProps.closeModal,
     ownerDetails: state.session.user
   }
 }
@@ -18,11 +16,6 @@ export class BooksForm extends React.Component {
       title: '',
       author: '',
       publisher: ''
-    }
-  }
-  componentWillReceiveProps (nextProps) {
-    if (!nextProps.loading.addBooksLoading) {
-      nextProps.closeModal()
     }
   }
   addBook () {

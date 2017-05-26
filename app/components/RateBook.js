@@ -11,11 +11,6 @@ export class RateBook extends React.Component {
     this.changeComment = this.changeComment.bind(this)
     this.rateBook = this.rateBook.bind(this)
   }
-  componentWillReceiveProps (nextProps) {
-    if (!nextProps.loading) {
-      nextProps.closeModal()
-    }
-  }
   handleChange (e) {
     this.setState({
       rating: e.target.value

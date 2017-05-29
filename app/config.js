@@ -3,4 +3,4 @@ const Contract = {
   id: '0x95b2f7f949f7b98d9306db39fd7ac120d51c1bca'
 }
 
-export default Contract
+module.exports = Contract

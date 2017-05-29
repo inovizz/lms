@@ -4,7 +4,7 @@ import * as libraryActions from '../actions/libraryActions'
 import Dashboard from './Dashboard'
 import Header from './Header'
 
-const mapStateToProps = (state, ownProps) => {
+export const mapStateToProps = (state, ownProps) => {
   return {
     session: state.session,
     accounts: state.accounts

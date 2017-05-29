@@ -103,6 +103,7 @@ export const addBook = (book) => {
         }
       ).then((response) => {
       dispatch(action(actionType.GET_ADD_BOOKS_SUCCESS, book))
+      dispatch(getAllBooks())
     }).catch((e) => {
       console.log("Error Occured", e)
       dispatch(action(actionType.GET_ADD_BOOKS_ERROR, NotificationType('error', 'Error', e.message)))

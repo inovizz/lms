@@ -75,51 +75,49 @@ const Book = ({
                 {book.description}
               </div>
             </div>
-            {
-              <div className='media-bottom'>
-                <p>
-                {
-                  members[book.owner] !== undefined &&
-                  members[book.owner].name !== '' &&
-                  <span>
-                    Book shared by &nbsp;
-                    <strong>{members[book.owner].name}</strong>
-                    &nbsp;&nbsp;
-                  </span>
-                }
-                {
-                  members[book.borrower] !== undefined &&
-                  members[book.borrower].name !== '' &&
-                  <span>
-                    Currently with &nbsp;
-                    <strong>{members[book.borrower].name}</strong>
-                  </span>
-                }
-                </p>
-                <LoginButton
-                  authenticated={authenticated}
-                  loginSuccess={(response) => {
-                    getMemberDetailsByEmail(response, openModal, ['bookModal', book])
-                  }}
-                  loginFailure={(err) => console.log(err)}
-                  success = {() => openModal('bookModal', book)}
-                  className='btn btn-default borrow-btn'
-                  disabled={isDisabled(book, btnTitle) ? 'disabled' : false}
-                  buttonText={btnTitle? btnTitle : 'Return'}
-                  logo='' />
-                <LoginButton
-                  authenticated={authenticated}
-                  loginSuccess={(response) => {
-                    getMemberDetailsByEmail(response, openModal, ['rateBook', book])
-                  }}
-                  loginFailure={(err) => console.log(err)}
-                  success = {() => openModal('rateBook', book)}
-                  className='btn btn-default'
-                  disabled={false}
-                  buttonText='Rate'
-                  logo='' />
-              </div>
-            }
+            <div className='media-bottom'>
+              <p>
+              {
+                members[book.owner] !== undefined &&
+                members[book.owner].name !== '' &&
+                <span>
+                  Book shared by &nbsp;
+                  <strong>{members[book.owner].name}</strong>
+                  &nbsp;&nbsp;
+                </span>
+              }
+              {
+                members[book.borrower] !== undefined &&
+                members[book.borrower].name !== '' &&
+                <span>
+                  Currently with &nbsp;
+                  <strong>{members[book.borrower].name}</strong>
+                </span>
+              }
+              </p>
+              <LoginButton
+                authenticated={authenticated}
+                loginSuccess={(response) => {
+                  getMemberDetailsByEmail(response, openModal, ['bookModal', book])
+                }}
+                loginFailure={(err) => console.log(err)}
+                success = {() => openModal('bookModal', book)}
+                className='btn btn-default borrow-btn'
+                disabled={isDisabled(book, btnTitle) ? 'disabled' : false}
+                buttonText={btnTitle? btnTitle : 'Return'}
+                logo='' />
+              <LoginButton
+                authenticated={authenticated}
+                loginSuccess={(response) => {
+                  getMemberDetailsByEmail(response, openModal, ['rateBook', book])
+                }}
+                loginFailure={(err) => console.log(err)}
+                success = {() => openModal('rateBook', book)}
+                className='btn btn-default'
+                disabled={false}
+                buttonText='Rate'
+                logo='' />
+            </div>
           </div>
         )
       })}

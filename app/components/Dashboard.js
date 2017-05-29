@@ -22,7 +22,7 @@ const leadStyle = {
   paddingBottom : 0
 }
 
-const mapStateToProps = (state, ownProps) => {
+export const mapStateToProps = (state, ownProps) => {
   return {
     allBooks: state.books.allBooks,
     ownerDetails: state.session.user,
@@ -78,7 +78,7 @@ export class Dashboard extends React.Component {
      return (<Loader text={title}/>)
    }
   }
-  renderBooks () {
+  render () {
     const ownerBooks = this.props.allBooks.filter((book) => book.owner === this.props.ownerDetails.account)
     const borrowedBooks = this.props.allBooks.filter((book) => book.borrower === this.props.ownerDetails.account)
     const members = (this.props.accounts && this.props.accounts.members) ? this.props.accounts.members : ''
@@ -159,14 +159,6 @@ export class Dashboard extends React.Component {
             }
         </div>
       </div>
-    )
-  }
-  render () {
-    return (
-        // this.props.allBooks.length
-        // ?
-        this.renderBooks()
-        // : this.renderLoading()
     )
   }
 }

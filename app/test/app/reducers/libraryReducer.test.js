@@ -1,4 +1,4 @@
-import {
+  import {
   libraryReducer,
   loadingReducer,
   errorReducer,
@@ -398,26 +398,7 @@ describe('Reducers', () => {
           type: 'GET_ADD_BOOKS_SUCCESS',
           payload: book
         })).toEqual({
-          allBooks : [
-            ...books,
-            {
-              'id' : 2,
-              'title' : book.title,
-              'author' : book.author,
-              'publisher' : book.publisher,
-              'owner' : book.owner.account,
-              'borrower' : '0x0',
-              'state' : '0',
-              'dateAdded' : '1493054441',
-              'dateIssued' : '0',
-              'imageUrl' : book.imageUrl,
-              'description' : book.description,
-              'genre' : book.genre,
-              'avgRating': 0,
-              'totalRating': 0,
-              'reviewersCount': 0,
-            }
-          ]
+          allBooks : books
         })
     })
     it('should handle GET_BORROW_BOOKS_SUCCESS', () => {

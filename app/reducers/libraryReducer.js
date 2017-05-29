@@ -1,4 +1,4 @@
-import {shuffleArray} from './helpers'
+import { shuffleArray } from './helpers'
 
 export const libraryReducer = (state = [], action) => {
   switch (action.type) {
@@ -232,31 +232,7 @@ export const allBooksReducers = (state = [], action) => {
       }
     }
     case 'GET_ADD_BOOKS_SUCCESS': {
-      const id = state.allBooks.length >0 ? parseInt(state.allBooks[state.allBooks.length-1].id) :0
-      const books = [
-        ...state.allBooks,
-        {
-          'id' : id+1,
-          'title' : action.payload.title,
-          'author' : action.payload.author,
-          'publisher' : action.payload.publisher,
-          'owner' : action.payload.owner.account,
-          'borrower' : '0x0',
-          'state' : '0',
-          'dateAdded' : Date.now(),
-          'dateIssued' : '0',
-          'imageUrl' : action.payload.imageUrl,
-          'description' : action.payload.description,
-          'genre' : action.payload.genre,
-          'avgRating': 0,
-          'totalRating': 0,
-          'reviewersCount': 0
-        }
-      ]
-      return {
-        ...state,
-        allBooks : books
-      }
+      return state
     }
     case 'GET_BORROW_BOOKS_SUCCESS': {
       const id = state.allBooks.findIndex(x => x.id==action.payload.book.id)

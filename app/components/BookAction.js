@@ -36,6 +36,8 @@ export class BookAction extends React.Component {
                           ? 'Return'
                           : 'Close'
     const { book, members } = this.props
+    const borrowed_date = book.state === '0' ? Date.now() : (+book.dateIssued)*1000
+    const due_date = new Date(borrowed_date + 10*24*60*60*1000) // increment date by 10 days
     return (
       <form className='form-horizontal' onSubmit={this.handleSubmit}>
         <fieldset>
@@ -75,6 +77,12 @@ export class BookAction extends React.Component {
                         <td>{members[book.borrower].email}</td>
                       </tr>
                     }
+                    {
+                      <tr>
+                        <td>Due Date</td>
+                        <td>{due_date.toDateString()}</td>
+                      </tr>
+                    }
                   </tbody>
                 : <tbody>
                     {
@@ -89,6 +97,12 @@ export class BookAction extends React.Component {
                       <tr>
                         <td>Email</td>
                         <td>{members[book.owner].email}</td>
+                      </tr>
+                    }
+                    {
+                      <tr>
+                        <td>Due Date</td>
+                        <td>{due_date.toDateString()}</td>
                       </tr>
                     }
                   </tbody>

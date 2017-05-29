@@ -19,7 +19,8 @@ describe('BookAction', () => {
         author: 'BookAuthor',
         publisher: 'BookPublisher',
         state: '0',
-        owner: '0x1'
+        owner: '0x1',
+        dateIssued: '0'
       },
       ownerDetails: {
         name: 'User',
@@ -29,6 +30,7 @@ describe('BookAction', () => {
       borrowBook: jest.fn(),
       returnBook: jest.fn()
     }
+    Date.now = jest.fn(() => 1496041895220)
     component = shallow(<BookAction {...props} />)
   })
 
@@ -62,6 +64,10 @@ describe('BookAction', () => {
             <td>Email</td>
             <td>owner@example.com</td>
           </tr>
+          <tr>
+            <td>Due Date</td>
+            <td>Thu Jun 08 2017</td>
+          </tr>
         </tbody>
       )
       expect(component.contains(expected)).toEqual(true)
@@ -89,6 +95,7 @@ describe('BookAction', () => {
     beforeEach(() => {
       props.btnTitle = 'Return'
       props.book.state = '1'
+      props.book.dateIssued = '1496041895'
       component = shallow(<BookAction {...props} />)
     })
     it('should have "Return Book" title', () => {
@@ -107,6 +114,10 @@ describe('BookAction', () => {
           <tr>
             <td>Email</td>
             <td>owner@example.com</td>
+          </tr>
+          <tr>
+            <td>Due Date</td>
+            <td>Thu Jun 08 2017</td>
           </tr>
         </tbody>
       )
@@ -129,6 +140,7 @@ describe('BookAction', () => {
       props.book.state = '1'
       props.isOwner = true
       props.book.borrower = '0x1'
+      props.book.dateIssued = '1496041895'
       component = shallow(<BookAction {...props} />)
     })
     it('should have "Return Book" title', () => {
@@ -159,6 +171,10 @@ describe('BookAction', () => {
               <tr>
                 <td>Email</td>
                 <td>owner@example.com</td>
+              </tr>
+              <tr>
+                <td>Due Date</td>
+                <td>Thu Jun 08 2017</td>
               </tr>
             </tbody>
       )

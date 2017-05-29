@@ -1,5 +1,4 @@
 'use strict';
-import expectThrow from './helpers/expectThrow';
 
 const LMS = artifacts.require('../contracts/LMS.sol');
 
@@ -43,20 +42,48 @@ contract('LMS', function(accounts) {
         it('should not add an already added member', async function() {
             let memberCount = await lms.numMembers();
             assert.equal(memberCount.valueOf(), 1);
-            await lms.addMember("John Doe", 0x0, "Jd@gmail.com");
-            await lms.addMember("John Doe", 0x0, "Jd@gmail.com");
+            await lms.addMember("John Doe", accounts[1], "Jd@gmail.com");
+            let res = await lms.addMember("John Doe", accounts[1], "Jd@gmail.com");
+            assert.equal(res.logs[0].args.statusCode.c[0], 102);
             memberCount = await lms.numMembers();
             assert.equal(memberCount.valueOf(), 2);
         });
         it('should not add the already added default member', async function() {
-            await lms.addMember("Already added member", web3.eth.coinbase, "Jd@gmail.com");
+            let res = await lms.addMember("Already added member", web3.eth.coinbase, "email");
+            assert.equal(res.logs[0].args.statusCode.c[0], 102);
+            let memberCount = await lms.numMembers();
+            assert.equal(memberCount.valueOf(), 1);
+        });
+        it('should activate removed member', async function() {
+            await lms.removeMember(web3.eth.coinbase);
+            let res = await lms.addMember("Already added member", web3.eth.coinbase, "email");
+            assert.equal(res.logs[0].args.statusCode.c[0], 102);
+            let memberCount = await lms.numMembers();
+            assert.equal(memberCount.valueOf(), 1);
+        });
+        it('should not add the member if email and account already associated with 2 different members', async function() {
+            await lms.addMember("Already added member", accounts[1], "Jd@gmail.com");
+            let res = await lms.addMember("Spammer", accounts[1], 'email');
+            assert.equal(res.logs[0].args.statusCode.c[0], 103);
+            let memberCount = await lms.numMembers();
+            assert.equal(memberCount.valueOf(), 2);
+        });
+        it('should not add if email already registered with some other account', async function() {
+            let res = await lms.addMember("Already added member", accounts[1], "email");
+            assert.equal(res.logs[0].args.statusCode.c[0], 104);
+            let memberCount = await lms.numMembers();
+            assert.equal(memberCount.valueOf(), 1);
+        });
+        it('should not add if account already registered with some other email', async function() {
+            let res = await lms.addMember("Already added member", web3.eth.coinbase, "P@email.com");
+            assert.equal(res.logs[0].args.statusCode.c[0], 105);
             let memberCount = await lms.numMembers();
             assert.equal(memberCount.valueOf(), 1);
         });
     });
 
     describe('getMemberDetailsByEmail', function() {
-        it('should not add an already added member', async function() {
+        it('should provide member details', async function() {
             let memberCount = await lms.numMembers();
             assert.equal(memberCount.valueOf(), 1);
             await lms.addMember("John Doe", 0x0, "Jd@gmail.com");
@@ -69,6 +96,12 @@ contract('LMS', function(accounts) {
             assert.equal(status.valueOf(), 0);
             assert.isAtMost(dateAdded, Math.floor(Date.now() / 1000));
             assert.isAbove(dateAdded, Math.floor(Date.now() / 1000) - 300);
+        });
+        it('should return blank for a non-existent member details', async function() {
+            let [name, account, email, status, dateAdded] = await lms.getMemberDetailsByEmail("Jd@gmail.com");
+            assert.equal(name, '');
+            assert.equal(email, '')
+            assert.equal(status.valueOf(), 0);
         });
     });
 
@@ -83,6 +116,12 @@ contract('LMS', function(accounts) {
             assert.isAtMost(timestamp, Math.floor(Date.now() / 1000));
             assert.isAbove(timestamp, Math.floor(Date.now() / 1000) - 300);
         });
+        it('should return blank for a non-existent member details', async function() {
+            let [name, account, email, status, dateAdded] = await lms.getMemberDetailsByAccount(0x0);
+            assert.equal(name, '');
+            assert.equal(email, '')
+            assert.equal(status.valueOf(), 0);
+        });
     });
 
     describe('getMemberDetailsByIndex', function() {
@@ -96,10 +135,13 @@ contract('LMS', function(accounts) {
             assert.isAtMost(attr[4], Math.floor(Date.now() / 1000));
             assert.isAbove(attr[4], Math.floor(Date.now() / 1000) - 300);
         })
-        it('should throw an error for a non-existent index', async function() {
-            await expectThrow(lms.getMemberDetailsByIndex(-1));
-            await expectThrow(lms.getMemberDetailsByIndex(0));
-            await expectThrow(lms.getMemberDetailsByIndex(2));
+        it('should return blank for a non-existent index', async function() {
+            let res = await lms.getMemberDetailsByIndex(-1);
+            assert.equal(res, '');
+            let res2 = await lms.getMemberDetailsByIndex(0);
+            assert.equal(res2, '');
+            let res3 = await lms.getMemberDetailsByIndex(2);
+            assert.equal(res3, '');
         })
     });
 
@@ -163,7 +205,7 @@ What You Make It is a fictional story about a strong female", "Literature & Fict
             assert.equal(bookAttr[10], 'Life Is What You Make It is a fictional story about a strong female');
             assert.equal(bookAttr[11], 'Literature & Fiction');
         });
-        it("should add a book and get book addition amount in owner's account", async function() {
+        it("Should add a book and add endowment in owner's account", async function() {
             let ownerBal1 = web3.eth.getBalance(accounts[0]);
             let contractBal1 =  web3.eth.getBalance(lms.address);
             await lms.addBook("Life Is What You Make It", "Preeti Shenoy", "Srishti Publisher", "https://tinyurl.com/mj55qnr", "Life Is \
@@ -208,16 +250,27 @@ What You Make It is a fictional story about a strong female", "Literature & Fict
         });
         it('should not allow non-members to add a book', async function() {
             await lms.removeMember(web3.eth.coinbase);
-            await expectThrow(lms.addBook("t", "a", "p", "u", "d", "g"));
-            await expectThrow(lms.addBook("t", "a", "p", "u", "d", "g", {from: accounts[1]}));
+            let res = await lms.addBook("t", "a", "p", "u", "d", "g");
+            assert.equal(res.logs[0].args.statusCode.c[0], 100);
+            let res1 = await lms.addBook("t", "a", "p", "u", "d", "g", {from: accounts[1]});
+            assert.equal(res1.logs[0].args.statusCode.c[0], 100);
+        });
+        it('should not allow contract to add a book if balance is less than reward 10**2', async function() {
+            await lms.removeMember(web3.eth.coinbase);
+            let lms2 = await LMS.new('Lallan2', "email2", {value: web3.toWei(0.0000001)});
+            let res = await lms2.addBook("t", "a", "p", "u", "d", "g");
+            assert.equal(res.logs[0].args.statusCode.c[0], 120);
         });
     });
 
     describe('getBook', function() {
         it('should throw an error for a non-existent index', async function() {
-            await expectThrow(lms.getBook(-1));
-            await expectThrow(lms.getBook(0));
-            await expectThrow(lms.getBook(2));
+            let res = await lms.getBook(-1);
+            assert.equal(res, '');
+            let res2 = await lms.getBook(0);
+            assert.equal(res2, '');
+            let res3 = await lms.getBook(2);
+            assert.equal(res3, '');
         })
     });
 
@@ -247,7 +300,8 @@ What You Make It is a fictional story about a strong female", "Literature & Fict
             await lms.addMember('Other member', accounts[1], "Om@gmail.com");
             await lms.addBook("Life Is What You Make It", "Preeti Shenoy", "Srishti Publisher", "https://tinyurl.com/mj55qnr", "Life Is \
 What You Make It is a fictional story about a strong female", "Literature & Fiction");
-            await lms.updateBook(1, 't', 'a', 'p', 'imgUrl','d', 'g',{from: accounts[1]});
+            let res = await lms.updateBook(1, 't', 'a', 'p', 'imgUrl','d', 'g',{from: accounts[1]});
+            assert.equal(res.logs[0].args.statusCode.c[0], 122);
             let bookCount = await lms.numBooks();
             assert.equal(bookCount, 1);
             let book = await lms.getBook(1);
@@ -341,13 +395,19 @@ What You Make It is a fictional story about a strong female", "Literature & Fict
     });
 
     describe('borrowBook', function() {
-        it("should not allow borrowing book if value send is less than 100", async function() {
+        it("should not allow borrowing book if value send is less than 10**12", async function() {
             await lms.addBook('a', 'b', 'c', 'e', 'f', 'g');
             await lms.addMember('Michael Scofield', accounts[2], "Ms@gmail.com");
-            await lms.borrowBook(1, {from: accounts[2], value: 10**12})
-            await expectThrow(lms.borrowBook(1, {from: accounts[2], value: 10000})); // should throw exception
+            let res = await lms.borrowBook(1, {from: accounts[2], value: 10**12});
+            assert.equal(res.logs[0].args.bookId.c[0],1);
+            let res1 = await lms.borrowBook(1, {from: accounts[2], value: 10000});
+            assert.equal(res1.logs[0].args.statusCode.c[0],123);
         });
-
+        it("should not allow non-member to borrow book ", async function() {
+            await lms.addBook('a', 'b', 'c', 'e', 'f', 'g');
+            let res = await lms.borrowBook(1, {from: accounts[1], value: 10**12});
+            assert.equal(res.logs[0].args.statusCode.c[0],100);
+        });
         it('should borrow book and transfer 50% weis to owner account', async function() {
             await lms.addBook('a', 'b', 'c', 'e', 'f', 'g');
             await lms.addMember('Michael Scofield', accounts[2], "Ms@gmail.com");
@@ -367,14 +427,15 @@ What You Make It is a fictional story about a strong female", "Literature & Fict
             assert.isAtLeast((borrowBal1.minus(borrowBal2)).valueOf(), 0.1); 
             // TODO - Include Gas esimation price in borrowers balance check
         });
-
         it('should not allow borrowing books that are already borrowed', async function() {
             await lms.addBook('t', 'a', 'p', 'u', 'd', 'g');
             await lms.borrowBook(1, {from: accounts[0], value: web3.toWei(0.1)});
-            await expectThrow(lms.borrowBook(1, {from: accounts[0], value: web3.toWei(0.1)}));
+            let res = await lms.borrowBook(1, {from: accounts[0], value: web3.toWei(0.1)});
+            assert.equal(res.logs[0].args.statusCode.c[0],124);
         });
         it("should not allow borrowing books that don't exist", async function() {
-            await expectThrow(lms.borrowBook(1, {from: accounts[0], value: web3.toWei(0.1)}));
+            let res = await lms.borrowBook(1, {from: accounts[0], value: web3.toWei(0.1)});
+            assert.equal(res.logs[0].args.statusCode.c[0],124);
         });
         it('should set the borrower, issue date and state', async function() {
             await lms.addBook("1984", "Orwell", "Classic Publishers", "image url", "description", "genre");
@@ -419,11 +480,13 @@ What You Make It is a fictional story about a strong female", "Literature & Fict
 
     describe('returnBook', function() {
         it("should not allow returning books that don't exist", async function() {
-            await expectThrow(lms.returnBook(1));
+            let res = await (lms.returnBook(1));
+            assert.equal(res.logs[0].args.statusCode.c[0],126);
         });
         it('should not allow returning books that have not been issued', async function() {
             await lms.addBook('t', 'a', 'p', 'u', 'd', 'g');
-            await expectThrow(lms.returnBook(1));
+            let res = await (lms.returnBook(1));
+            assert.equal(res.logs[0].args.statusCode.c[0],126);
         });
         it('should reset the borrower, issue date and state', async function() {
             await lms.addBook('t', 'a', 'p', 'u', 'd', 'g');
@@ -441,7 +504,8 @@ What You Make It is a fictional story about a strong female", "Literature & Fict
             // Default member borrows the book
             await lms.borrowBook(1, {from: accounts[0], value: 10**12});
             // Default member tries to return the book
-            await expectThrow(lms.returnBook(1));
+            let res = await (lms.returnBook(1));
+            assert.equal(res.logs[0].args.statusCode.c[0],126);
             // Book owner successfully returns the book
             await lms.returnBook(1, {from: accounts[1]});
         });
@@ -481,6 +545,15 @@ What You Make It is a fictional story about a strong female", "Literature & Fict
                 assert.equal(bookAttr[12], 5);
             });
         });
+        it('should not allow rating a non-existing book', async function() {
+            let res = await lms.rateBook(1, 5, "A must-read classic!", 0);
+            assert.equal(res.logs[0].args.statusCode.c[0],127);
+        });
+        it('should not allow rating a book with invalid rating i.e. rate<1 or rate>5', async function() {
+            await lms.addBook("1984", "Orwell", "Classic Publishers", "image url", "description", "genre");
+            let res = await lms.rateBook(1, 0, "A must-read classic!", 0);
+            assert.equal(res.logs[0].args.statusCode.c[0],127);
+        }); 
         it('should allow a member to rate multiple times and fetch the ratings from events', async function() {
             await lms.addBook("1984", "Orwell", "Classic Publishers", "image url", "description", "genre");
             let reviews = [

@@ -27,6 +27,12 @@ const isDisabled = (book, bookAction) => {
   return (bookAction === 'Borrow' && book.state === '1') || (bookAction === 'Return' && book.state === '0')
 }
 
+const getUserRating = (selectedBook,ownerDetails) => {
+  if(typeof selectedBook !== "undefined" && typeof selectedBook.ratings !== "undefined" && typeof selectedBook.reviewers !== "undefined"){
+      return selectedBook.ratings[selectedBook.reviewers.indexOf(ownerDetails.account)]
+  }
+  return 0
+}
 const Book = ({
     title,
     books,
@@ -138,6 +144,7 @@ const Book = ({
       loading = {
         loading.rateBookLoading
       }
+      presetRate={getUserRating(selectedBook,ownerDetails)}
       />
     </Modal>
     <Modal

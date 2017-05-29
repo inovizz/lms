@@ -1,20 +1,23 @@
 import React from 'react'
+import ReactStars from 'react-stars'
 
+const style = {
+  textLable: {
+    textAlign: 'left'
+  },
+  starRate: {
+    paddingTop: '5px'
+  }
+}
 export class RateBook extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      rating: '1',
+      rating: props.presetRate,
       comment: ''
     }
-    this.handleChange = this.handleChange.bind(this)
     this.changeComment = this.changeComment.bind(this)
     this.rateBook = this.rateBook.bind(this)
-  }
-  handleChange (e) {
-    this.setState({
-      rating: e.target.value
-    })
   }
   changeComment (e) {
     this.setState({
@@ -27,9 +30,10 @@ export class RateBook extends React.Component {
     const comment = this.state.comment
     this.props.rateBook(rating, comment)
     this.props.closeModal()
+  }
+  ratingChanged(newRating){
     this.setState({
-      rating: '1',
-      comment: ''
+      rating: newRating
     })
   }
   render () {
@@ -41,19 +45,19 @@ export class RateBook extends React.Component {
             <span className='glyphicon glyphicon-remove close-btn' onClick={() => this.props.closeModal()}></span>
           </legend>
           <div className='form-group'>
-            <label htmlFor='rate' className='col-sm-3 control-label'>Ratings</label>
-            <div className='col-sm-9'>
-            <select className='form-control' id='rate' onChange={this.handleChange} value={this.state.rating}>
-              <option value='1'>1</option>
-              <option value='2'>2</option>
-              <option value='3'>3</option>
-              <option value='4'>4</option>
-              <option value='5'>5</option>
-            </select>
+            <label htmlFor='rate' className='col-sm-3 control-label' style={style.textLable}>Ratings</label>
+            <div className='col-sm-9' style={style.starRate}>
+              <ReactStars
+                count={5}
+                onChange={(newRating)=>this.ratingChanged(newRating)}
+                size={24}
+                half={false}
+                value={this.state.rating}
+                color2={'#e7711b'} />
             </div>
           </div>
           <div className='form-group'>
-            <label htmlFor='comment' className='col-sm-3 control-label'>Comment</label>
+            <label htmlFor='comment' className='col-sm-3 control-label' style={style.textLable}>Comment</label>
             <div className='col-sm-9'>
               <textarea
                 className = 'form-control'

@@ -15,8 +15,8 @@ describe('RateBook', () => {
   it('should render the book form', () => {
     expect(component.find('form').exists()).toEqual(true)
   })
-  it('should have a select option',() => {
-    expect(component.find('select').exists()).toEqual(true)
+  it('should have a ReactStars rating',() => {
+    expect(component.find('ReactStars').exists()).toEqual(true)
   })
   it('should have a textarea for comment',() => {
     expect(component.find('textarea').exists()).toEqual(true)
@@ -35,10 +35,10 @@ describe('RateBook', () => {
     component.find('.close-btn').simulate('click')
     expect(props.closeModal.mock.calls.length).toBe(1)
   })
-  it('should change value of select',() => {
-    const e = { target: { value: '3' } }
-    component.find('select').simulate('change', e)
-    expect(component.find('select').props().value).toBe('3')
+  it('should change value of ReactStars',() => {
+    const e = '3'
+    component.find('ReactStars').simulate('change', e)
+    expect(component.find('ReactStars').props().value).toBe('3')
   })
   it('should change value of textarea',() => {
     const e = { target: { value: 'Wonderful' } }

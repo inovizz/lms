@@ -68,6 +68,7 @@
     "react-notification-system-redux": "^1.1.2",
     "react-redux": "^5.0.4",
     "react-router-dom": "^4.1.1",
+    "react-stars": "^2.1.0",
     "redux": "^3.6.0",
     "redux-react-session": "^1.2.0",
     "redux-thunk": "^2.2.0",

@@ -205,6 +205,7 @@ export const allBooksReducers = (state = [], action) => {
       let allBooks = books.map(book => {
         book.reviewers = book.reviewers || []
         book.ratings = book.ratings || []
+        book.comments = book.comments || []
         if(book.id === booksRating.bookId) {
           const index = book.reviewers.indexOf(booksRating.reviewer)
           let oldRating = 0
@@ -212,9 +213,11 @@ export const allBooksReducers = (state = [], action) => {
             oldRating = book.ratings[index]
             book.ratings[index] = booksRating.rating
             book.reviewers[index] = booksRating.reviewer
+            book.comments[index] = booksRating.comments
           } else {
             book.ratings.push(booksRating.rating)
             book.reviewers.push(booksRating.reviewer)
+            book.comments.push(booksRating.comments)
           }
           if(booksRating.flag) {
             if(oldRating === 0) {

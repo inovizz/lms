@@ -34,6 +34,16 @@ describe('Image', () => {
       component.find('img').simulate('load');
       expect(component.find('.loader').exists()).toEqual(false)
     })
+    it('should change the source of image if image not available', () => {
+      const nextProps = { src: 'Image' }
+      component.instance().componentWillReceiveProps(nextProps)
+      expect(component.state().src).toEqual(nextProps.src)
+    })
+    it('should not change the source of image if image is available', () => {
+      const nextProps = {}
+      component.instance().componentWillReceiveProps(nextProps)
+      expect(component.state().src).toEqual(undefined)
+    })
   })
 
   describe('render when type is false',() => {

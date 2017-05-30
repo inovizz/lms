@@ -187,6 +187,7 @@ export const rateBook = (rating, comment, book, ownerDetails) => {
           dispatch(action(actionType.GET_RATE_BOOK_SUCCESS, {
             bookId: book.id,
             rating: rating,
+            comments: comment,
             reviewer: ownerDetails.account,
             flag: true
           }))

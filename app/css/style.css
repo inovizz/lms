@@ -247,26 +247,18 @@ a.navbar-brand {
   font-weight: 300;
   color: #292929;
   padding-bottom: 5px;
-  display: -webkit-box;
- -webkit-line-clamp: 3;
- -webkit-box-orient: vertical;
- max-height: 72px;
- overflow: hidden;
 }
 
-.taContainer {
-  height: 96px;
-  margin-bottom: 24px;
+.book .media-body {
+  padding-bottom: 60px;
 }
 
 .bookDescription {
   opacity: 0.8;
   color: #292929;
-  padding-bottom: 5px;
   display: -webkit-box;
  -webkit-line-clamp: 7;
  -webkit-box-orient: vertical;
- height: 168px;
  overflow: hidden;
  margin-bottom: 15px;
 }
@@ -306,8 +298,7 @@ a.navbar-brand {
 .rating {
   unicode-bidi: bidi-override;
   color: #e7711b;
-  position: absolute;
-  left: 0;
+  display: inline-block;
 }
 
 .rating > span.active {
@@ -432,4 +423,51 @@ a.navbar-brand {
     height: 10px;
     transform: rotateZ(180deg) translateX(-20px) scale(1.25);
   }
+}
+
+/* Book Details */
+.book-details-row {
+  display: flex;
+  padding-top: 5%;
+}
+
+.book-details-row .book{
+  flex: 1 0 65%;
+  margin: 0;
+}
+
+.book-details-row .book .list-group-item {
+  width: 100%;
+  margin: 0;
+}
+
+.book-details-row .book .imgMedium {
+  width: 50%;
+}
+
+.book-details-row .book .bookDescription {
+  display: block;
+  height: auto;
+}
+
+.book-details-row .comments{
+  flex: 0 0 33%;
+  margin-left: 2%;
+}
+
+/* Comments Section - Book Details Page*/
+.comment {
+  border-bottom: 1px solid #edeeed;
+  padding: 0.5rem 0;
+  font-size: 12px;
+}
+
+.comment p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.comment strong {
+  color: #125688;
+  margin-right: 5px;
 }

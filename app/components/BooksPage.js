@@ -1,14 +1,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import * as libraryActions from '../actions/libraryActions'
-import Book from './Book'
 import Header from './Header'
-import Banner from './Banner'
-import SearchBook from './SearchBook'
 import Modal from 'react-modal'
 import LMSAuth from './LMSAuth'
 import Loader from './Loader'
+import Home from './Home'
+import BookDetailsPage from './BookDetailsPage'
 import NotifyMe from './notifications/NotifyMe'
+import { Switch, Route } from 'react-router-dom'
 
 const modalStyle = {
   content : {
@@ -37,12 +37,8 @@ const mapStateToProps = (state, ownProps) => {
 export class BooksPage extends React.Component {
   constructor (props) {
     super(props)
-    this.searchVal = ''
     this.state = {
-      rateModalIsOpen: false,
-      authModalIsOpen: !this.props.isExistingMember.user,
-      bookModalIsOpen: false,
-      book: {}
+      authModalIsOpen: !this.props.isExistingMember.user
     }
   }
   componentDidMount () {
@@ -65,27 +61,14 @@ export class BooksPage extends React.Component {
         authModalIsOpen: true
       })
     }
-    if(nextProps.session.authenticated && nextProps.session.user.account) {
-      if(!nextProps.accounts) {
-        this.props.getBalance(nextProps.session.user)
-      }
-      if(nextProps.isExistingMember.callbackFn) {
-        nextProps.isExistingMember.callbackFn.apply(this, nextProps.isExistingMember.argsArr)
-      }
+    if(nextProps.session.authenticated && nextProps.session.user.account && !nextProps.accounts) {
+      this.props.getBalance(nextProps.session.user)
     }
   }
   toggleModal (modal, book) {
     switch (modal) {
-      case 'rateBook' : {
-        this.setState({ rateModalIsOpen: !this.state.rateModalIsOpen, book })
-        break;
-      }
       case 'authModal' : {
         this.setState({ authModalIsOpen: !this.state.authModalIsOpen })
-        break;
-      }
-      case 'bookModal' : {
-        this.setState({ bookModalIsOpen: !this.state.bookModalIsOpen, book })
         break;
       }
     }
@@ -112,12 +95,6 @@ export class BooksPage extends React.Component {
     }
   }
   render () {
-    const books = this.props.books.value
-                  ? this.props.books.filteredBooks.length
-                    ? this.props.books.filteredBooks
-                    : []
-                  : (this.props.books.allBooks.length ? this.props.books.allBooks : [])
-    const members = (this.props.accounts && this.props.accounts.members) ? this.props.accounts.members : ''
     return (
       <div>
         <Header
@@ -134,57 +111,15 @@ export class BooksPage extends React.Component {
           logout = {
             () => this.props.logout()
           } />
-        <Banner />
+
         {
           this.renderLoader()
         }
         <NotifyMe message={this.props.error}/>
-        <div className='container'>
-          <div className='row'>
-            <div className='col-md-7'>
-              <ul className='nav navbar-nav'>
-                <li>
-                  <a href='#' className='active'>All Books</a>
-                </li>
-              </ul>
-            </div>
-            <div className='col-sm-4 col-sm-offset-1'>
-              <SearchBook searchBook={this.props.searchBook} />
-            </div>
-          </div>
-          {
-            this.props.books.allBooks.length
-            ? <Book loading = {
-                this.props.loading
-              }
-              title = ''
-              books = {
-                books
-              }
-              members = {members}
-              ownerDetails = { this.props.ownerDetails }
-              selectedBook = { this.state.book }
-              btnTitle = 'Borrow'
-              isOwner = {false}
-              rateBook = {
-                (rating, comment) => this.props.rateBook(rating, comment, this.state.book, this.props.ownerDetails)
-              }
-              openModal = {
-                (modalName, book) => this.toggleModal(modalName, book)
-              }
-              closeModal = {
-                (modalName) => this.toggleModal(modalName)
-              }
-              rateModalIsOpen = { this.state.rateModalIsOpen }
-              bookModalIsOpen = { this.state.bookModalIsOpen }
-              authenticated = { this.props.session.authenticated }
-              getMemberDetailsByEmail={
-                (response, callbackFn, argsArray) => this.props.getMemberDetailsByEmail(response, callbackFn, argsArray)
-              }
-              width = '70%' />
-            : <div className="col-md-12">No Books Added</div>
-          }
-        </div>
+        <Switch>
+          <Route path='/book/:id' component={BookDetailsPage} />
+          <Route exact path='/' component={Home} />
+        </Switch>
         <Modal
             isOpen={this.state.authModalIsOpen && (this.props.isExistingMember.user ? true: false) }
             onRequestClose={() => this.toggleModal('authModal')}

@@ -354,7 +354,8 @@ describe('Reducers', () => {
             'totalRating': 3,
             'reviewersCount': 1,
             'reviewers': ['0xeeffa82fb768e9057d7967f672a3d0a6116d2528'],
-            'ratings': [3]
+            'ratings': [3],
+            'comments': ['Awesome']
           }]
         })
     })

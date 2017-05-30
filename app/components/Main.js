@@ -2,14 +2,15 @@ import React from 'react'
 import { Switch, Route, withRouter } from 'react-router-dom'
 import App from './App'
 import BooksPage from './BooksPage'
+import BookDetailsPage from './BookDetailsPage'
 import RequestAuthentication from './RequestAuthentication'
 import { connect } from 'react-redux'
 
 const Main = ({ checked }) => (
   checked &&
   <Switch>
-    <Route exact path='/' component={BooksPage} />
     <Route path='/books' component={RequestAuthentication(App)} />
+    <Route path='/' component={BooksPage} />
   </Switch>
 )
 

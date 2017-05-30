@@ -12,6 +12,10 @@ export const action = (type, flag) => {
   }
 }
 
+export const isSuccess = (response) => {
+  return !(response.logs.length && response.logs[0].event === 'Status')
+}
+
 export const getAccounts = () => {
   return (dispatch) => {
     dispatch(action(actionType.GET_ACCOUNTS_LOADING, true))
@@ -91,19 +95,26 @@ export const addBook = (book) => {
   return (dispatch) => {
     dispatch(action(actionType.GET_ADD_BOOKS_LOADING, true))
     lms.addBook(
-        book.title,
-        book.author,
-        book.publisher,
-        book.imageUrl,
-        book.description,
-        book.genre,
-        {
-          from: book.owner.account,
-          gas: 600000
-        }
-      ).then((response) => {
-      dispatch(action(actionType.GET_ADD_BOOKS_SUCCESS, book))
-      dispatch(getAllBooks())
+      book.title,
+      book.author,
+      book.publisher,
+      book.imageUrl,
+      book.description,
+      book.genre,
+      {
+        from: book.owner.account,
+        gas: 600000
+      }
+    ).then((response) => {
+      if(isSuccess(response)) {
+        dispatch(action(actionType.GET_ADD_BOOKS_SUCCESS, book))
+        dispatch(getAllBooks())
+      } else {
+        dispatch(action(
+          actionType.GET_ADD_BOOKS_ERROR,
+          NotificationType('error', 'Error', response.logs[0].args.statusCode.c[0])
+        ))
+      }
     }).catch((e) => {
       console.log("Error Occured", e)
       dispatch(action(actionType.GET_ADD_BOOKS_ERROR, NotificationType('error', 'Error', e.message)))
@@ -118,7 +129,14 @@ export const returnBook = (book) => {
   return (dispatch) => {
     dispatch(action(actionType.GET_RETURN_BOOKS_LOADING, true))
     lms.returnBook(book.id, { from : book.owner, gas: 200000 }).then((response) => {
-      dispatch(action(actionType.GET_RETURN_BOOKS_SUCCESS, book))
+      if(isSuccess(response)) {
+        dispatch(action(actionType.GET_RETURN_BOOKS_SUCCESS, book))
+      } else {
+          dispatch(action(
+            actionType.GET_RETURN_BOOKS_ERROR,
+            NotificationType('error', 'Error', response.logs[0].args.statusCode.c[0])
+          ))
+      }
     }).catch((e) => {
       console.log("Error Occured", e)
       dispatch(action(actionType.GET_RETURN_BOOKS_ERROR, NotificationType('error', 'Error', e.message)))
@@ -133,7 +151,14 @@ export const borrowBook = (book, ownerDetails) => {
   return (dispatch) => {
     dispatch(action(actionType.GET_BORROW_BOOKS_LOADING, true))
     lms.borrowBook(book.id, { from: ownerDetails.account, value: web3.toWei(0.1), gas: 200000 }).then((response) => {
-      dispatch(action(actionType.GET_BORROW_BOOKS_SUCCESS, { book, owner: ownerDetails.account }))
+      if(isSuccess(response)) {
+        dispatch(action(actionType.GET_BORROW_BOOKS_SUCCESS, { book, owner: ownerDetails.account }))
+      } else {
+          dispatch(action(
+            actionType.GET_BORROW_BOOKS_ERROR,
+            NotificationType('error', 'Error', response.logs[0].args.statusCode.c[0])
+          ))
+      }
     }).catch((e) => {
       console.log("Error Occured", e)
       dispatch(action(actionType.GET_BORROW_BOOKS_ERROR, NotificationType('error', 'Error', e.message)))
@@ -158,12 +183,19 @@ export const rateBook = (rating, comment, book, ownerDetails) => {
         from: ownerDetails.account,
         gas: 300000
       }).then((response) => {
-      dispatch(action(actionType.GET_RATE_BOOK_SUCCESS, {
-        bookId: book.id,
-        rating: rating,
-        reviewer: ownerDetails.account,
-        flag: true
-      }))
+        if(isSuccess(response)) {
+          dispatch(action(actionType.GET_RATE_BOOK_SUCCESS, {
+            bookId: book.id,
+            rating: rating,
+            reviewer: ownerDetails.account,
+            flag: true
+          }))
+        } else {
+          dispatch(action(
+            actionType.RATE_BOOK_ERROR,
+            NotificationType('error', 'Error', response.logs[0].args.statusCode.c[0])
+          ))
+        }
     }).catch((e) => {
       console.log("Error Occured", e)
       dispatch(action(actionType.RATE_BOOK_ERROR, NotificationType('error', 'Error', e.message)))
@@ -296,17 +328,24 @@ export const addMember = (member) => {
             from: web3.eth.accounts[0],
             gas: 600000
           }).then((response) => {
-          web3.eth.sendTransaction({
-            from: web3.eth.accounts[0],
-            to: member[1],
-            value: web3.toWei(1000)
-          }, (e, res) => {
-            if(e) {
-              return dispatch(action(actionType.ADD_MEMBER_ERROR, NotificationType('error', 'Error', e.message)))
+            if(isSuccess(response)) {
+              web3.eth.sendTransaction({
+                from: web3.eth.accounts[0],
+                to: member[1],
+                value: web3.toWei(1000)
+              }, (e, res) => {
+                if(e) {
+                  return dispatch(action(actionType.ADD_MEMBER_ERROR, NotificationType('error', 'Error', e.message)))
+                }
+                dispatch(getAllMembers())
+                dispatch(action(actionType.ADD_MEMBER_SUCCESS, true))
+              })
+            } else {
+              dispatch(action(
+                actionType.ADD_MEMBER_ERROR,
+                NotificationType('error', 'Error', response.logs[0].args.statusCode.c[0])
+              ))
             }
-            dispatch(getAllMembers())
-            dispatch(action(actionType.ADD_MEMBER_SUCCESS, true))
-          })
         }).catch((e) => {
           console.log("Error Occured", e)
           dispatch(action(actionType.ADD_MEMBER_ERROR, NotificationType('error', 'Error', e.message)))

@@ -17,7 +17,7 @@ web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545'));
 // import mailinjs npm package for sending email
 // & instantiate constructor by passing API URL and API key
 require('mailin-api-node-js');
-var client = new Mailin("https://api.sendinblue.com/v2.0","********");
+var client = new Mailin("https://api.sendinblue.com/v2.0","apikey");
 
 // import contract id from app/config.js
 var contract_id =  require("../app/config.js");
@@ -40,8 +40,8 @@ var lms = LMS.at(contract_id.id);
 var allBooks = lms.getAllBooks()[0].split("|");
 
 // get timestamp of 10 days back
-var currentDate = new Date();
-var timestamp = (currentDate.setDate(currentDate.getDate() - 10)) / 1000 | 0;
+var d = new Date();
+var timestamp = (d.setDate(d.getDate() - 10)) / 1000 | 0;
 
 // function to convert name in title case for better email formatting
 function titleCase(str) {
@@ -72,6 +72,7 @@ for (var i = 0; i <= allBooks.length-1; i++) {
 		var issuedDate =  new Date(parseInt(book[8])*1000);
 		// calculate duedate using issuedDate timestamp
 		var dueDate = new Date(issuedDate.setDate(issuedDate.getDate()+10));
+		var currentDate = new Date();
 		// calculate time difference between duedate and currentdate in hours
 		var timeDiff = Math.abs(currentDate.getTime() - dueDate.getTime());
 		var timeDiffHours = timeDiff / (1000 * 3600);
@@ -89,7 +90,7 @@ for (var i = 0; i <= allBooks.length-1; i++) {
 						kindly contact Bookshelf admin at \
 						<a href='mailto:bookshelf@imaginea.com'>bookshelf@imaginea.com</a>.\
 						</p></br><p>Note: This is an auto-generated email, \
-						please do not respond back.</p></br><p>Thanks,</p><p>Team Bookshelf</p>"
+						please do not respond back.</p></br><p>Thanks,</br>Team Bookshelf</p>"
 			};
 		client.send_email(data).on('complete', function(data) {
 		console.log(data);

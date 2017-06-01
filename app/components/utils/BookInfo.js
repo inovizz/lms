@@ -23,15 +23,9 @@ const BookInfo = ({ type, book, members, authenticated, openModal, getMemberDeta
       <div className='bookDescription'>
         {book.description}
       </div>
-      {
-        type === 'info' &&
-        <Link to={`/book/${book.id}`}>
-          Click here to view more..
-        </Link>
-      }
     </div>
     <div className='media-bottom'>
-      <p>
+      <p className='user-info'>
       {
         members[book.owner] !== undefined &&
         members[book.owner].name !== '' &&
@@ -50,6 +44,7 @@ const BookInfo = ({ type, book, members, authenticated, openModal, getMemberDeta
         </span>
       }
       </p>
+      <p className='btns'>
       {
         type === 'info' &&
           <LoginButton
@@ -78,6 +73,7 @@ const BookInfo = ({ type, book, members, authenticated, openModal, getMemberDeta
           buttonText='Rate'
           logo='' />
       }
+      </p>
     </div>
   </div>
 )

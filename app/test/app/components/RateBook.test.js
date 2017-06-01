@@ -8,7 +8,8 @@ describe('RateBook', () => {
     props = {
       rateBook: jest.fn(),
       closeModal: jest.fn(),
-      loading: false
+      loading: false,
+      selectedBook: { title: 'Book' }
     }
     component = shallow(<RateBook {...props} />)
   })

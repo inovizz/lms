@@ -21,7 +21,7 @@ const modalStyle = {
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
+export const mapStateToProps = (state, ownProps) => {
   return {
     books: state.books,
     ownerDetails: state.session.user,

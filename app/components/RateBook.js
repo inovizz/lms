@@ -41,7 +41,7 @@ export class RateBook extends React.Component {
       <form className='form-horizontal' onSubmit={this.rateBook}>
         <fieldset>
           <legend>
-            Rate
+            <p>Rate - {this.props.selectedBook.title}</p>
             <span className='glyphicon glyphicon-remove close-btn' onClick={() => this.props.closeModal()}></span>
           </legend>
           <div className='form-group'>

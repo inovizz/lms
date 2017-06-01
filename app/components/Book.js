@@ -84,6 +84,7 @@ const Book = ({
         loading.rateBookLoading
       }
       presetRate={getUserRating(selectedBook,ownerDetails)}
+      selectedBook = {selectedBook}
       />
     </Modal>
     <Modal

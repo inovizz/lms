@@ -251,6 +251,7 @@ a.navbar-brand {
 
 .book .media-body {
   padding-bottom: 60px;
+  height: 400px;
 }
 
 .bookDescription {
@@ -261,35 +262,16 @@ a.navbar-brand {
  -webkit-box-orient: vertical;
  overflow: hidden;
  margin-bottom: 15px;
+ height: 150px;
 }
 
-/*
-
-.hint--bottom:before {
-  margin-top: -11px;
-  left: calc(50% - 6px);
-  top: 100%;
+legend p {
+  width: 90%;
+  display: inline-block;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
-
-[class*=hint--] {
-    position: relative;
-}
-
-[class*=hint--][aria-label]:after {
-    content: attr(aria-label);
-}
-
-.hint--bottom:after {
-  -webkit-transform: translateX(-50%);
-  -moz-transform: translateX(-50%);
-  transform: translateX(-50%);
-  top: 100%;
-  left: 50%;
-  z-index: 2
-}
-
-*/
-
 .ratingContainer {
   position: relative;
   height: 24px;
@@ -318,17 +300,26 @@ a.navbar-brand {
   width: 97%;
   bottom: 0;
   line-height: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.book .media-bottom p {
-  display: inline-block;
-  line-height: 40px;
-  vertical-align: middle;
+.book .media-bottom p.user-info {
+  flex: 1 1 70%;
+  margin: 0;
+}
+
+.book .media-bottom p.btns {
+  flex: 1 1 30%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
   margin: 0;
 }
 
 .book .media-bottom .btn {
-  float: right;
+  height: 40px;
 }
 
 .add-btn {
@@ -336,7 +327,7 @@ a.navbar-brand {
 }
 
 .borrow-btn {
-  margin-left: 15px;
+  margin-right: 15px;
 }
 
 .book-close-btn {
@@ -443,6 +434,10 @@ a.navbar-brand {
 
 .book-details-row .book .imgMedium {
   width: 50%;
+}
+
+.book-details-row .book .media-body {
+  height: auto;
 }
 
 .book-details-row .book .bookDescription {

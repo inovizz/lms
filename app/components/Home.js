@@ -5,7 +5,7 @@ import Banner from './Banner'
 import { connect } from 'react-redux'
 import * as libraryActions from '../actions/libraryActions'
 
-const mapStateToProps = (state, ownProps) => {
+export const mapStateToProps = (state, ownProps) => {
   return {
     books: state.books,
     ownerDetails: state.session.user,
@@ -17,7 +17,7 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-class Home extends React.Component {
+export class Home extends React.Component {
   constructor (props) {
     super(props)
     this.searchVal = ''

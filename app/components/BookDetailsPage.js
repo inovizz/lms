@@ -11,7 +11,7 @@ export const mapStateToProps = (state, ownProps) => {
   }
 }
 
-class BookDetailsPage extends React.Component {
+export class BookDetailsPage extends React.Component {
   render () {
     const book = this.props.books.allBooks.filter((book) => book.id === this.props.match.params.id)
     const members = (this.props.accounts && this.props.accounts.members) ? this.props.accounts.members : ''

@@ -4,8 +4,6 @@ import Modal from 'react-modal'
 import Book, { isDisabled, getUserRating } from '../../../components/Book'
 import RateBook from '../../../components/RateBook'
 import BookAction from '../../../components/BookAction'
-import Image from '../../../components/utils/Image'
-import LoginButton from '../../../components/utils/LoginButton'
 
 describe('Book', () => {
   let component, props;

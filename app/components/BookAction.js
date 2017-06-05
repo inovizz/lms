@@ -74,7 +74,7 @@ export class BookAction extends React.Component {
                       members[book.borrower].email !== '' &&
                       <tr>
                         <td>Email</td>
-                        <td>{members[book.borrower].email}</td>
+                        <td><a href={'mailto:'+members[book.borrower].email}>{members[book.borrower].email}</a></td>
                       </tr>
                     }
                     {
@@ -96,7 +96,7 @@ export class BookAction extends React.Component {
                       members[book.owner].email !== '' &&
                       <tr>
                         <td>Email</td>
-                        <td>{members[book.owner].email}</td>
+                        <td><a href={'mailto:'+members[book.owner].email}>{members[book.owner].email}</a></td>
                       </tr>
                     }
                     {

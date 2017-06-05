@@ -62,7 +62,7 @@ describe('BookAction', () => {
           </tr>
           <tr>
             <td>Email</td>
-            <td>owner@example.com</td>
+            <td><a href='mailto:owner@example.com'>owner@example.com</a></td>
           </tr>
           <tr>
             <td>Due Date</td>
@@ -113,7 +113,7 @@ describe('BookAction', () => {
           </tr>
           <tr>
             <td>Email</td>
-            <td>owner@example.com</td>
+            <td><a href='mailto:owner@example.com'>owner@example.com</a></td>
           </tr>
           <tr>
             <td>Due Date</td>
@@ -170,7 +170,7 @@ describe('BookAction', () => {
               </tr>
               <tr>
                 <td>Email</td>
-                <td>owner@example.com</td>
+                <td><a href='mailto:owner@example.com'>owner@example.com</a></td>
               </tr>
               <tr>
                 <td>Due Date</td>

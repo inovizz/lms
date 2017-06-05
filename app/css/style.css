@@ -432,7 +432,7 @@ legend p {
   margin: 0;
 }
 
-.book-details-row .book .imgMedium {
+.book-details-row .book .imgMedium, .book-details-row .book .imgLarge {
   width: 50%;
 }
 

@@ -315,7 +315,7 @@ export const existingMemberReducer = (state=[], action) => {
       return action.payload
     case 'UNLOCK_ACCOUNT_ERROR':
       return []
-    case 'GET_MEMBER_DETAILS_LOADING':
+    case 'GET_BORROW_BOOKS_LOADING':
     case 'RATE_BOOK_LOADING':
       return {
         ...state,

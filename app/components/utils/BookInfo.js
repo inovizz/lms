@@ -31,7 +31,9 @@ const BookInfo = ({ type, book, members, authenticated, openModal, getMemberDeta
         members[book.owner].name !== '' &&
         <span>
           Book shared by &nbsp;
-          <strong>{members[book.owner].name}</strong>
+          <a href={'mailto:'+members[book.owner].email}>
+            <strong>{members[book.owner].name}</strong>
+          </a>
           &nbsp;&nbsp;
         </span>
       }
@@ -40,39 +42,35 @@ const BookInfo = ({ type, book, members, authenticated, openModal, getMemberDeta
         members[book.borrower].name !== '' &&
         <span>
           Currently with &nbsp;
-          <strong>{members[book.borrower].name}</strong>
+          <a href={'mailto:'+members[book.borrower].email}>
+            <strong>{members[book.borrower].name}</strong>
+          </a>
         </span>
       }
       </p>
       <p className='btns'>
-      {
-        type === 'info' &&
-          <LoginButton
-            authenticated={authenticated}
-            loginSuccess={(response) => {
-              getMemberDetailsByEmail(response, openModal, ['bookModal', book])
-            }}
-            loginFailure={(err) => console.log(err)}
-            success = {() => openModal('bookModal', book)}
-            className='btn btn-default borrow-btn'
-            disabled={isDisabled(book, btnTitle) ? 'disabled' : false}
-            buttonText={btnTitle? btnTitle : 'Return'}
-            logo='' />
-      }
-      {
-        type === 'info' &&
         <LoginButton
           authenticated={authenticated}
           loginSuccess={(response) => {
-            getMemberDetailsByEmail(response, openModal, ['rateBook', book])
+            getMemberDetailsByEmail(response, openModal, ['bookModal', book])
           }}
           loginFailure={(err) => console.log(err)}
-          success = {() => openModal('rateBook', book)}
-          className='btn btn-default'
-          disabled={false}
-          buttonText='Rate'
+          success = {() => openModal('bookModal', book)}
+          className='btn btn-default borrow-btn'
+          disabled={isDisabled(book, btnTitle) ? 'disabled' : false}
+          buttonText={btnTitle? btnTitle : 'Return'}
           logo='' />
-      }
+      <LoginButton
+        authenticated={authenticated}
+        loginSuccess={(response) => {
+          getMemberDetailsByEmail(response, openModal, ['rateBook', book])
+        }}
+        loginFailure={(err) => console.log(err)}
+        success = {() => openModal('rateBook', book)}
+        className='btn btn-default'
+        disabled={false}
+        buttonText='Rate'
+        logo='' />
       </p>
     </div>
   </div>

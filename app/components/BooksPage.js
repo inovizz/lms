@@ -111,8 +111,10 @@ export class BooksPage extends React.Component {
           session={ this.props.session }
           accounts={ this.props.accounts }
           logout = {
-            () => this.props.logout()
-          } />
+            () => {
+              this.props.logout()
+              this.props.history.push('/')
+          }} />
 
         {
           this.renderLoader()

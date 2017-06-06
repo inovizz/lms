@@ -34,7 +34,8 @@ describe('BooksPage',() => {
       getMemberDetailsByEmail: jest.fn(),
       logout: jest.fn(),
       createAccount: jest.fn(),
-      unlockAccount: jest.fn()
+      unlockAccount: jest.fn(),
+      history: []
     }
     component = shallow(<BooksPage {...props} />)
   })

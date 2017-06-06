@@ -18,7 +18,7 @@ const BookInfo = ({ type, book, members, authenticated, openModal, getMemberDeta
       </div>
       <div className='ratingContainer'>
         <Ratings ratings={book.avgRating} />
-        <span>&nbsp;{ book.reviewersCount }&nbsp;voters</span>
+        <span>&nbsp;{ book.reviewersCount }&nbsp;{ (book.reviewersCount > 1) ? 'votes' : 'vote' }</span>
       </div>
       <div className='bookDescription'>
         {book.description}

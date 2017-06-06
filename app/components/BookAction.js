@@ -42,7 +42,9 @@ export class BookAction extends React.Component {
       <form className='form-horizontal' onSubmit={this.handleSubmit}>
         <fieldset>
           <legend>
-            {actionType === 1 ? "Borrow Book" : "Return Book"}
+            <p>
+              {actionType === 1 ? "Borrow Book" : "Return Book"} - {book.title}
+            </p>
             <span className='glyphicon glyphicon-remove close-btn' onClick={() => this.props.closeModal()}></span>
           </legend>
           <div className='row'>

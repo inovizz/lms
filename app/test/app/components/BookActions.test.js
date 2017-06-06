@@ -48,7 +48,7 @@ describe('BookAction', () => {
       component = shallow(<BookAction {...props} />)
     })
     it('should have "Borrow Book" title', () => {
-      expect(component.find('legend').text()).toEqual('Borrow Book')
+      expect(component.find('legend').text()).toEqual('Borrow Book - BookTitle')
     })
     it('should have correct information for borrower', () => {
       expect(component.find('p.lead').text()).toEqual('Please contact the book owner for pick up.')
@@ -99,7 +99,7 @@ describe('BookAction', () => {
       component = shallow(<BookAction {...props} />)
     })
     it('should have "Return Book" title', () => {
-      expect(component.find('legend').text()).toEqual('Return Book')
+      expect(component.find('legend').text()).toEqual('Return Book - BookTitle')
     })
     it('should have correct information for borrower', () => {
       expect(component.find('p.lead').text()).toEqual('Please return book to the owner.')
@@ -144,7 +144,7 @@ describe('BookAction', () => {
       component = shallow(<BookAction {...props} />)
     })
     it('should have "Return Book" title', () => {
-      expect(component.find('legend').text()).toEqual('Return Book')
+      expect(component.find('legend').text()).toEqual('Return Book - BookTitle')
     })
     it('should have correct information for borrower', () => {
       expect(component.find('p.lead').text()).toEqual('Click "Return" to confirm that the book has been returned to you.')

@@ -97,7 +97,7 @@ export class Home extends React.Component {
                 (response, callbackFn, argsArray) => this.props.getMemberDetailsByEmail(response, callbackFn, argsArray)
               }
               width = '70%' />
-            : <div className='col-md-12'>No Books Added</div>
+            : this.props.loading.allbooksloading ? '' : <div className='col-md-12'>No Books Added</div>
           }
         </div>
       </div>

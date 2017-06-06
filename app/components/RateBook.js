@@ -28,7 +28,9 @@ export class RateBook extends React.Component {
     e.preventDefault()
     const rating = this.state.rating
     const comment = this.state.comment
-    this.props.rateBook(rating, comment)
+    if (rating !== this.props.presetRate) {
+      this.props.rateBook(rating, comment)
+    }
     this.props.closeModal()
   }
   ratingChanged(newRating){

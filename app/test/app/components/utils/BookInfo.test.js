@@ -23,7 +23,8 @@ describe('BookInfo', () => {
         'dateIssued': '0',
         'avgRating': 4,
         'imageUrl': 'https://images-eu.ssl-images-amazon.com/images/I/416Hql52NCL.jpg',
-        'description': 'description'
+        'description': 'description',
+        'reviewersCount': 1
       },
       members: {
         '0xba21a9b09d528b2e1726d786a1d1b861032dba87': {
@@ -63,6 +64,16 @@ describe('BookInfo', () => {
   })
   it('should have Ratings Component', () => {
     expect(component.find(Ratings).exists()).toBe(true)
+  })
+  describe('Voters Count',() => {
+    it('should show singular vote',() => {
+      expect(component.find('.ratingContainer span').text().trim()).toEqual('1 vote')
+    })
+    it('should show votes',() => {
+      props.book.reviewersCount = 2
+      component = shallow(<BookInfo {...props} />)
+      expect(component.find('.ratingContainer span').text().trim()).toEqual('2 votes')
+    })
   })
   it('should have 2 LoginButton',() => {
     expect(component.find(LoginButton).length).toBe(2)

@@ -130,5 +130,16 @@ describe('Home',() => {
       })
     })
   })
-
+  it('Book is loading',() => {
+    props.books.allBooks = []
+    props.loading.allbooksloading = true
+    component = shallow(<Home {...props} />)
+    expect(component.find(Book).exists()).toBe(false)
+  })
+  it('No books',() => {
+    props.books.allBooks = []
+    props.loading.allbooksloading = false
+    component = shallow(<Home {...props} />)
+    expect(component.contains(<div className='col-md-12'>No Books Added</div>)).toBe(true)
+  })
 })

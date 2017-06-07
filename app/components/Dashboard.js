@@ -69,12 +69,14 @@ export class Dashboard extends React.Component {
                   ? 'Loading Books'
                   : this.props.loading.addBooksLoading
                     ? 'Adding book...'
+                    : this.props.loading.borrowBooksLoading
+                    ? 'Borrowing book'
                     : this.props.loading.returnBooksLoading
                     ? 'Returning Book'
                     : this.props.loading.rateBookLoading
                       ? 'Submitting Rating'
                       : 'Fetching details from library';
-   if (this.props.loading.allbooksloading || this.props.loading.addBooksLoading || this.props.loading.returnBooksLoading ||  this.props.loading.rateBookLoading) {
+   if (this.props.loading.allbooksloading || this.props.loading.addBooksLoading || this.props.loading.returnBooksLoading ||  this.props.loading.rateBookLoading || this.props.loading.borrowBooksLoading) {
      return (<Loader text={title}/>)
    }
   }

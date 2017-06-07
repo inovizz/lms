@@ -35,7 +35,6 @@ const Book = ({
     ownerDetails,
     selectedBook,
     btnTitle,
-    isOwner,
     loading,
     rateBook,
     openModal,
@@ -91,7 +90,6 @@ const Book = ({
       contentLabel='Book Action'>
       <BookAction
         btnTitle={btnTitle}
-        isOwner={isOwner}
         members={members}
         book={selectedBook}
         ownerDetails={ownerDetails}

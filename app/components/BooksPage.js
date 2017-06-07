@@ -87,12 +87,14 @@ export class BooksPage extends React.Component {
                     ? 'Creating Account'
                     : this.props.loading.borrowBooksLoading
                     ? 'Borrowing book'
-                    : this.props.loading.rateBookLoading
+                    : this.props.loading.returnBooksLoading
+                    ? 'Returning Book'
+                     : this.props.loading.rateBookLoading
                       ? 'Submitting Rating'
                       : this.props.loading.allbooksloading
                         ? 'Loading Books'
                         : ''
-    if(this.props.loading.allbooksloading || this.props.loading.loginLoader || (this.props.loading.createAccountLoader || this.props.loading.addMemberLoader) || flag || this.props.loading.borrowBooksLoading ||  this.props.loading.rateBookLoading) {
+    if(this.props.loading.allbooksloading || this.props.loading.loginLoader || (this.props.loading.createAccountLoader || this.props.loading.addMemberLoader) || flag || this.props.loading.borrowBooksLoading || this.props.loading.returnBooksLoading || this.props.loading.rateBookLoading) {
       return <Loader text={title} />
     }
   }

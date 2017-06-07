@@ -4,11 +4,47 @@ import Image from './Image'
 import Ratings from './Ratings'
 import LoginButton from './LoginButton'
 
-const BookInfo = ({ type, book, members, authenticated, openModal, getMemberDetailsByEmail, isDisabled, btnTitle }) => (
+export const isDisabled = (book, authenticated, ownerDetails) => {
+  if(authenticated) {
+    return book.owner !== ownerDetails.account && book.borrower !== ownerDetails.account && book.state === '1'
+  }
+  return book.state === '1'
+}
+
+export const getButtonText = (book) => {
+  if(book.state === '1' ) {
+    return 'Return'
+  } else {
+    return 'Borrow'
+  }
+}
+
+export const getStatus = (state) => {
+  switch (state) {
+    case '0':
+      return 'Available'
+    case '1':
+      return 'Borrowed'
+    case '2':
+      return 'Overdue'
+    case '3':
+      return 'Lost'
+    case '4':
+      return 'Removed'
+    default:
+      return 'Not Available'
+  }
+}
+
+export const getTime = (date) => {
+  return (new Date(+(date)*1000 + 10*24*60*60*1000)).toDateString()
+}
+
+const BookInfo = ({ type, book, members, authenticated, openModal, getMemberDetailsByEmail, ownerDetails }) => (
   <div className='list-group-item'>
     <div className='media-left'>
       <Link to={`/book/${book.id}`}>
-        <Image type={btnTitle} src={book.imageUrl}/>
+        <Image type={getButtonText(book)} src={book.imageUrl}/>
       </Link>
     </div>
     <div className='media-body'>
@@ -23,6 +59,34 @@ const BookInfo = ({ type, book, members, authenticated, openModal, getMemberDeta
       <div className='bookDescription'>
         {book.description}
       </div>
+      {
+        type === 'details' &&
+        <table className='table table-responsive table-bordered'>
+          <tbody>
+            <tr>
+              <td><strong>Genre</strong></td>
+              <td>{book.genre}</td>
+              <td><strong>Status</strong></td>
+              <td>{getStatus(book.state)}</td>
+            </tr>
+            <tr>
+              <td><strong>Owner</strong></td>
+              <td>{members[book.owner].name}</td>
+              <td><strong>Added on</strong></td>
+              <td>{getTime(book.dateAdded)}</td>
+            </tr>
+            {
+              book.state === '1' &&
+              <tr>
+                <td><strong>Borrower</strong></td>
+                <td>{members[book.borrower].name}</td>
+                <td><strong>Issued on</strong></td>
+                <td>{getTime(book.dateIssued)}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
     </div>
     <div className='media-bottom'>
       <p className='user-info'>
@@ -57,8 +121,8 @@ const BookInfo = ({ type, book, members, authenticated, openModal, getMemberDeta
           loginFailure={(err) => console.log(err)}
           success = {() => openModal('bookModal', book)}
           className='btn btn-default borrow-btn'
-          disabled={isDisabled(book, btnTitle) ? 'disabled' : false}
-          buttonText={btnTitle? btnTitle : 'Return'}
+          disabled={isDisabled(book, authenticated, ownerDetails)}
+          buttonText={getButtonText(book)}
           logo='' />
       <LoginButton
         authenticated={authenticated}

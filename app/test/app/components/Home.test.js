@@ -90,12 +90,19 @@ describe('Home',() => {
     it('No Book if books not present',() => {
       props.books.allBooks = []
       component = shallow(<Home {...props} />)
-      expect(component.find(Home).exists()).toBe(false)
+      expect(component.find(Book).exists()).toBe(false)
     })
-    it('No Book if value if true',() => {
+    it('No Book if value is true, filteredBooks is not present',() => {
       props.books.value = true
+      props.books.filteredBooks = []
       component = shallow(<Home {...props} />)
-      expect(component.find(Home).exists()).toBe(false)
+      expect(component.find(Book).props().books).toEqual([])
+    })
+    it('Book if value is true, filteredBooks is present',() => {
+      props.books.value = true
+      props.books.filteredBooks = [{ title: 'mybook' }]
+      component = shallow(<Home {...props} />)
+      expect(component.find(Book).exists()).toBe(true)
     })
     it('should call rateBook',() => {
       BookInstance.rateBook()
@@ -141,5 +148,22 @@ describe('Home',() => {
     props.loading.allbooksloading = false
     component = shallow(<Home {...props} />)
     expect(component.contains(<div className='col-md-12'>No Books Added</div>)).toBe(true)
+  })
+  describe('Members',() => {
+    it('No accounts',() => {
+      props.accounts = undefined
+      component = shallow(<Home {...props} />)
+      expect(component.find(Book).props().members).toEqual('')
+    })
+    it('No Members',() => {
+      props.accounts = { members: undefined }
+      component = shallow(<Home {...props} />)
+      expect(component.find(Book).props().members).toEqual('')
+    })
+    it('No Members',() => {
+      props.accounts = { members: { '0x0': { name: 'User' } } }
+      component = shallow(<Home {...props} />)
+      expect(component.find(Book).props().members).toEqual(props.accounts.members)
+    })
   })
 })

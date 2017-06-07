@@ -1,6 +1,6 @@
 import React from 'react'
 import { shallow } from 'enzyme'
-import BookInfo from '../../../../components/utils/BookInfo'
+import BookInfo, { getStatus, getTime } from '../../../../components/utils/BookInfo'
 import Image from '../../../../components/utils/Image'
 import LoginButton from '../../../../components/utils/LoginButton'
 import Ratings from '../../../../components/utils/Ratings'
@@ -34,24 +34,29 @@ describe('BookInfo', () => {
           name: 'Borrower'
         },
         '0x1': {
-          name: ''
+          name: '0xba21a9b09d528b2e1726d786a1d1b861032dba87'
         }
       },
-      btnTitle: 'Borrow',
       openModal : jest.fn(),
       authenticated : true,
       getMemberDetailsByEmail: jest.fn(),
-      isDisabled: jest.fn((book, bookAction) => {
-        return (bookAction === 'Borrow' && book.state === '1') || (bookAction === 'Return' && book.state === '0')
-      })
+      ownerDetails: { account: '0x1' }
     }
     component = shallow(<BookInfo {...props} />)
   })
+  it('getStatus',() => {
+    expect(getStatus('0')).toBe('Available')
+    expect(getStatus('1')).toBe('Borrowed')
+    expect(getStatus('2')).toBe('Overdue')
+    expect(getStatus('3')).toBe('Lost')
+    expect(getStatus('4')).toBe('Removed')
+    expect(getStatus('5')).toBe('Not Available')
+  })
+  it('getTime',() => {
+    expect(getTime('1496041895')).toBe('Thu Jun 08 2017')
+  })
   it('should display book image', () => {
     expect(component.find(Image).props().src).toEqual(props.book.imageUrl)
-  })
-  it('should have a Image with type "Borrow"', () => {
-    expect(component.find(Image).props().type).toEqual(props.btnTitle)
   })
   it('should display book title', () => {
     expect(component.find('.media-heading').text()).toEqual(props.book.title)
@@ -129,34 +134,37 @@ describe('BookInfo', () => {
       component.find(LoginButton).first().props().loginFailure()
       expect(props.openModal.mock.calls.length).toBe(0)
     })
-    it('should be disabled',() => {
-      expect(component.find(LoginButton).first().props().disabled).toBe('disabled')
+    it('should be disabled, when user is not book owner/borrower',() => {
+      expect(component.find(LoginButton).first().props().disabled).toBe(true)
     })
-    it('should be disabled',() => {
+    it('should not be disabled, if book is available',() => {
       props.book.state = '0'
-      props.btnTitle = 'Return'
       component = shallow(<BookInfo {...props} />)
-      expect(component.find(LoginButton).first().props().disabled).toBe('disabled')
+      expect(component.find(LoginButton).first().props().disabled).toBe(false)
     })
-    it('should not be disabled',() => {
+    it('should not be disabled, if book is borrowed & user is book owner',() => {
+      props.book.owner = props.ownerDetails.account
       props.book.state = '1'
-      props.btnTitle = 'Return'
       component = shallow(<BookInfo {...props} />)
       expect(component.find(LoginButton).first().props().disabled).toBe(false)
     })
-    it('should be disabled',() => {
-      props.book.state = '0'
-      props.btnTitle = 'Borrow'
+    it('should not be disabled, if book is borrowed & user is book borrower',() => {
+      props.book.borrower = props.ownerDetails.account
       component = shallow(<BookInfo {...props} />)
       expect(component.find(LoginButton).first().props().disabled).toBe(false)
-    })
-    it('should have buttonText "Borrow"',() => {
-      expect(component.find(LoginButton).first().props().buttonText).toBe('Borrow')
     })
     it('should have buttonText "Return"',() => {
-      props.btnTitle = ''
+      expect(component.find(LoginButton).first().props().buttonText).toBe('Return')
+    })
+    it('should have buttonText "Return"',() => {
+      props.authenticated = false;
       component = shallow(<BookInfo {...props} />)
       expect(component.find(LoginButton).first().props().buttonText).toBe('Return')
+    })
+    it('should have buttonText "Borrow"',() => {
+      props.book.state = 0;
+      component = shallow(<BookInfo {...props} />)
+      expect(component.find(LoginButton).first().props().buttonText).toBe('Borrow')
     })
   })
   describe('LoginButton (Rate)', () => {
@@ -178,6 +186,15 @@ describe('BookInfo', () => {
     })
     it('should not be disabled',() => {
       expect(component.find(LoginButton).last().props().disabled).toBe(false)
+    })
+  })
+  describe('Details',() => {
+    beforeEach(() => {
+      props.type = 'details'
+      component = shallow(<BookInfo {...props} />)
+    })
+    it('Should have details table',() => {
+      expect(component.find('table').exists()).toBe(true)
     })
   })
 })

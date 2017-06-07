@@ -85,20 +85,6 @@ describe('Book', () => {
       expect(props.closeModal.mock.calls.length).toBe(1)
     })
   })
-  describe('isDisabled',() => {
-    it('Borrow & State is 1',() => {
-      expect(isDisabled({ state: '1' }, 'Borrow')).toBe(true)
-    })
-    it('Borrow & State is 0',() => {
-      expect(isDisabled({ state: '0' }, 'Borrow')).toBe(false)
-    })
-    it('Return & State is 1',() => {
-      expect(isDisabled({ state: '1' }, 'Return')).toBe(false)
-    })
-    it('Return & State is 1',() => {
-      expect(isDisabled({ state: '0' }, 'Return')).toBe(true)
-    })
-  })
   describe('getUserRating',() => {
     it('No book selected',() => {
       props.selectedBook = undefined

@@ -215,5 +215,27 @@ describe('BooksPage',() => {
       component.find(LMSAuth).props().createAccount()
       expect(props.createAccount.mock.calls.length).toBe(1)
     })
+    it('If modal is closed and user is logged in',() => {
+      props.isExistingMember.user = {}
+      component = shallow(<BooksPage {...props} />)
+      expect(component.find(Modal).props().isOpen).toBe(false)
+    })
+    it('If modal is closed and user is not logged in',() => {
+      props.isExistingMember.user = undefined
+      component = shallow(<BooksPage {...props} />)
+      expect(component.find(Modal).props().isOpen).toBe(false)
+    })
+    it('If modal is open and user is logged in',() => {
+      props.isExistingMember = { user : {} }
+      component = shallow(<BooksPage {...props} />)
+      component.instance().toggleModal('authModal')
+      expect(component.find(Modal).props().isOpen).toBe(true)
+    })
+    it('If modal is open and user is not logged in',() => {
+      props.isExistingMember = { user : '' }
+      component = shallow(<BooksPage {...props} />)
+      component.instance().toggleModal('authModal')
+      expect(component.find(Modal).props().isOpen).toBe(false)
+    })
   })
 })

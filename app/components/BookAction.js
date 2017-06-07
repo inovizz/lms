@@ -17,7 +17,7 @@ export class BookAction extends React.Component {
   checkActionType () {
     if (this.props.book.state === '0') {
       return 1 // User is borrowing book
-    } else if(this.props.isOwner) {
+    } else if(this.props.book.owner === this.props.ownerDetails.account) {
       return 2 // Owner is returning book
     } else {
       return 3 // Borrower is returning book

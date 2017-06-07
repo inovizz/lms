@@ -90,18 +90,6 @@ describe('BookDetailsPage',() => {
       component.find(BookInfo).props().openModal('bookModal')
       expect(component.state().bookModalIsOpen).toBe(true)
     })
-    it('Borrow & State is 1',() => {
-      expect(component.find(BookInfo).props().isDisabled({ state: '1' }, 'Borrow')).toBe(true)
-    })
-    it('Borrow & State is 0',() => {
-      expect(component.find(BookInfo).props().isDisabled({ state: '0' }, 'Borrow')).toBe(false)
-    })
-    it('Return & State is 1',() => {
-      expect(component.find(BookInfo).props().isDisabled({ state: '1' }, 'Return')).toBe(false)
-    })
-    it('Return & State is 1',() => {
-      expect(component.find(BookInfo).props().isDisabled({ state: '0' }, 'Return')).toBe(true)
-    })
   })
   it('should have a CommentList Component', () => {
     expect(component.find(CommentList).exists()).toBe(true)

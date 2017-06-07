@@ -12,6 +12,10 @@ describe('BookAction', () => {
         '0x1': {
           name: 'Owner',
           email: 'owner@example.com'
+        },
+        '0x2': {
+          name: 'User',
+          email: 'borrower@example.com'
         }
       },
       book: {
@@ -20,7 +24,8 @@ describe('BookAction', () => {
         publisher: 'BookPublisher',
         state: '0',
         owner: '0x1',
-        dateIssued: '0'
+        dateIssued: '0',
+        borrower: '0x2'
       },
       ownerDetails: {
         name: 'User',
@@ -93,7 +98,6 @@ describe('BookAction', () => {
 
   describe('Borrower clicks on Return button', () => {
     beforeEach(() => {
-      props.btnTitle = 'Return'
       props.book.state = '1'
       props.book.dateIssued = '1496041895'
       component = shallow(<BookAction {...props} />)
@@ -136,10 +140,8 @@ describe('BookAction', () => {
 
   describe('Owner clicks on Return button', () => {
     beforeEach(() => {
-      props.btnTitle = 'Return'
       props.book.state = '1'
-      props.isOwner = true
-      props.book.borrower = '0x1'
+      props.ownerDetails = { name: 'Owner', account: '0x1' }
       props.book.dateIssued = '1496041895'
       component = shallow(<BookAction {...props} />)
     })
@@ -166,11 +168,11 @@ describe('BookAction', () => {
             </tr>
               <tr>
                 <td>Borrowed By</td>
-                <td>Owner</td>
+                <td>{props.members[props.book.borrower].name}</td>
               </tr>
               <tr>
                 <td>Email</td>
-                <td><a href='mailto:owner@example.com'>owner@example.com</a></td>
+                <td><a href={'mailto:'+props.members[props.book.borrower].email}>{props.members[props.book.borrower].email}</a></td>
               </tr>
               <tr>
                 <td>Due Date</td>

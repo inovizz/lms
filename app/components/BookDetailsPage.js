@@ -60,9 +60,6 @@ export class BookDetailsPage extends React.Component {
     }
     return 0
   }
-  isDisabled (book, bookAction) {
-    return (bookAction === 'Borrow' && book.state === '1') || (bookAction === 'Return' && book.state === '0')
-  }
   render () {
     const book = this.props.books.allBooks.filter((book) => book.id === this.props.match.params.id)
     const members = (this.props.accounts && this.props.accounts.members) ? this.props.accounts.members : ''
@@ -81,8 +78,7 @@ export class BookDetailsPage extends React.Component {
                 getMemberDetailsByEmail={
                   (response, callbackFn, argsArray) => this.props.getMemberDetailsByEmail(response, callbackFn, argsArray)
                 }
-                isDisabled={(book, bookAction) => this.isDisabled(book, bookAction)}
-                btnTitle={'Borrow'} />
+                ownerDetails={this.props.session.user} />
             </div>
           }
           {

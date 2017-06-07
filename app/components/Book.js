@@ -22,10 +22,6 @@ const modalStyle = {
   }
 }
 
-export const isDisabled = (book, bookAction) => {
-  return (bookAction === 'Borrow' && book.state === '1') || (bookAction === 'Return' && book.state === '0')
-}
-
 export const getUserRating = (selectedBook,ownerDetails) => {
   if(typeof selectedBook !== "undefined" && typeof selectedBook.ratings !== "undefined" && typeof selectedBook.reviewers !== "undefined"){
       return selectedBook.ratings[selectedBook.reviewers.indexOf(ownerDetails.account)]
@@ -62,8 +58,7 @@ const Book = ({
               authenticated={authenticated}
               openModal={openModal}
               getMemberDetailsByEmail={getMemberDetailsByEmail}
-              isDisabled={isDisabled}
-              btnTitle={btnTitle} />
+              ownerDetails={ownerDetails} />
         )
       })}
     </div>

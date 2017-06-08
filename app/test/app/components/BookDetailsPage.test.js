@@ -5,6 +5,7 @@ import { BookDetailsPage, mapStateToProps } from '../../../components/BookDetail
 import BookInfo from '../../../components/utils/BookInfo'
 import CommentList from '../../../components/utils/CommentList'
 import RateBook from '../../../components/RateBook'
+import BooksForm from '../../../components/BooksForm'
 import BookAction from '../../../components/BookAction'
 
 describe('BookDetailsPage',() => {
@@ -70,12 +71,25 @@ describe('BookDetailsPage',() => {
       component.instance().toggleModal('bookModal', {})
     })
     it('should closeModal onRequestClose',() => {
-      component.find(Modal).last().props().onRequestClose()
+      component.find(Modal).nodes[1].props.onRequestClose()
       expect(component.state().bookModalIsOpen).toBe(false)
     })
     it('should run closeModal',() => {
       component.find(BookAction).props().closeModal()
       expect(component.state().bookModalIsOpen).toBe(false)
+    })
+  })
+  describe('Edit Book Modal', () => {
+    beforeEach(() => {
+      component.instance().toggleModal('editBook', {})
+    })
+    it('should closeModal onRequestClose',() => {
+      component.find(Modal).last().props().onRequestClose()
+      expect(component.state().editBookModalIsOpen).toBe(false)
+    })
+    it('should run closeModal',() => {
+      component.find(BooksForm).props().closeModal()
+      expect(component.state().editBookModalIsOpen).toBe(false)
     })
   })
   describe('BookInfo', () => {

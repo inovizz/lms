@@ -113,6 +113,12 @@ const BookInfo = ({ type, book, members, authenticated, openModal, getMemberDeta
       }
       </p>
       <p className='btns'>
+        {
+          authenticated && book.owner === ownerDetails.account && type === 'details' &&
+          <button className='btn btn-default edit-btn' onClick={() => openModal('editBook', book)}>
+            Edit
+          </button>
+        }
         <LoginButton
           authenticated={authenticated}
           loginSuccess={(response) => {

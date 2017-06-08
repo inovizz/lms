@@ -6,6 +6,7 @@ import BookInfo from './utils/BookInfo'
 import RateBook from './RateBook'
 import BookAction from './BookAction'
 import CommentList from './utils/CommentList'
+import BooksForm from './BooksForm'
 
 const modalStyle = {
   content : {
@@ -34,6 +35,7 @@ export class BookDetailsPage extends React.Component {
     this.state = {
       rateModalIsOpen: false,
       bookModalIsOpen: false,
+      editBookModalIsOpen: false,
       book: {}
     }
   }
@@ -50,6 +52,10 @@ export class BookDetailsPage extends React.Component {
       }
       case 'bookModal' : {
         this.setState({ bookModalIsOpen: !this.state.bookModalIsOpen, book })
+        break;
+      }
+      case 'editBook' : {
+        this.setState({ editBookModalIsOpen: !this.state.editBookModalIsOpen, book })
         break;
       }
     }
@@ -122,6 +128,15 @@ export class BookDetailsPage extends React.Component {
             ownerDetails={this.props.session.user}
             closeModal={() => this.toggleModal('bookModal')}
           />
+        </Modal>
+        <Modal
+          isOpen={this.state.editBookModalIsOpen}
+          onRequestClose={() => this.toggleModal('editBook')}
+          shouldCloseOnOverlayClick={false}
+          role='dialog'
+          style={modalStyle}
+          contentLabel='Edit book'>
+          <BooksForm closeModal={() => this.toggleModal('editBook')} book={this.state.book} />
         </Modal>
       </div>
     )

@@ -4,7 +4,6 @@ import * as libraryActions from '../actions/libraryActions'
 
 export const mapStateToProps = (state) => {
   return {
-    loading: state.loading,
     ownerDetails: state.session.user
   }
 }
@@ -12,46 +11,62 @@ export const mapStateToProps = (state) => {
 export class BooksForm extends React.Component {
   constructor (props) {
     super(props)
-    this.newBook = {
-      title: '',
-      author: '',
-      publisher: ''
+    this.state = {
+      title: this.props.book ? this.props.book.title : '',
+      author: this.props.book ? this.props.book.author : '',
+      publisher: this.props.book ? this.props.book.publisher : '',
+      description: this.props.book ? this.props.book.description : '',
+      imageUrl: this.props.book ? this.props.book.imageUrl : '',
+      genre: this.props.book ? this.props.book.genre : ''
     }
+    this.handleSubmit = this.handleSubmit.bind(this)
+    this.handleChange = this.handleChange.bind(this)
   }
-  addBook () {
+  isBookUpdated (book) {
+    return (this.props.book.title !== book.title
+            || this.props.book.author !== book.author
+            || this.props.book.publisher !== book.publisher
+            || this.props.book.description !== book.description
+            || this.props.book.imageUrl !== book.imageUrl
+            || this.props.book.genre !== book.genre)
+  }
+  handleSubmit (e) {
+    e.preventDefault()
     const book = {
-      title : this.newBook.title.value,
-      author : this.newBook.author.value,
-      publisher : this.newBook.publisher.value,
-      description : this.newBook.description.value,
-      imageUrl : this.newBook.imageUrl.value,
-      genre : this.newBook.genre.value,
+      title : this.state.title,
+      author : this.state.author,
+      publisher : this.state.publisher,
+      description : this.state.description,
+      imageUrl : this.state.imageUrl,
+      genre : this.state.genre,
       owner: this.props.ownerDetails
     }
-    this.props.addBook(book)
+    if(this.props.book) {
+      if(this.isBookUpdated(book)) {
+        this.props.updateBook(this.props.book.id, book)
+      }
+    } else {
+      this.props.addBook(book)
+    }
+    this.props.closeModal()
+  }
+  handleChange (e) {
+    this.setState({
+      [e.target.id] : e.target.value
+    })
   }
   render () {
     return (
-      <form className='form-horizontal' ref='bookForm' onSubmit={(e) => {
-        e.preventDefault()
-        this.addBook()
-        this.refs.bookForm.reset()
-        this.props.closeModal()
-      }}>
+      <form className='form-horizontal' onSubmit={this.handleSubmit}>
         <fieldset>
           <legend>
-            Add a book
+            {
+              this.props.book
+              ? <p>{'Edit - '+ this.props.book.title }</p>
+              : <p>Add a book</p>
+            }
             <span className='glyphicon glyphicon-remove close-btn' onClick={() => this.props.closeModal()}></span>
           </legend>
-          {
-            this.props.loading.addBooksLoading
-            ? <div className='form-group'>
-                <p className='text-center text-info'>
-                  Adding a new book.
-                </p>
-              </div>
-            : ''
-          }
           <div className='form-group'>
             <label htmlFor='title' className='col-sm-3 control-label'>Title</label>
             <div className='col-sm-9'>
@@ -59,11 +74,8 @@ export class BooksForm extends React.Component {
               className = 'form-control'
               id = 'title'
               placeholder = 'Title'
-              ref = {
-                (node) => {
-                  this.newBook.title = node
-                }
-              }
+              defaultValue = {this.state.title}
+              onChange= {this.handleChange}
               required / >
             </div>
           </div>
@@ -74,11 +86,8 @@ export class BooksForm extends React.Component {
                 className = 'form-control'
                 id = 'author'
                 placeholder = 'Author'
-                ref = {
-                  (node) => {
-                    this.newBook.author = node
-                  }
-                }
+                defaultValue = {this.state.author}
+                onChange= {this.handleChange}
                 required / >
             </div>
           </div>
@@ -89,11 +98,8 @@ export class BooksForm extends React.Component {
                 className = 'form-control'
                 id = 'publisher'
                 placeholder = 'Publisher'
-                ref = {
-                  (node) => {
-                    this.newBook.publisher = node
-                  }
-                }
+                defaultValue = {this.state.publisher}
+                onChange= {this.handleChange}
                 required / >
             </div>
           </div>
@@ -104,11 +110,8 @@ export class BooksForm extends React.Component {
                 className = 'form-control'
                 id = 'imageUrl'
                 placeholder = 'Image URL'
-                ref = {
-                  (node) => {
-                    this.newBook.imageUrl = node
-                  }
-                }
+                defaultValue = {this.state.imageUrl}
+                onChange= {this.handleChange}
                 required / >
             </div>
           </div>
@@ -119,11 +122,8 @@ export class BooksForm extends React.Component {
               className = 'form-control'
               id = 'description'
               placeholder = 'Description'
-              ref = {
-                (node) => {
-                  this.newBook.description = node
-                }
-              }
+              defaultValue = {this.state.description}
+              onChange= {this.handleChange}
               rows='9'
               required />
             </div>
@@ -135,17 +135,14 @@ export class BooksForm extends React.Component {
               className = 'form-control'
               id = 'genre'
               placeholder = 'Genre'
-              ref = {
-                (node) => {
-                  this.newBook.genre = node
-                }
-              }
+              defaultValue = {this.state.genre}
+              onChange= {this.handleChange}
               required / >
             </div>
           </div>
           <div className='form-group'>
             <div className='text-center'>
-              <button type='submit' className='btn btn-default'>Add</button>
+              <button type='submit' className='btn btn-default'>{this.props.book ? 'Edit' : 'Add'}</button>
             </div>
           </div>
         </fieldset>

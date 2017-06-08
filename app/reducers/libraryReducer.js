@@ -59,6 +59,7 @@ export const loadingReducer = (state = {}, action) => {
         myBooksLoading : action.payload
       }
     case 'GET_ADD_BOOKS_LOADING':
+    case 'UPDATE_BOOK_LOADING':
       return {
         ...state,
         addBooksLoading : action.payload
@@ -126,6 +127,7 @@ export const errorReducer = (state = [], action) => {
     case 'GET_MEMBER_DETAILS_ERROR':
     case 'GET_ALL_MEMBERS_ERROR':
     case 'UNLOCK_ACCOUNT_ERROR':
+    case 'UPDATE_BOOK_ERROR':
       return {
         ...state,
         message : action.payload

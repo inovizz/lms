@@ -125,6 +125,40 @@ export const addBook = (book) => {
   }
 }
 
+export const updateBook = (bookId, book) => {
+  return (dispatch) => {
+    dispatch(action(actionType.UPDATE_BOOK_LOADING, true))
+    lms.updateBook(
+      bookId,
+      book.title,
+      book.author,
+      book.publisher,
+      book.imageUrl,
+      book.description,
+      book.genre,
+      {
+        from: book.owner.account,
+        gas: 600000
+      }
+    ).then((response) => {
+      if(isSuccess(response)) {
+        dispatch(getAllBooks())
+      } else {
+        dispatch(action(
+          actionType.UPDATE_BOOK_ERROR,
+          NotificationType('error', 'Error', response.logs[0].args.statusCode.c[0])
+        ))
+      }
+    }).catch((e) => {
+      console.log("Error Occured", e)
+      dispatch(action(actionType.UPDATE_BOOK_ERROR, NotificationType('error', 'Error', e.message)))
+    }).then(() => {
+      dispatch(action(actionType.UPDATE_BOOK_LOADING, false))
+      dispatch(getBalance(book.owner))
+    })
+  }
+}
+
 export const returnBook = (book) => {
   return (dispatch) => {
     dispatch(action(actionType.GET_RETURN_BOOKS_LOADING, true))

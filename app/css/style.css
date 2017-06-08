@@ -326,7 +326,7 @@ legend p {
   float: right;
 }
 
-.borrow-btn {
+.borrow-btn, .edit-btn {
   margin-right: 15px;
 }
 

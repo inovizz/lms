@@ -177,7 +177,7 @@ describe('BooksPage',() => {
       component = shallow(<BooksPage {...props} />)
       expect(component.find(Loader).props().text).toBe('Submitting Rating')
     })
-    it('should show loader with text "Fetching details from library"',() => {
+    it('should not show a loader',() => {
       props.loading.loginLoader = false
       component = shallow(<BooksPage {...props} />)
       expect(component.find(Loader).exists()).toEqual(false)
@@ -187,6 +187,12 @@ describe('BooksPage',() => {
       props.loading.allbooksloading = true
       component = shallow(<BooksPage {...props} />)
       expect(component.find(Loader).props().text).toBe('Loading Books')
+    })
+    it('should show loader with text "Updating Book"',() => {
+      props.loading.loginLoader = false
+      props.loading.addBooksLoading = true
+      component = shallow(<BooksPage {...props} />)
+      expect(component.find(Loader).props().text).toBe('Updating Book')
     })
   })
   describe('Authentication Modal', () => {

@@ -7,6 +7,7 @@ import RateBook from './RateBook'
 import BookAction from './BookAction'
 import CommentList from './utils/CommentList'
 import BooksForm from './BooksForm'
+import BookHistory from './BookHistory'
 
 const modalStyle = {
   content : {
@@ -25,7 +26,8 @@ export const mapStateToProps = (state, ownProps) => {
     books: state.books,
     session: state.session,
     isExistingMember: state.isExistingMember,
-    loading: state.loading
+    loading: state.loading,
+    book_history: state.book_history
   }
 }
 
@@ -93,6 +95,13 @@ export class BookDetailsPage extends React.Component {
               members={members} ratings={book[0].ratings} reviewers={book[0].reviewers} comments={book[0].comments} />
           }
         </div>
+        {
+          book.length !== 0 &&
+          <BookHistory
+          book={book[0]}
+          members={members}
+          book_history={this.props.book_history} />
+        }
         <Modal
           isOpen={this.state.rateModalIsOpen}
           onRequestClose={() => this.toggleModal('rateBook')}

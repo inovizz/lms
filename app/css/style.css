@@ -466,3 +466,11 @@ legend p {
   color: #125688;
   margin-right: 5px;
 }
+.book-history {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+.book-record {
+  flex: 0 0 50%;
+}

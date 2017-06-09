@@ -412,3 +412,43 @@ export const shuffleAllBooks = (books) =>{
     dispatch(action(actionType.SHUFFLE_ALL_BOOKS,books))
   }
 }
+
+export const borrowEvent = (bookId) => {
+  return (dispatch) => {
+    dispatch(action(actionType.BORROW_EVENT_LOADING, true))
+    var borrowEvent = lms.Borrow({ bookId }, {
+      fromBlock: 0,
+      toBlock: 'latest'
+    });
+    borrowEvent.watch(function(e, result) {
+      borrowEvent.stopWatching();
+      if (e) {
+        console.log("Error Occured", e)
+        dispatch(action(actionType.BORROW_EVENT_ERROR, NotificationType('error', 'Error', e.message)))
+      } else {
+        dispatch(action(actionType.BORROW_EVENT_SUCCESS, result.args))
+      }
+      dispatch(action(actionType.BORROW_EVENT_LOADING, false))
+    });
+  }
+}
+
+export const returnEvent = ( bookId ) => {
+  return (dispatch) => {
+    dispatch(action(actionType.RETURN_EVENT_LOADING, true))
+    var returnEvent = lms.Return({ bookId }, {
+      fromBlock: 0,
+      toBlock: 'latest'
+    });
+    returnEvent.watch(function(e, result) {
+      returnEvent.stopWatching();
+      if (e) {
+        console.log("Error Occured", e)
+        dispatch(action(actionType.RETURN_EVENT_ERROR, NotificationType('error', 'Error', e.message)))
+      } else {
+        dispatch(action(actionType.RETURN_EVENT_SUCCESS, result.args))
+      }
+      dispatch(action(actionType.RETURN_EVENT_LOADING, false))
+    });
+  }
+}

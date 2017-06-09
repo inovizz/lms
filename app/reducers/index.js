@@ -7,7 +7,8 @@ import {
   errorReducer,
   allBooksReducers,
   myBooksReducers,
-  existingMemberReducer
+  existingMemberReducer,
+  bookHistoryReducer
 } from './libraryReducer'
 import { sessionReducer } from 'redux-react-session'
 import { reducer as notifications } from 'react-notification-system-redux';
@@ -20,7 +21,8 @@ const rootReducer = combineReducers({
   myBooks: myBooksReducers,
   session: sessionReducer,
   notifications,
-  isExistingMember: existingMemberReducer
+  isExistingMember: existingMemberReducer,
+  book_history: bookHistoryReducer
 })
 
 export default rootReducer

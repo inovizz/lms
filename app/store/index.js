@@ -24,7 +24,11 @@ const defaultState = {
     allBooks : [],
     filteredBooks : []
   },
-  myBooks: []
+  myBooks: [],
+  book_history: {
+    borrow_history: {},
+    return_history: {}
+  }
 }
 
 const enhancers = compose(

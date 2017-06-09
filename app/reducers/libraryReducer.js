@@ -105,6 +105,16 @@ export const loadingReducer = (state = {}, action) => {
         ...state,
         allMembersLoading : action.payload
       }
+    case 'BORROW_EVENT_LOADING':
+      return {
+        ...state,
+        borrowEventLoading : action.payload
+      }
+    case 'RETURN_EVENT_LOADING':
+      return {
+        ...state,
+        returnEventLoading : action.payload
+      }
     default:
       return state
   }
@@ -128,6 +138,8 @@ export const errorReducer = (state = [], action) => {
     case 'GET_ALL_MEMBERS_ERROR':
     case 'UNLOCK_ACCOUNT_ERROR':
     case 'UPDATE_BOOK_ERROR':
+    case 'BORROW_EVENT_ERROR':
+    case 'RETURN_EVENT_ERROR':
       return {
         ...state,
         message : action.payload
@@ -326,5 +338,36 @@ export const existingMemberReducer = (state=[], action) => {
       }
     default:
       return state
+  }
+}
+
+export const bookHistoryReducer = (state=[], action) => {
+  switch (action.type) {
+    case 'BORROW_EVENT_SUCCESS' : {
+      const borrowEvent = action.payload
+      const bookId = borrowEvent.bookId.valueOf()
+      const timestamp = parseInt(borrowEvent.timestamp.valueOf())
+      let borrow_history = { ...state.borrow_history }
+      borrow_history[bookId] = borrow_history[bookId] || []
+      borrow_history[bookId].push({ timestamp, borrower: borrowEvent.borrower })
+      return {
+        ...state,
+        borrow_history
+      }
+    }
+    case 'RETURN_EVENT_SUCCESS' : {
+      const returnEvent = action.payload
+      const bookId = returnEvent.bookId.valueOf()
+      const timestamp = parseInt(returnEvent.timestamp.valueOf())
+      let return_history = { ...state.return_history }
+      return_history[bookId] = return_history[bookId] || []
+      return_history[bookId].push({ timestamp, borrower: returnEvent.borrower })
+      return {
+        ...state,
+        return_history
+      }
+    }
+    default:
+      return state;
   }
 }

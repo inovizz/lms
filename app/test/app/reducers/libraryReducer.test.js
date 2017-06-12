@@ -9,7 +9,8 @@
   returnBookReducer,
   borrowBookReducer,
   rateBookReducer,
-  existingMemberReducer
+  existingMemberReducer,
+  bookHistoryReducer
 } from '../../../reducers/libraryReducer'
 
 describe('Reducers', () => {
@@ -159,6 +160,20 @@ describe('Reducers', () => {
           type: 'GET_ALL_MEMBERS_LOADING',
           payload: true
         })).toEqual({ 'allMembersLoading' : true })
+    })
+    it('should handle BORROW_EVENT_LOADING', () => {
+      expect(
+        loadingReducer(undefined, {
+          type: 'BORROW_EVENT_LOADING',
+          payload: true
+        })).toEqual({ 'borrowEventLoading' : true })
+    })
+    it('should handle RETURN_EVENT_LOADING', () => {
+      expect(
+        loadingReducer(undefined, {
+          type: 'RETURN_EVENT_LOADING',
+          payload: true
+        })).toEqual({ 'returnEventLoading' : true })
     })
   })
   describe('errorReducer', () => {
@@ -526,6 +541,25 @@ describe('Reducers', () => {
           type: 'RATE_BOOK_LOADING',
           payload: true
         })).toEqual({ 'callbackFn' : null, argsArr: null })
+    })
+  })
+  describe('bookHistoryReducer', () => {
+    it('should return initial state', () => {
+      expect(bookHistoryReducer(undefined, {})).toEqual([])
+    })
+    it('should handle BORROW_EVENT_SUCCESS', () => {
+      expect(
+        bookHistoryReducer(undefined, {
+          type: 'BORROW_EVENT_SUCCESS',
+          payload: { bookId: '1', timestamp: '123', borrower: '0x0' }
+        })).toEqual({ borrow_history: { '1': [{ timestamp: 123, borrower: '0x0' }] } })
+    })
+    it('should handle RETURN_EVENT_SUCCESS', () => {
+      expect(
+        bookHistoryReducer(undefined, {
+          type: 'RETURN_EVENT_SUCCESS',
+          payload: { bookId: '1', timestamp: '123', borrower: '0x0' }
+        })).toEqual({ return_history: { '1': [{ timestamp: 123, borrower: '0x0' }] } })
     })
   })
 })

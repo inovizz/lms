@@ -3,13 +3,13 @@ import { connect } from 'react-redux'
 import * as libraryActions from '../actions/libraryActions'
 import BookRecord from './utils/BookRecord'
 
-const mapStateToProps = (state=[]) => {
+export const mapStateToProps = (state=[]) => {
   return {
     book_history: state.book_history
   }
 }
 
-class BookHistory extends React.Component {
+export class BookHistory extends React.Component {
   componentDidMount () {
     if(!this.props.book_history || !this.props.book_history.borrow_history[+this.props.book.id]) {
       this.props.borrowEvent(this.props.book.id)

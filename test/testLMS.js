@@ -9,35 +9,6 @@ contract('LMS', function(accounts) {
         lms = await LMS.new('Lallan', "email", {value: web3.toWei(0.1)});
     });
 
-    describe('constructorFunction', function() {
-        it('should have default amount of 10**17 in contract account', async function() {
-            let contractBal =  web3.eth.getBalance(lms.address);
-            assert.equal(contractBal.valueOf(), 10**17);
-        });
-
-        it('should have a default member', async function() {
-            let memberCount = await lms.numMembers();
-            assert.equal(memberCount, 1);
-        });
-
-        it('should have no books by default', async function() {
-            let bookCount = await lms.numBooks();
-            assert.equal(bookCount, 0);
-        });
-    });
-
-    describe('getOwnerDetails', function() {
-        it('should provide owner details', async function() {
-            let [name, account, email, status, timestamp] = await lms.getOwnerDetails();
-            assert.equal(name, 'Lallan');
-            assert.equal(account, web3.eth.coinbase);
-            assert.equal(email, "email")
-            assert.equal(status.valueOf(), 0);
-            assert.isAtMost(timestamp, Math.floor(Date.now() / 1000));
-            assert.isAbove(timestamp, Math.floor(Date.now() / 1000) - 300);
-        });
-    });
-
     describe('addMember', function() {
         it('should not add an already added member', async function() {
             let memberCount = await lms.numMembers();
@@ -619,5 +590,36 @@ What You Make It is a fictional story about a strong female", "Literature & Fict
         });
     });
 
+    // These tests have been moved to the bottom as the events take longer to finish, which sometimes confuses
+    // testrpc about whether the tests are complete or not. You can see a continuous output "eth_getFilterChanges"
+    // in the testrpc console when that happens.
 
+    describe('constructorFunction', function() {
+        it('should have default amount of 10**17 in contract account', async function() {
+            let contractBal =  web3.eth.getBalance(lms.address);
+            assert.equal(contractBal.valueOf(), 10**17);
+        });
+
+        it('should have a default member', async function() {
+            let memberCount = await lms.numMembers();
+            assert.equal(memberCount, 1);
+        });
+
+        it('should have no books by default', async function() {
+            let bookCount = await lms.numBooks();
+            assert.equal(bookCount, 0);
+        });
+    });
+
+    describe('getOwnerDetails', function() {
+        it('should provide owner details', async function() {
+            let [name, account, email, status, timestamp] = await lms.getOwnerDetails();
+            assert.equal(name, 'Lallan');
+            assert.equal(account, web3.eth.coinbase);
+            assert.equal(email, "email")
+            assert.equal(status.valueOf(), 0);
+            assert.isAtMost(timestamp, Math.floor(Date.now() / 1000));
+            assert.isAbove(timestamp, Math.floor(Date.now() / 1000) - 300);
+        });
+    });
 });

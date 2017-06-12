@@ -1,4 +1,5 @@
 // An iterable data stored designed to be eternal.
+// A more appropriate name could be IterableDataStore, but that's a mouthful.
 // Create new instances for each logical entity e.g. one for books, one for members and so on.
 // As is true for all Ethereum contracts, keep the contract addresses very safe, else you will lose all data.
 
@@ -10,6 +11,8 @@ contract DataStore is Killable {
     uint public count;
 
     function addNew() {
+        // Invoke this function before adding a new record.
+        // TODO Find if addNew can be called simultaneously. If yes, the below index will not point to correct entry.
         count++;
     }
 
@@ -21,57 +24,57 @@ contract DataStore is Killable {
     // {2: {'name': 'Johnny Appleseed', 'email': 'johnny.appleseed@icloud.com', 'address': '1, Infinite Loop'}}
     // Book Data Store: {1: {'title': '1984', 'author': '', 'publisher': '', 'imgUrl': ''}}
 
-    function getAddressValue(uint index, bytes32 record) constant returns (address) {
-        return AddressStorage[index][record];
+    function getAddressValue(uint index, bytes32 key) constant returns (address) {
+        return AddressStorage[index][key];
     }
 
-    function setAddressValue(uint index, bytes32 record, address value) {
-        AddressStorage[index][record] = value;
+    function setAddressValue(uint index, bytes32 key, address value) {
+        AddressStorage[index][key] = value;
     }
 
-    function getIntValue(uint index, bytes32 record) constant returns (uint) {
-        return IntStorage[index][record];
+    function getIntValue(uint index, bytes32 key) constant returns (uint) {
+        return IntStorage[index][key];
     }
 
-    function setIntValue(uint index, bytes32 record, uint value) {
-        IntStorage[index][record] = value;
+    function setIntValue(uint index, bytes32 key, uint value) {
+        IntStorage[index][key] = value;
     }
 
-    function getStringValue(uint index, bytes32 record) constant returns (string) {
+    function getStringValue(uint index, bytes32 key) constant returns (string) {
         // This function cannot be used by other contracts or libraries due to an EVM restriction
         // on contracts reading variable-sized data from other contracts.
-        return StringStorage[index][record];
+        return StringStorage[index][key];
     }
 
-    function setStringValue(uint index, bytes32 record, string value) {
-        StringStorage[index][record] = value;
+    function setStringValue(uint index, bytes32 key, string value) {
+        StringStorage[index][key] = value;
     }
 
     mapping(bytes32 => mapping (address => uint)) AddressIndex;
     mapping(bytes32 => mapping (bytes32 => uint)) Bytes32Index;
     mapping(bytes32 => mapping (int => uint)) IntIndex;
 
-    function getAddressIndex(bytes32 indexName, address record) constant returns (uint) {
-        return AddressIndex[indexName][record];
+    function getAddressIndex(bytes32 indexName, address key) constant returns (uint) {
+        return AddressIndex[indexName][key];
     }
 
-    function setAddressIndex(bytes32 indexName, uint index, address record) {
-        AddressIndex[indexName][record] = index;
+    function setAddressIndex(bytes32 indexName, address key, uint index) {
+        AddressIndex[indexName][key] = index;
     }
 
-    function getBytes32Index(bytes32 indexName, bytes32 record) constant returns (uint) {
-        return Bytes32Index[indexName][record];
+    function getBytes32Index(bytes32 indexName, bytes32 key) constant returns (uint) {
+        return Bytes32Index[indexName][key];
     }
 
-    function setBytes32Index(bytes32 indexName, uint index, bytes32 record) {
-        Bytes32Index[indexName][record] = index;
+    function setBytes32Index(bytes32 indexName, bytes32 key, uint index) {
+        Bytes32Index[indexName][key] = index;
     }
 
-    function getIntIndex(bytes32 indexName, int record) constant returns (uint) {
-        return IntIndex[indexName][record];
+    function getIntIndex(bytes32 indexName, int key) constant returns (uint) {
+        return IntIndex[indexName][key];
     }
 
-    function setIntIndex(bytes32 indexName, uint index, int record) {
-        IntIndex[indexName][record] = index;
+    function setIntIndex(bytes32 indexName, int key, uint index) {
+        IntIndex[indexName][key] = index;
     }
 }

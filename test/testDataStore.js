@@ -57,11 +57,11 @@ contract('DataStore', function(accounts) {
             await store.addNew();
             let index = await store.count();
             await store.setAddressValue(index, web3.sha3('account'), accounts[0]);
-            await store.setAddressIndex(web3.sha3('owner'), index, accounts[0]);
+            await store.setAddressIndex(web3.sha3('owner'), accounts[0], index);
             let found = await store.getAddressIndex(web3.sha3('owner'), accounts[0]);
             assert.equal(found.valueOf(), index.valueOf());
             index = 2;
-            await store.setAddressIndex(web3.sha3('borrower'), index, accounts[0]);
+            await store.setAddressIndex(web3.sha3('borrower'), accounts[0], index);
             found = await store.getAddressIndex(web3.sha3('borrower'), accounts[0]);
             assert.equal(found.valueOf(), index.valueOf());
         });
@@ -72,7 +72,7 @@ contract('DataStore', function(accounts) {
             await store.addNew();
             let index = await store.count();
             await store.setStringValue(index, web3.sha3('email'), 'john.doe@example.com');
-            await store.setBytes32Index(web3.sha3('email'), index, web3.sha3('john.doe@example.com'));
+            await store.setBytes32Index(web3.sha3('email'), web3.sha3('john.doe@example.com'), index);
             let found = await store.getBytes32Index(web3.sha3('email'), web3.sha3('john.doe@example.com'));
             assert.equal(found.valueOf(), index.valueOf());
         });
@@ -83,7 +83,7 @@ contract('DataStore', function(accounts) {
             await store.addNew();
             let index = await store.count();
             await store.setIntValue(index, web3.sha3('ID'), 1199228);
-            await store.setIntIndex(web3.sha3('employee_id'), index, 1199228);
+            await store.setIntIndex(web3.sha3('employee_id'), 1199228, index);
             let found = await store.getIntIndex(web3.sha3('employee_id'), 1199228);
             assert.equal(found.valueOf(), index.valueOf());
         });

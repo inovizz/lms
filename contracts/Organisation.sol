@@ -2,12 +2,14 @@ pragma solidity ^0.4.8;
 
 import "./helper_contracts/strings.sol";
 import "./helper_contracts/StringLib.sol";
+import "./helper_contracts/zeppelin/ownership/Ownable.sol";
 
+import "./DataStore.sol";
 import "./BooksLibrary.sol";
 import "./MembersLibrary.sol";
 
 
-contract Organisation {
+contract Organisation is Ownable {
     using strings for *;
     using BooksLibrary for address;
     using MembersLibrary for address;
@@ -15,13 +17,28 @@ contract Organisation {
     address public bookStore;
     address public memberStore;
 
+    modifier onlyMember {
+        bool member = false;
+        for (uint i=1; i <= memberStore.memberCount(); i++) {
+            var (account, state, dateAdded) = memberStore.getMember(i);
+            if (account == msg.sender && state == 0) {
+                member = true;
+                break;
+            }
+        }
+        if (!member) {
+            throw;
+        } else {
+            _;
+        }
+    }
+
     function Organisation() payable {
-        // Call setBookStore and setMemberStore before using this contract.
         // TODO Check for funds being transferred
         // The contract could also be funded after instantiation through sendTransaction.
     }
 
-    function setDataStore(address _bookStore, address _memberStore) {
+    function setDataStore(address _bookStore, address _memberStore) onlyOwner {
         if (_bookStore == 0x0) {
             bookStore = new DataStore();
         } else {
@@ -46,15 +63,15 @@ contract Organisation {
         return memberStore.memberCount();
     }
 
-    function addMember(string name, string email, address account) {
+    function addMember(string name, string email, address account) onlyOwner {
         memberStore.addMember(name, email, account);
     }
 
-    function removeMember(address account) {
+    function removeMember(address account) onlyOwner {
         memberStore.removeMember(account);
     }
 
-    function getMember(uint id) constant returns (string memberString) {
+    function getMember(uint id) constant onlyOwner returns (string memberString) {
         if (id < 1 || id > memberStore.memberCount()) {
             return;
         }
@@ -68,7 +85,7 @@ contract Organisation {
         return memberString;
     }
 
-    function getAllMembers() constant returns (string memberString, uint8 count) {
+    function getAllMembers() constant onlyOwner returns (string memberString, uint8 count) {
         string memory member;
         for (uint i = 1; i <= memberStore.memberCount(); i++) {
             member = getMember(i);
@@ -89,7 +106,7 @@ contract Organisation {
         return bookStore.bookCount();
     }
 
-    function addBook(uint isbn13) public {
+    function addBook(uint isbn13) public onlyMember {
         bookStore.addBook(isbn13);
     }
 
@@ -125,19 +142,21 @@ contract Organisation {
         }
     }
 
-    function borrowBook(uint id) payable {
+    function borrowBook(uint id) payable onlyMember {
         bookStore.borrowBook(id);
     }
 
-    function returnBook(uint id) {
+    function returnBook(uint id) onlyMember {
         bookStore.returnBook(id);
     }
 
-    function rateBook(uint id, uint rating, uint oldRating, string comments) {
+    function rateBook(uint id, uint rating, uint oldRating, string comments) onlyMember {
         bookStore.rateBook(id, rating, oldRating, comments);
     }
 
-    function kill(address upgradedOrganisation_) {
-        selfdestruct(upgradedOrganisation_);
+    function kill(address upgradedOrganisation) onlyOwner {
+        DataStore(bookStore).transferOwnership(upgradedOrganisation);
+        DataStore(memberStore).transferOwnership(upgradedOrganisation);
+        selfdestruct(upgradedOrganisation);
     }
 }

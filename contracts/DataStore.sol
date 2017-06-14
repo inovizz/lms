@@ -8,6 +8,7 @@ pragma solidity ^0.4.0;
 import "./helper_contracts/zeppelin/lifecycle/Killable.sol";
 
 contract DataStore is Killable {
+    // The data in this contract can be changed only by the owner, which should be the calling contract.
     uint public count;
 
     function addNew() {
@@ -28,7 +29,7 @@ contract DataStore is Killable {
         return AddressStorage[index][key];
     }
 
-    function setAddressValue(uint index, bytes32 key, address value) {
+    function setAddressValue(uint index, bytes32 key, address value) onlyOwner {
         AddressStorage[index][key] = value;
     }
 
@@ -36,7 +37,7 @@ contract DataStore is Killable {
         return IntStorage[index][key];
     }
 
-    function setIntValue(uint index, bytes32 key, uint value) {
+    function setIntValue(uint index, bytes32 key, uint value) onlyOwner {
         IntStorage[index][key] = value;
     }
 
@@ -46,7 +47,7 @@ contract DataStore is Killable {
         return StringStorage[index][key];
     }
 
-    function setStringValue(uint index, bytes32 key, string value) {
+    function setStringValue(uint index, bytes32 key, string value) onlyOwner {
         StringStorage[index][key] = value;
     }
 
@@ -58,7 +59,7 @@ contract DataStore is Killable {
         return AddressIndex[indexName][key];
     }
 
-    function setAddressIndex(bytes32 indexName, address key, uint index) {
+    function setAddressIndex(bytes32 indexName, address key, uint index) onlyOwner {
         AddressIndex[indexName][key] = index;
     }
 
@@ -66,7 +67,7 @@ contract DataStore is Killable {
         return Bytes32Index[indexName][key];
     }
 
-    function setBytes32Index(bytes32 indexName, bytes32 key, uint index) {
+    function setBytes32Index(bytes32 indexName, bytes32 key, uint index) onlyOwner {
         Bytes32Index[indexName][key] = index;
     }
 
@@ -74,7 +75,7 @@ contract DataStore is Killable {
         return IntIndex[indexName][key];
     }
 
-    function setIntIndex(bytes32 indexName, int key, uint index) {
+    function setIntIndex(bytes32 indexName, int key, uint index) onlyOwner {
         IntIndex[indexName][key] = index;
     }
 }

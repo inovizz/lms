@@ -65,6 +65,17 @@ library MembersLibrary {
         }
     }
 
+    function getMember(address memberStoreAddress, uint index) constant returns (address account, uint state, uint dateAdded) {
+        var memberStore = DataStore(memberStoreAddress);
+        if (index < 1 || index > memberStore.count()) {
+            return;
+        }
+        account = memberStore.getAddressValue(index, 'account');
+        state = memberStore.getIntValue(index, 'state');
+        dateAdded = memberStore.getIntValue(index, 'dateAdded');
+    }
+
+    // Functions below are not used since Organisation contract cannot read string from library.
     function getMemberDetailsByAccount(address memberStoreAddress, address account) constant returns (string member) {
         var memberStore = DataStore(memberStoreAddress);
         var accountIndex = memberStore.getAddressIndex('account', account);
@@ -104,16 +115,6 @@ library MembersLibrary {
         parts[2] = StringLib.uintToString(memberStore.getIntValue(index, 'state')).toSlice();
         parts[3] = StringLib.uintToString(memberStore.getIntValue(index, 'dateAdded')).toSlice();
         member = ";".toSlice().join(parts);
-    }
-
-    function getMember(address memberStoreAddress, uint index) constant returns (address account, uint state, uint dateAdded) {
-        var memberStore = DataStore(memberStoreAddress);
-        if (index < 1 || index > memberStore.count()) {
-            return;
-        }
-        account = memberStore.getAddressValue(index, 'account');
-        state = memberStore.getIntValue(index, 'state');
-        dateAdded = memberStore.getIntValue(index, 'dateAdded');
     }
 
     function getAllMembers(address memberStoreAddress) constant returns (string memberString, uint8 count) {

@@ -10,7 +10,11 @@ contract('Organisation', function(accounts) {
         bookStore = await DataStore.new();
         memberStore = await DataStore.new();
         org = await Organisation.new({value: web3.toWei(0.1)});
+        // Transfer ownership of stores from default account to organisation. This allows modifying the data store.
+        bookStore.transferOwnership(org.address);
+        memberStore.transferOwnership(org.address);
         await org.setDataStore(bookStore.address, memberStore.address);
+        await org.addMember('name', 'email', accounts[0]);
         // await org.setDataStore(0x0, 0x0);
         // TODO Investigate why org works with 0x0 data stores too.
     });
@@ -20,14 +24,13 @@ contract('Organisation', function(accounts) {
         assert.equal(count, 0);
     });
 
-    it('should have no members by default', async function() {
+    it('should have one member by default', async function() {
         let count =  await org.memberCount()
-        assert.equal(count, 0);
+        assert.equal(count, 1);
     });
 
     describe('addMember', function() {
         it('should add the member', async function() {
-            await org.addMember('name', 'email', accounts[0]);
             let count = await org.memberCount();
             assert.equal(count.valueOf(), 1);
             let member = await org.getMember(1);
@@ -39,7 +42,6 @@ contract('Organisation', function(accounts) {
             assert.isAbove(attr[3], Math.floor(Date.now() / 1000) - 300);
         });
         it('should not add the member again', async function() {
-            await org.addMember('name', 'email', accounts[0]);
             let count = await org.memberCount();
             assert.equal(count.valueOf(), 1);
 
@@ -50,7 +52,6 @@ contract('Organisation', function(accounts) {
 
     describe('removeMember', function() {
         it('should deactivate the member', async function() {
-            await org.addMember('name', 'email', accounts[0]);
             await org.removeMember(accounts[0]);
             let count = await org.memberCount();
             assert.equal(count.valueOf(), 1);
@@ -72,12 +73,12 @@ contract('Organisation', function(accounts) {
                 {name: 'Johnny Appleseed', email: 'johnny@apple.com'},
             ];
             for (let i=0; i<3; i++) {
-                await org.addMember(info[i].name, info[i].email, accounts[i]);
+                await org.addMember(info[i].name, info[i].email, accounts[i+1]);
             }
             let [members, count] = await org.getAllMembers();
-            assert.equal(count, 3);     // Including the default member
+            assert.equal(count, 4);     // Including the default member
             members = members.split('|');
-            for (let i=0; i<3; i++) {
+            for (let i=1; i<4; i++) {
                 let attr = members[i].split(';');
                 let name = await memberStore.getStringValue(attr[0], 'name');
                 let email = await memberStore.getStringValue(attr[0], 'email');
@@ -86,8 +87,8 @@ contract('Organisation', function(accounts) {
                 assert.equal(attr[2], '0');
                 assert.isAtMost(attr[3], Math.floor(Date.now() / 1000));
                 assert.isAbove(attr[3], Math.floor(Date.now() / 1000) - 300);
-                assert.equal(name, info[i].name);
-                assert.equal(email, info[i].email);
+                assert.equal(name, info[i-1].name);
+                assert.equal(email, info[i-1].email);
             }
         });
     });
@@ -114,6 +115,8 @@ contract('Organisation', function(accounts) {
 
     describe('getAllBooks', function() {
         it('should return all books, irrespective of who owns them', async function() {
+            await org.addMember('name1', 'email1', accounts[1]);
+            await org.addMember('name2', 'email2', accounts[2]);
             let ISBNs = [9780001112222, 9780001113333, 9780001114444];
             for (let i = 0; i < 3; i++) {
                 await org.addBook(ISBNs[i], {from: accounts[i]});
@@ -142,6 +145,7 @@ contract('Organisation', function(accounts) {
     describe('borrowBook', function() {
         it('should set borrower details', async function() {
             await org.addBook(9781234512345);
+            await org.addMember('name1', 'email1', accounts[1]);
             await org.borrowBook(1, {from: accounts[1], value: web3.toWei(0.1) /2 });
             let book = await org.getBook(1);
             let bookAttr = book.split(';');
@@ -162,6 +166,7 @@ contract('Organisation', function(accounts) {
     describe('returnBook', function() {
         it('should reset borrower details', async function() {
             await org.addBook(9781234512345);
+            await org.addMember('name1', 'email1', accounts[1]);
             await org.borrowBook(1, {from: accounts[1]});
             await org.returnBook(1);
             let book = await org.getBook(1);

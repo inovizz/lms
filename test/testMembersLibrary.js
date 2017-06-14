@@ -9,6 +9,8 @@ contract('MembersLibrary', function(accounts) {
     beforeEach(async function() {
         store = await DataStore.new();
         membersLibrary = await MembersLibrary.new();
+        // Transfer ownership of store from default account to members library. This allows modifying the data store.
+        store.transferOwnership(membersLibrary.address);
         await membersLibrary.addMember(store.address, 'Abc Def', 'p@gmail.com', accounts[0]);
     });
 

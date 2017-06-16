@@ -3,6 +3,7 @@ import { web3, lms } from '../web3'
 import actionType from './actionTypes'
 import { sessionService } from 'redux-react-session'
 import axios from 'axios'
+import apiList from './api.list'
 import NotificationType from '../components/notifications/NotificationTypes'
 
 export const action = (type, flag) => {
@@ -65,9 +66,10 @@ export const getOwnerDetails = (response) => {
 export const getAllBooks = () => {
   return (dispatch) => {
     dispatch(action(actionType.GET_ALL_BOOKS_LOADING, true))
-    lms.getAllBooks.call().then((books) => {
+    axios.get(apiList.books)
+    .then((books) => {
       dispatch(getRatings())
-      dispatch(action(actionType.GET_ALL_BOOKS_SUCCESS, books))
+      dispatch(action(actionType.GET_ALL_BOOKS_SUCCESS, books.data.result))
       dispatch(action(actionType.GET_ALL_BOOKS_LOADING, false))
     }).catch((e) => {
       console.log("Error Occured", e)
@@ -80,8 +82,9 @@ export const getAllBooks = () => {
 export const getMyBooks = () => {
   return (dispatch) => {
     dispatch(action(actionType.GET_MY_BOOKS_LOADING, true))
-    lms.getMyBooks.call().then((books) => {
-      dispatch(action(actionType.GET_MY_BOOKS_SUCCESS, books))
+    axios.get(apiList.mybooks)
+    .then((books) => {
+      dispatch(action(actionType.GET_MY_BOOKS_SUCCESS, books.data.result))
       dispatch(action(actionType.GET_MY_BOOKS_LOADING, false))
     }).catch((e) => {
       console.log("Error Occured", e)
@@ -94,25 +97,15 @@ export const getMyBooks = () => {
 export const addBook = (book) => {
   return (dispatch) => {
     dispatch(action(actionType.GET_ADD_BOOKS_LOADING, true))
-    lms.addBook(
-      book.title,
-      book.author,
-      book.publisher,
-      book.imageUrl,
-      book.description,
-      book.genre,
-      {
-        from: book.owner.account,
-        gas: 600000
-      }
-    ).then((response) => {
-      if(isSuccess(response)) {
+    axios.post(apiList.addbook, book)
+    .then((response) => {
+      if(response.data.status) {
         dispatch(action(actionType.GET_ADD_BOOKS_SUCCESS, book))
         dispatch(getAllBooks())
       } else {
         dispatch(action(
           actionType.GET_ADD_BOOKS_ERROR,
-          NotificationType('error', 'Error', response.logs[0].args.statusCode.c[0])
+          NotificationType('error', 'Error', response.data.logs)
         ))
       }
     }).catch((e) => {
@@ -128,25 +121,18 @@ export const addBook = (book) => {
 export const updateBook = (bookId, book) => {
   return (dispatch) => {
     dispatch(action(actionType.UPDATE_BOOK_LOADING, true))
-    lms.updateBook(
+    const bookData = {
       bookId,
-      book.title,
-      book.author,
-      book.publisher,
-      book.imageUrl,
-      book.description,
-      book.genre,
-      {
-        from: book.owner.account,
-        gas: 600000
-      }
-    ).then((response) => {
-      if(isSuccess(response)) {
+      book
+    }
+    axios.post(apiList.updatebook, bookData)
+    .then((response) => {
+      if(response.data.status) {
         dispatch(getAllBooks())
       } else {
         dispatch(action(
           actionType.UPDATE_BOOK_ERROR,
-          NotificationType('error', 'Error', response.logs[0].args.statusCode.c[0])
+          NotificationType('error', 'Error', response.data.logs)
         ))
       }
     }).catch((e) => {
@@ -162,13 +148,14 @@ export const updateBook = (bookId, book) => {
 export const returnBook = (book) => {
   return (dispatch) => {
     dispatch(action(actionType.GET_RETURN_BOOKS_LOADING, true))
-    lms.returnBook(book.id, { from : book.owner, gas: 200000 }).then((response) => {
-      if(isSuccess(response)) {
+    axios.post(apiList.returnbook, book)
+    .then((response) => {
+      if(response.data.status) {
         dispatch(action(actionType.GET_RETURN_BOOKS_SUCCESS, book))
       } else {
           dispatch(action(
             actionType.GET_RETURN_BOOKS_ERROR,
-            NotificationType('error', 'Error', response.logs[0].args.statusCode.c[0])
+            NotificationType('error', 'Error', response.data.logs)
           ))
       }
     }).catch((e) => {
@@ -184,13 +171,18 @@ export const returnBook = (book) => {
 export const borrowBook = (book, ownerDetails) => {
   return (dispatch) => {
     dispatch(action(actionType.GET_BORROW_BOOKS_LOADING, true))
-    lms.borrowBook(book.id, { from: ownerDetails.account, value: web3.toWei(0.1), gas: 200000 }).then((response) => {
-      if(isSuccess(response)) {
+    const bookBorrowData = {
+      bookId: book.id,
+      ownerDetails 
+    }
+    axios.post(apiList.borrowbook, bookBorrowData)
+    .then((response) => {
+      if(response.data.status) {
         dispatch(action(actionType.GET_BORROW_BOOKS_SUCCESS, { book, owner: ownerDetails.account }))
       } else {
           dispatch(action(
             actionType.GET_BORROW_BOOKS_ERROR,
-            NotificationType('error', 'Error', response.logs[0].args.statusCode.c[0])
+            NotificationType('error', 'Error', response.data.logs)
           ))
       }
     }).catch((e) => {
@@ -338,7 +330,7 @@ export const createAccount = (session,password) => {
       "params":[password],
       "id":74
     }
-    return axios.post('/api/create_account',request)
+    return axios.post(apiList.create_account, request)
             .then((response) => {
               const user = [
                 session.profileObj.name,

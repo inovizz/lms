@@ -1,10 +1,15 @@
-const path = require('path');
-const express = require('express');
+import path from 'path';
+import express from 'express';
+import logger from 'morgan';
+import config from './server/config';
 const app = express();
-const config = require('./server/config');
-const routes = require('./server/routes');
-const bodyParser = require('body-parser');
+import routes from './server/routes/index.route';
+import bodyParser from 'body-parser';
 
+// Console the logger
+if (config.env === 'development') {
+  app.use(logger('dev'));
+}
 
 // Middlewares
 app.use(express.static(__dirname + '/dist'));
@@ -13,9 +18,10 @@ app.use(bodyParser.json());
 
 // Routing
 
-const api = require('./server/routes')(app, express);
-app.use('/api',api);
+// Route api
+app.use('/api', routes);
 
+// Default - Route WildCard
 app.get('*', function(req, res) {
   res.sendFile(path.join(__dirname,'dist','index.html'));
 });

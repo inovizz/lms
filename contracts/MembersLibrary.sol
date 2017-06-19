@@ -8,8 +8,6 @@ import "./DataStore.sol";
 
 library MembersLibrary {
 
-    using strings for *;
-
     // Status of transaction. Used for error handling.
     event Status(uint indexed statusCode);
 
@@ -73,63 +71,5 @@ library MembersLibrary {
         account = memberStore.getAddressValue(index, 'account');
         state = memberStore.getIntValue(index, 'state');
         dateAdded = memberStore.getIntValue(index, 'dateAdded');
-    }
-
-    // Functions below are not used since Organisation contract cannot read string from library.
-    function getMemberDetailsByAccount(address memberStoreAddress, address account) constant returns (string member) {
-        var memberStore = DataStore(memberStoreAddress);
-        var accountIndex = memberStore.getAddressIndex('account', account);
-        if (accountIndex < 1 || accountIndex > memberStore.count()) {
-            return;
-        }
-        var parts = new strings.slice[](4);
-        parts[0] = StringLib.uintToString(accountIndex).toSlice();
-        parts[1] = StringLib.addressToString(memberStore.getAddressValue(accountIndex, 'account')).toSlice();
-        parts[2] = StringLib.uintToString(memberStore.getIntValue(accountIndex, 'state')).toSlice();
-        parts[3] = StringLib.uintToString(memberStore.getIntValue(accountIndex, 'dateAdded')).toSlice();
-        member = ";".toSlice().join(parts);
-    }
-
-    function getMemberDetailsByEmail(address memberStoreAddress, string email) constant returns (string member) {
-        var memberStore = DataStore(memberStoreAddress);
-        var emailIndex = memberStore.getBytes32Index('email', sha3(email));
-        if (emailIndex < 1 || emailIndex > memberStore.count()) {
-            return;
-        }
-        var parts = new strings.slice[](4);
-        parts[0] = StringLib.uintToString(emailIndex).toSlice();
-        parts[1] = StringLib.addressToString(memberStore.getAddressValue(emailIndex, 'account')).toSlice();
-        parts[2] = StringLib.uintToString(memberStore.getIntValue(emailIndex, 'state')).toSlice();
-        parts[3] = StringLib.uintToString(memberStore.getIntValue(emailIndex, 'dateAdded')).toSlice();
-        member = ";".toSlice().join(parts);
-    }
-
-    function getMemberDetailsByIndex(address memberStoreAddress, uint index) constant returns (string member) {
-        var memberStore = DataStore(memberStoreAddress);
-        if (index < 1 || index > memberStore.count()) {
-            return;
-        }
-        var parts = new strings.slice[](4);
-        parts[0] = StringLib.uintToString(index).toSlice();
-        parts[1] = StringLib.addressToString(memberStore.getAddressValue(index, 'account')).toSlice();
-        parts[2] = StringLib.uintToString(memberStore.getIntValue(index, 'state')).toSlice();
-        parts[3] = StringLib.uintToString(memberStore.getIntValue(index, 'dateAdded')).toSlice();
-        member = ";".toSlice().join(parts);
-    }
-
-    function getAllMembers(address memberStoreAddress) constant returns (string memberString, uint8 count) {
-        string memory member;
-        var memberStore = DataStore(memberStoreAddress);
-        for (uint i = 1; i <= memberStore.count(); i++) {
-            member = getMemberDetailsByIndex(memberStoreAddress, i);
-            if (!member.toSlice().equals("".toSlice())) {
-                count++;
-                if (memberString.toSlice().equals("".toSlice())) {
-                    memberString = member;
-                } else {
-                    memberString = memberString.toSlice().concat('|'.toSlice()).toSlice().concat(member.toSlice());
-                }
-            }
-        }
     }
 }

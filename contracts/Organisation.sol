@@ -14,22 +14,19 @@ contract Organisation is Ownable {
     using BooksLibrary for address;
     using MembersLibrary for address;
 
+    // Status of transaction. Used for error handling.
+    event Status(uint indexed statusCode);
+
     address public bookStore;
     address public memberStore;
 
     modifier onlyMember {
-        bool member = false;
-        for (uint i=1; i <= memberStore.memberCount(); i++) {
-            var (account, state, dateAdded) = memberStore.getMember(i);
-            if (account == msg.sender && state == 0) {
-                member = true;
-                break;
-            }
-        }
-        if (!member) {
-            throw;
-        } else {
+        var index = DataStore(memberStore).getAddressIndex('account', msg.sender);
+        var state = DataStore(memberStore).getIntValue(index, 'state');
+        if (index != 0 && state == 0) {
             _;
+        } else {
+            Status(100);
         }
     }
 
@@ -143,15 +140,15 @@ contract Organisation is Ownable {
     }
 
     function borrowBook(uint id) payable onlyMember {
-        bookStore.borrowBook(id);
+        bookStore.borrowBook(id, msg.sender);
     }
 
     function returnBook(uint id) onlyMember {
-        bookStore.returnBook(id);
+        bookStore.returnBook(id, msg.sender);
     }
 
     function rateBook(uint id, uint rating, uint oldRating, string comments) onlyMember {
-        bookStore.rateBook(id, rating, oldRating, comments);
+        bookStore.rateBook(id, rating, oldRating, comments, msg.sender);
     }
 
     function kill(address upgradedOrganisation) onlyOwner {

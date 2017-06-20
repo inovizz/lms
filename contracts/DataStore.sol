@@ -11,6 +11,12 @@ contract DataStore is Killable {
     // The data in this contract can be changed only by the owner, which should be the calling contract.
     uint public count;
 
+    event Event(string eventName, uint indexed index, address indexed account, string value, uint indexed number, uint timestamp);
+
+    function triggerEvent(string eventName, uint index, address account, string value, uint number) {
+        Event(eventName, index, account, value, number, now);
+    }
+
     function addNew() {
         // Invoke this function before adding a new record.
         // TODO Find if addNew can be called simultaneously. If yes, the below index will not point to correct entry.

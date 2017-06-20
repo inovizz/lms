@@ -15,7 +15,6 @@ library BooksLibrary {
     }
 
     function addBook(address bookStoreAddress, uint isbn13) public {
-        // TODO Only members should be able to add books
         if (this.balance < 10**12) {
             Status(120);
             return;
@@ -50,7 +49,7 @@ library BooksLibrary {
         reviewersCount = bookStore.getIntValue(id, sha3('reviewersCount'));
     }
 
-    function borrowBook(address bookStoreAddress, uint id) {
+    function borrowBook(address bookStoreAddress, uint id, address account) {
         var bookStore = DataStore(bookStoreAddress);
         // Can't borrow book if passed value is not sufficient
         if (msg.value < 10**12) {
@@ -72,11 +71,10 @@ library BooksLibrary {
         bookStore.setAddressValue(id, sha3('borrower'), msg.sender);
         bookStore.setIntValue(id, sha3('dateIssued'), now);
         bookStore.setIntValue(id, sha3('state'), 1);
-//        Borrow(id, msg.sender, catalog[id].dateIssued);
+        bookStore.triggerEvent("borrow", id, account, "", 0);
     }
 
-    function returnBook(address bookStoreAddress, uint id) {
-//        address borrower;
+    function returnBook(address bookStoreAddress, uint id, address account) {
         var bookStore = DataStore(bookStoreAddress);
         if (id > bookStore.count()
                 || bookStore.getIntValue(id, sha3('state')) == 0
@@ -85,14 +83,14 @@ library BooksLibrary {
             Status(126);
             return;
         }
-//        borrower = catalog[id].borrower;
+        address borrower = bookStore.getAddressValue(id, sha3('borrower'));
         bookStore.setAddressValue(id, sha3('borrower'), 0x0);
         bookStore.setIntValue(id, sha3('dateIssued'), 0);
         bookStore.setIntValue(id, sha3('state'), 0);
-//        Return(id, borrower, now);
+        bookStore.triggerEvent("return", id, account, "", 0);
     }
 
-    function rateBook(address bookStoreAddress, uint id, uint rating, uint oldRating, string comments) {
+    function rateBook(address bookStoreAddress, uint id, uint rating, uint oldRating, string comments, address account) {
         var bookStore = DataStore(bookStoreAddress);
         if (id > bookStore.count() || rating < 1 || rating > 5) {
             Status(127);
@@ -107,9 +105,8 @@ library BooksLibrary {
                 bookStore.getIntValue(id, sha3('totalRating')) + rating - oldRating
             );
         }
-
+        bookStore.triggerEvent("rate", id, account, comments, rating);
         // All reviews are logged. Applications are responsible for eliminating duplicate ratings
         // and computing average rating.
-//        Rate(id, msg.sender, rating, comments, now);
     }
 }

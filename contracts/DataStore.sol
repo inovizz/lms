@@ -7,6 +7,7 @@ pragma solidity ^0.4.0;
 
 import "./helper_contracts/zeppelin/lifecycle/Killable.sol";
 
+
 contract DataStore is Killable {
     // The data in this contract can be changed only by the owner, which should be the calling contract.
     uint public count;

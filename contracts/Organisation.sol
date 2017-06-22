@@ -140,18 +140,22 @@ contract Organisation is Ownable {
     }
 
     function borrowBook(uint id) payable onlyMember {
-        bookStore.borrowBook(id, msg.sender);
+        bookStore.borrowBook(id);
     }
 
     function returnBook(uint id) onlyMember {
-        bookStore.returnBook(id, msg.sender);
+        bookStore.returnBook(id);
     }
 
     function rateBook(uint id, uint rating, uint oldRating, string comments) onlyMember {
-        bookStore.rateBook(id, rating, oldRating, comments, msg.sender);
+        bookStore.rateBook(id, rating, oldRating, comments);
     }
 
     function kill(address upgradedOrganisation) onlyOwner {
+        if (upgradedOrganisation == 0x0) {
+            throw;
+        }
+        Organisation(upgradedOrganisation).setDataStore(bookStore, memberStore);
         DataStore(bookStore).transferOwnership(upgradedOrganisation);
         DataStore(memberStore).transferOwnership(upgradedOrganisation);
         selfdestruct(upgradedOrganisation);

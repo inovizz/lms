@@ -353,7 +353,7 @@ contract('Organisation', function(accounts) {
                 returnEvent.stopWatching();
                 if (err) { throw err; }
                 assert.equal(result.args.index, 1);
-                assert.equal(result.args.account, accounts[0]);
+                assert.equal(result.args.account, accounts[1]);
                 assert.equal(result.args.eventName, 'return');
                 assert.isAtMost(result.args.timestamp, Math.floor(Date.now() / 1000));
                 assert.isAbove(result.args.timestamp, Math.floor(Date.now() / 1000) - 300);

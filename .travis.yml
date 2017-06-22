@@ -11,8 +11,10 @@ notifications:
 before_install:
 - npm install truffle@3.1.9 -g
 - npm i -g ethereumjs-testrpc
+- npm install -g solium
 - npm install
 script:
+- solium --dir contracts
 - testrpc > /dev/null &
 - truffle compile
 - truffle test

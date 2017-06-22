@@ -1,5 +1,6 @@
 pragma solidity ^0.4.8;
 
+
 contract OrganisationInterface {
     function OrganisationInterface(address, address);
 

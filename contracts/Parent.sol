@@ -6,6 +6,7 @@ import "./OrganisationInterface.sol";
 
 import "./helper_contracts/zeppelin/ownership/Ownable.sol";
 
+
 contract Parent is Ownable {
     using OrgLibrary for address;
     address public orgStore;
@@ -36,8 +37,6 @@ contract Parent is Ownable {
 
     function upgradeOrganisation(bytes32 key, address newOrg) onlyOwner {
         var org = orgStore.getOrganisation(key);
-        var (bookStore, memberStore) = OrganisationInterface(org).getDataStore();
-        OrganisationInterface(newOrg).setDataStore(bookStore, memberStore);
         orgStore.setOrganisation(key, newOrg);
         OrganisationInterface(org).kill(newOrg);
     }

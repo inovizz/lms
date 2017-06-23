@@ -26,8 +26,8 @@ contract('DataStore', function(accounts) {
         it('should set an attribute of type address', async function() {
             await store.addNew();
             let index = await store.count();
-            await store.setAddressValue(index, web3.sha3('account'), accounts[0]);
-            let account = await store.getAddressValue(index, web3.sha3('account'));
+            await store.setAddressValue(web3.sha3('account', index), accounts[0]);
+            let account = await store.getAddressValue(web3.sha3('account', index));
             assert.equal(account, accounts[0]);
         });
     });
@@ -36,8 +36,8 @@ contract('DataStore', function(accounts) {
         it('should set an attribute of type integer', async function() {
             await store.addNew();
             let index = await store.count();
-            await store.setIntValue(index, web3.sha3('balance'), 10000);
-            let balance = await store.getIntValue(index, web3.sha3('balance'));
+            await store.setIntValue(web3.sha3('balance', index), 10000);
+            let balance = await store.getIntValue(web3.sha3('balance', index));
             assert.equal(balance, 10000);
         });
     });
@@ -46,8 +46,8 @@ contract('DataStore', function(accounts) {
         it('should set an attribute of type string', async function() {
             await store.addNew();
             let index = await store.count();
-            await store.setStringValue(index, web3.sha3('email'), 'john.doe@example.com');
-            let email = await store.getStringValue(index, web3.sha3('email'));
+            await store.setStringValue(web3.sha3('email', index), 'john.doe@example.com');
+            let email = await store.getStringValue(web3.sha3('email', index));
             assert.equal(email, 'john.doe@example.com');
         });
     });
@@ -56,9 +56,9 @@ contract('DataStore', function(accounts) {
         it('should set an index based on field of type address', async function() {
             await store.addNew();
             let index = await store.count();
-            await store.setAddressValue(index, web3.sha3('account'), accounts[0]);
-            await store.setAddressIndex(web3.sha3('owner'), accounts[0], index);
-            let found = await store.getAddressIndex(web3.sha3('owner'), accounts[0]);
+            await store.setAddressValue(web3.sha3('account', index), accounts[0]);
+            await store.setAddressIndex(web3.sha3('owner', index), accounts[0], index);
+            let found = await store.getAddressIndex(web3.sha3('owner', index), accounts[0]);
             assert.equal(found.valueOf(), index.valueOf());
             index = 2;
             await store.setAddressIndex(web3.sha3('borrower'), accounts[0], index);
@@ -71,7 +71,7 @@ contract('DataStore', function(accounts) {
         it('should set an index based on field of type bytes32', async function() {
             await store.addNew();
             let index = await store.count();
-            await store.setStringValue(index, web3.sha3('email'), 'john.doe@example.com');
+            await store.setStringValue(web3.sha3('email', index), 'john.doe@example.com');
             await store.setBytes32Index(web3.sha3('email'), web3.sha3('john.doe@example.com'), index);
             let found = await store.getBytes32Index(web3.sha3('email'), web3.sha3('john.doe@example.com'));
             assert.equal(found.valueOf(), index.valueOf());
@@ -82,7 +82,7 @@ contract('DataStore', function(accounts) {
         it('should set an index based on field of type int', async function() {
             await store.addNew();
             let index = await store.count();
-            await store.setIntValue(index, web3.sha3('ID'), 1199228);
+            await store.setIntValue(web3.sha3('ID', index), 1199228);
             await store.setIntIndex(web3.sha3('employee_id'), 1199228, index);
             let found = await store.getIntIndex(web3.sha3('employee_id'), 1199228);
             assert.equal(found.valueOf(), index.valueOf());

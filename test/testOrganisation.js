@@ -2,6 +2,12 @@
 
 const DataStore = artifacts.require('../contracts/DataStore.sol');
 const Organisation = artifacts.require('../contracts/Organisation.sol');
+const sha3 = require('solidity-sha3').default;
+// web3.sha3 behaves a little differently than Ethereum's or Solidity's sha3.
+// As a workaround, we have used solidity-sha3.
+// TODO: Use solidity-sha3 npm package instead of tarball.
+// Do this once this open PR gets merged: https://github.com/raineorshine/solidity-sha3/pull/1
+
 
 contract('Organisation', function(accounts) {
     let bookStore, memberStore, org;
@@ -70,13 +76,14 @@ contract('Organisation', function(accounts) {
             members = members.split('|');
             for (let i=1; i<4; i++) {
                 let attr = members[i].split(';');
-                let name = await memberStore.getStringValue(attr[0], 'name');
-                let email = await memberStore.getStringValue(attr[0], 'email');
                 assert.equal(attr[0], i+1);     // ID starts from 1, not 0.
                 assert.equal('0x' + attr[1], accounts[i]);
                 assert.equal(attr[2], '0');
                 assert.isAtMost(attr[3], Math.floor(Date.now() / 1000));
                 assert.isAbove(attr[3], Math.floor(Date.now() / 1000) - 300);
+
+                let name = await memberStore.getStringValue(sha3('name', i+1));
+                let email = await memberStore.getStringValue(sha3('email', i+1));
                 assert.equal(name, info[i-1].name);
                 assert.equal(email, info[i-1].email);
             }

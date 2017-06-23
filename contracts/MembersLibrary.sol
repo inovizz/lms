@@ -23,7 +23,7 @@ library MembersLibrary {
         var accountIndex = memberStore.getAddressIndex('account', account);
         if (accountIndex == emailIndex && accountIndex != 0) {
             // if member is already registered with given info
-            memberStore.setIntValue(accountIndex, 'state', 0);
+            memberStore.setIntValue(sha3('state', accountIndex), 0);
             Status(102);
             return;
         }
@@ -45,10 +45,10 @@ library MembersLibrary {
         memberStore.addNew();
         var index = memberStore.count();
 
-        memberStore.setStringValue(index, 'name', name);
-        memberStore.setStringValue(index, 'email', email);
-        memberStore.setIntValue(index, 'dateAdded', now);
-        memberStore.setAddressValue(index, 'account', account);
+        memberStore.setStringValue(sha3('name', index), name);
+        memberStore.setStringValue(sha3('email', index), email);
+        memberStore.setIntValue(sha3('dateAdded', index), now);
+        memberStore.setAddressValue(sha3('account', index), account);
 
         memberStore.setBytes32Index('email', sha3(email), index);
         memberStore.setAddressIndex('account', account, index);
@@ -59,7 +59,7 @@ library MembersLibrary {
         // Deactivate member
         var accountIndex = memberStore.getAddressIndex('account', account);
         if (accountIndex != 0) {
-            memberStore.setIntValue(accountIndex, 'state', 1);
+            memberStore.setIntValue(sha3('state', accountIndex), 1);
         }
     }
 
@@ -68,8 +68,8 @@ library MembersLibrary {
         if (index < 1 || index > memberStore.count()) {
             return;
         }
-        account = memberStore.getAddressValue(index, 'account');
-        state = memberStore.getIntValue(index, 'state');
-        dateAdded = memberStore.getIntValue(index, 'dateAdded');
+        account = memberStore.getAddressValue(sha3('account', index));
+        state = memberStore.getIntValue(sha3('state', index));
+        dateAdded = memberStore.getIntValue(sha3('dateAdded', index));
     }
 }

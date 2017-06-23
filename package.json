@@ -48,6 +48,7 @@
     "nock": "^9.0.13",
     "react-test-renderer": "^15.5.4",
     "redux-mock-store": "^1.2.3",
+    "solidity-sha3": "https://github.com/nalinranjan/solidity-sha3/tarball/master",
     "style-loader": "^0.13.1",
     "truffle-contract": "^1.1.6",
     "url-loader": "^0.5.8",

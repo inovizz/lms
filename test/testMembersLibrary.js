@@ -2,6 +2,8 @@
 
 const DataStore = artifacts.require('../contracts/DataStore.sol');
 const MembersLibrary = artifacts.require('../contracts/MembersLibrary.sol');
+const sha3 = require('solidity-sha3').default;
+
 
 contract('MembersLibrary', function(accounts) {
     let store, membersLibrary;
@@ -29,12 +31,13 @@ contract('MembersLibrary', function(accounts) {
             let count = await membersLibrary.memberCount(store.address);
             assert.equal(count, 1);
             let memberAttr = await membersLibrary.getMember(store.address, 1);
-            let name = await store.getStringValue(1, 'name');
-            let email = await store.getStringValue(1, 'email');
             assert.equal(memberAttr[0], accounts[0]);
             assert.equal(memberAttr[1], '0');
             assert.isAtMost(memberAttr[2], Math.floor(Date.now() / 1000));
             assert.isAbove(memberAttr[2], Math.floor(Date.now() / 1000) - 300);
+
+            let name = await store.getStringValue(sha3('name', 1));
+            let email = await store.getStringValue(sha3('email', 1));
             assert.equal(name, 'Abc Def');
             assert.equal(email, 'p@gmail.com');
         });

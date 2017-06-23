@@ -28,9 +28,9 @@ library BooksLibrary {
         // TODO Find if addNew can be called simultaneously. If yes, the below index will not point to correct entry.
         var index = bookStore.count();
 
-        bookStore.setIntValue(index, sha3('isbn'), isbn13);
-        bookStore.setIntValue(index, sha3('dateAdded'), now);
-        bookStore.setAddressValue(index, sha3('owner'), msg.sender);
+        bookStore.setIntValue(sha3('isbn', index), isbn13);
+        bookStore.setIntValue(sha3('dateAdded', index), now);
+        bookStore.setAddressValue(sha3('owner', index), msg.sender);
     }
 
     function getBook(address bookStoreAddress, uint id) constant returns (uint index, uint isbn, uint state, address owner, address borrower, uint dateAdded, uint dateIssued, uint totalRating, uint reviewersCount) {
@@ -39,14 +39,14 @@ library BooksLibrary {
             return;
         }
         index = id;
-        isbn = bookStore.getIntValue(id, sha3('isbn'));
-        state = bookStore.getIntValue(id, sha3('state'));
-        owner = bookStore.getAddressValue(id, sha3('owner'));
-        borrower = bookStore.getAddressValue(id, sha3('borrower'));
-        dateAdded = bookStore.getIntValue(id, sha3('dateAdded'));
-        dateIssued = bookStore.getIntValue(id, sha3('dateIssued'));
-        totalRating = bookStore.getIntValue(id, sha3('totalRating'));
-        reviewersCount = bookStore.getIntValue(id, sha3('reviewersCount'));
+        isbn = bookStore.getIntValue(sha3('isbn', id));
+        state = bookStore.getIntValue(sha3('state', id));
+        owner = bookStore.getAddressValue(sha3('owner', id));
+        borrower = bookStore.getAddressValue(sha3('borrower', id));
+        dateAdded = bookStore.getIntValue(sha3('dateAdded', id));
+        dateIssued = bookStore.getIntValue(sha3('dateIssued', id));
+        totalRating = bookStore.getIntValue(sha3('totalRating', id));
+        reviewersCount = bookStore.getIntValue(sha3('reviewersCount', id));
     }
 
     function borrowBook(address bookStoreAddress, uint id) {
@@ -57,33 +57,33 @@ library BooksLibrary {
             return;
         }
         // Can't borrow a non-existent book
-        if (id > bookStore.count() || bookStore.getIntValue(id, sha3('state')) != 0) {
+        if (id > bookStore.count() || bookStore.getIntValue(sha3('state', id)) != 0) {
             Status(124);
             return;
         }
         // 50% value is shared with the owner
         var ownerShare = msg.value/2;
-        if (!bookStore.getAddressValue(id, sha3('owner')).send(ownerShare)) {
+        if (!bookStore.getAddressValue(sha3('owner', id)).send(ownerShare)) {
             Status(125);
             return;
         }
 
-        bookStore.setAddressValue(id, sha3('borrower'), msg.sender);
-        bookStore.setIntValue(id, sha3('dateIssued'), now);
-        bookStore.setIntValue(id, sha3('state'), 1);
+        bookStore.setAddressValue(sha3('borrower', id), msg.sender);
+        bookStore.setIntValue(sha3('dateIssued', id), now);
+        bookStore.setIntValue(sha3('state', id), 1);
         bookStore.triggerEvent("borrow", id, msg.sender, "", 0);
     }
 
     function returnBook(address bookStoreAddress, uint id) {
         var bookStore = DataStore(bookStoreAddress);
-        if (id > bookStore.count() || bookStore.getIntValue(id, sha3('state')) == 0 || bookStore.getAddressValue(id, sha3('owner')) != msg.sender) {
+        if (id > bookStore.count() || bookStore.getIntValue(sha3('state', id)) == 0 || bookStore.getAddressValue(sha3('owner', id)) != msg.sender) {
             Status(126);
             return;
         }
-        address borrower = bookStore.getAddressValue(id, sha3('borrower'));
-        bookStore.setAddressValue(id, sha3('borrower'), 0x0);
-        bookStore.setIntValue(id, sha3('dateIssued'), 0);
-        bookStore.setIntValue(id, sha3('state'), 0);
+        address borrower = bookStore.getAddressValue(sha3('borrower', id));
+        bookStore.setAddressValue(sha3('borrower', id), 0x0);
+        bookStore.setIntValue(sha3('dateIssued', id), 0);
+        bookStore.setIntValue(sha3('state', id), 0);
         bookStore.triggerEvent("return", id, borrower, "", 0);
     }
 
@@ -94,12 +94,12 @@ library BooksLibrary {
             return;
         }
         if (oldRating == 0) {
-            bookStore.setIntValue(id, sha3('reviewersCount'), bookStore.getIntValue(id, sha3('reviewersCount')) + 1);
-            bookStore.setIntValue(id, sha3('totalRating'), bookStore.getIntValue(id, sha3('totalRating')) + rating);
+            bookStore.setIntValue(sha3('reviewersCount', id), bookStore.getIntValue(sha3('reviewersCount', id)) + 1);
+            bookStore.setIntValue(sha3('totalRating', id), bookStore.getIntValue(sha3('totalRating', id)) + rating);
         } else {
             bookStore.setIntValue(
-                id, sha3('totalRating'),
-                bookStore.getIntValue(id, sha3('totalRating')) + rating - oldRating
+                sha3('totalRating', id),
+                bookStore.getIntValue(sha3('totalRating', id)) + rating - oldRating
             );
         }
         bookStore.triggerEvent("rate", id, msg.sender, comments, rating);

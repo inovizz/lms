@@ -22,7 +22,7 @@ contract Organisation is Ownable {
 
     modifier onlyMember {
         var index = DataStore(memberStore).getAddressIndex('account', msg.sender);
-        var state = DataStore(memberStore).getIntValue(index, 'state');
+        var state = DataStore(memberStore).getIntValue(sha3('state', index));
         if (index != 0 && state == 0) {
             _;
         } else {

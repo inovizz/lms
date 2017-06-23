@@ -26,7 +26,7 @@ contract Parent is Ownable {
 
     function registerOrganisation(bytes32 key, address org) onlyOwner {
         // Important: Pass an organisation without a set data store
-        orgStore.createOrganisation(key, org);
+        orgStore.registerOrganisation(key, org);
         // Create new book and member data stores
         OrganisationInterface(org).setDataStore(0x0, 0x0);
     }

@@ -4,7 +4,7 @@ import "./DataStore.sol";
 
 
 library OrgLibrary {
-    function createOrganisation(address orgAddress, bytes32 key, address newAddress) public {
+    function registerOrganisation(address orgAddress, bytes32 key, address newAddress) public {
         var orgStore = DataStore(orgAddress);
         orgStore.addNew();
         var index = orgStore.count();

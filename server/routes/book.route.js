@@ -25,6 +25,10 @@ router.route('/searchbook/:isbn')
     /** GET /api/books/mybooks - Get details of my books */
     .get(BookCtrl.searchBook);
 
+router.route('/getratings')
+    /** POST /api/books/getratings - Get ratings of a book */
+    .get(BookCtrl.getRatings);
+
 // POST requests
 router.route('/addbook')
     /** POST /api/books/addbook - Add a new book */

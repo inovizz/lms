@@ -7,7 +7,7 @@ export const libraryReducer = (state = [], action) => {
     case 'GET_USER_BALANCE_SUCCESS':
       return {
         ...state,
-        balance: action.payload.toNumber()
+        balance: action.payload
       }
     case 'GET_MEMBER_DETAILS_SUCCESS':
       return {

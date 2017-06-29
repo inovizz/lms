@@ -14,19 +14,38 @@ router.route('/numberofmembers')
 
 router.route('/ownerdetails')
     /** GET /api/members/ownerdetails - Get details of owner */
-    .get(MemberCtrl.ownerdetails);
+    .get(MemberCtrl.getOwnerDetails);
 
 router.route('/memberdetails')
     /** GET /api/members/memberdetails - Get details of members */
     .get(MemberCtrl.memberdetails);
 
+router.route('/getaccounts')
+    /** GET /api/members/getaccounts - Get accounts */
+    .get(MemberCtrl.getAccounts);
+
+router.route('/memberdetailsbyemail')
+    /** GET /api/members/memberdetailsbyemail - Get details of members */
+    .post(MemberCtrl.getMemberDetailsByEmail);
+
+router.route('/memberdetailsbyaccount')
+    /** GET /api/members/memberdetailsbyaccount - Get details of members */
+    .post(MemberCtrl.getMemberDetailsByAccount);
+
+router.route('/getbalance')
+    /** POST /api/members/getbalance - get eth balance of a member */
+    .post(MemberCtrl.getBalance);
+
 router.route('/addmember')
-    /** GET /api/members/addmember - Add a new member */
+    /** POST /api/members/addmember - Add a new member */
     .post(MemberCtrl.addMember);
 
 router.route('/removemember')
-    /** GET /api/members/addmember - Remove a existing member */
+    /** POST /api/members/removemember - Remove a existing member */
     .post(MemberCtrl.removeMember);
 
+router.route('/unlockaccount')
+    /** POST /api/members/unlockAccount - Unlock member account */
+    .post(MemberCtrl.unlockAccount);
 
 export default router;

@@ -1,9 +1,7 @@
 import { web3, lms } from '../helpers/web3.helper'
 const isbn = require('node-isbn');
+import isSuccess from '../helpers/function.helper'
 
-const isSuccess = (response) => {
-	return !(response.logs.length && response.logs[0].event === 'Status')
-}
 export class BookController {
     getAllBooks (req, res) {
         lms.getAllBooks()
@@ -176,14 +174,42 @@ export class BookController {
     }
     rateBook(req, res){
 		var data = req.body;
-		lms.rateBook(data.id, data.rating, data.comments, data.oldRating, {
+		lms.rateBook(data.bookId, data.rating, data.comment, data.oldRating, {
 			from: data.account,
-			gas: 6000000
-		}).then((result) => {
-			res.json({ result });
+			gas: 300000
+		}).then((receipt) => {
+			if(isSuccess(receipt)){
+				res.json({
+					receipt,
+					status : true
+				});
+			}else{
+				res.json({
+					logs: receipt.logs[0].args.statusCode.c[0],
+					status: false
+				})
+			}
 		})
 		.catch((error) => {
 			console.log(error)
 		});
     }
+	getRatings(req, res){
+		lms.Rate({}, {
+			fromBlock: 0,
+			toBlock: 'latest'
+		},(e, result) => {
+			if (e) {
+				res.json({
+					logs: e.message,
+					status: false
+				})
+			} else {
+				res.json({
+					args : result.args,
+					status : true
+				});
+			}
+		});
+	}
 }

@@ -71,7 +71,7 @@ const BookInfo = ({ type, book, members, authenticated, openModal, getMemberDeta
             </tr>
             <tr>
               <td><strong>Owner</strong></td>
-              <td>{members[book.owner].name}</td>
+              <td>{ members[book.owner] ? members[book.owner].name : ''}</td>
               <td><strong>Added on</strong></td>
               <td>{getTime(book.dateAdded)}</td>
             </tr>
@@ -79,7 +79,7 @@ const BookInfo = ({ type, book, members, authenticated, openModal, getMemberDeta
               book.state === '1' &&
               <tr>
                 <td><strong>Borrower</strong></td>
-                <td>{members[book.borrower].name}</td>
+                <td>{members[book.borrower] ? members[book.borrower].name : ''}</td>
                 <td><strong>Issued on</strong></td>
                 <td>{getTime(book.dateIssued)}</td>
               </tr>

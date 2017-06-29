@@ -5,6 +5,12 @@ import config from './server/config';
 const app = express();
 import routes from './server/routes/index.route';
 import bodyParser from 'body-parser';
+import mongoose from 'mongoose';
+import passport from 'passport';
+import session from 'express-session';
+import flash from 'connect-flash';
+import passportStrategy from './server/helpers/passport.strategy';
+import UserAuthRoute from './server/routes/user.auth.route';
 
 // Console the logger
 if (config.env === 'development') {
@@ -16,7 +22,23 @@ app.use(express.static(__dirname + '/dist'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// Routing
+// Connect mongodb
+mongoose.connect(config.mongo_url);
+
+// Set up passport strategy
+passportStrategy(passport);
+
+// initialize passport and passport session
+app.use(session({ 
+    secret: 'passport_secret_key',
+    resave: true,
+    saveUninitialized: true
+   }));
+app.use(passport.initialize());
+app.use(passport.session()); // persistent login sessions
+app.use(flash()); // use connect-flash for flash messages stored in session
+
+UserAuthRoute(app, passport); // Set up the passport authentication
 
 // Route api
 app.use('/api', routes);

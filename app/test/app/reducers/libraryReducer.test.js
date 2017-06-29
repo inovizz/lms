@@ -28,12 +28,7 @@ describe('Reducers', () => {
         })).toEqual(['0xb'])
     })
     it('should handle GET_USER_BALANCE_SUCCESS', () => {
-      const payload = {
-        value: '123',
-        toNumber: () => {
-          return +payload.value
-        }
-      }
+      const payload = 123
       expect(
         libraryReducer(undefined, {
           type: 'GET_USER_BALANCE_SUCCESS',

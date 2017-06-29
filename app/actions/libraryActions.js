@@ -20,13 +20,19 @@ export const isSuccess = (response) => {
 export const getAccounts = () => {
   return (dispatch) => {
     dispatch(action(actionType.GET_ACCOUNTS_LOADING, true))
-    web3.eth.getAccounts((e, accs) => {
-      if (e != null) {
-        console.log("Error Occured", e)
-        dispatch(action(actionType.GET_ACCOUNTS_ERROR, NotificationType('error', 'Error', e.message)))
-      } else {
-        dispatch(action(actionType.GET_ACCOUNTS_SUCCESS, accs))
+    axios.get(apiList.getAccounts)
+    .then((result) => {
+      if(result.data.status){
+        dispatch(action(actionType.GET_ACCOUNTS_SUCCESS, result.data.accs))
+      }else{
+        console.log("Error Occured", result.data.logs)
+        dispatch(action(actionType.GET_ACCOUNTS_ERROR, NotificationType('error', 'Error', result.data.logs)))
       }
+    }).catch((err) => {
+      console.log("Error Occured", err);
+      dispatch(action(actionType.GET_ACCOUNTS_ERROR, NotificationType('error', 'Error', err.message)))
+    })
+    .then(() => {
       dispatch(action(actionType.GET_ACCOUNTS_LOADING, false))
     })
   }
@@ -35,27 +41,41 @@ export const getAccounts = () => {
 export const getBalance = (ownerDetails) => {
   return (dispatch) => {
     dispatch(action(actionType.GET_USER_BALANCE_LOADING, true))
-    web3.eth.getBalance(ownerDetails.account, (e, balance) => {
-      if (e != null) {
-        console.log("Error Occured", e)
-        dispatch(action(actionType.GET_USER_BALANCE_ERROR, NotificationType('error', 'Error', e.message)))
-      } else {
-        balance = web3.fromWei(balance, 'ether')
-        dispatch(action(actionType.GET_USER_BALANCE_SUCCESS, balance))
-      }
-      dispatch(action(actionType.GET_USER_BALANCE_LOADING, false))
-    })
+    const data = {
+      ownerDetails
+    }
+    axios.post(apiList.getBalance, data)
+      .then((result) => {
+        if(result.data.status){
+          dispatch(action(actionType.GET_USER_BALANCE_SUCCESS, result.data.balance))
+        }else{
+          dispatch(action(actionType.GET_USER_BALANCE_ERROR, NotificationType('error', 'Error', result.data.logs)))
+        }
+        dispatch(action(actionType.GET_USER_BALANCE_LOADING, false))
+      })
+      .catch((err) => {
+        console.log("Error Occured", err)
+      });
   }
 }
 
 export const getOwnerDetails = (response) => {
   return (dispatch) => {
     dispatch(action(actionType.GET_OWNERDETAILS_LOADING, true))
-    lms.getOwnerDetails.call().then((user) => {
-      login(response, user)
-      dispatch(action(actionType.GET_OWNERDETAILS_SUCCESS, user))
-      dispatch(action(actionType.GET_OWNERDETAILS_LOADING, false))
-    }).catch((e) => {
+    axios.post(apiList.ownerDetails)
+    .then((result) => {
+      if(result.data.status){
+        login(response, result.data.user)
+        console.log("owner details", result.data.user);
+        dispatch(action(actionType.GET_OWNERDETAILS_SUCCESS, result.data.user))
+        dispatch(action(actionType.GET_OWNERDETAILS_LOADING, false))
+      }else{
+        console.log("Error Occured", result.data.logs)
+        dispatch(action(actionType.GET_OWNERDETAILS_ERROR, NotificationType('error', 'Error', result.data.logs)))
+        dispatch(action(actionType.GET_OWNERDETAILS_LOADING, false))
+      }
+    })
+    .catch((e) => {
       console.log("Error Occured", e)
       dispatch(action(actionType.GET_OWNERDETAILS_ERROR, NotificationType('error', 'Error', e.message)))
       dispatch(action(actionType.GET_OWNERDETAILS_LOADING, false))
@@ -82,7 +102,7 @@ export const getAllBooks = () => {
 export const getMyBooks = () => {
   return (dispatch) => {
     dispatch(action(actionType.GET_MY_BOOKS_LOADING, true))
-    axios.get(apiList.mybooks)
+    axios.get(apiList.myBooks)
     .then((books) => {
       dispatch(action(actionType.GET_MY_BOOKS_SUCCESS, books.data.result))
       dispatch(action(actionType.GET_MY_BOOKS_LOADING, false))
@@ -97,7 +117,7 @@ export const getMyBooks = () => {
 export const addBook = (book) => {
   return (dispatch) => {
     dispatch(action(actionType.GET_ADD_BOOKS_LOADING, true))
-    axios.post(apiList.addbook, book)
+    axios.post(apiList.addBook, book)
     .then((response) => {
       if(response.data.status) {
         dispatch(action(actionType.GET_ADD_BOOKS_SUCCESS, book))
@@ -125,7 +145,7 @@ export const updateBook = (bookId, book) => {
       bookId,
       book
     }
-    axios.post(apiList.updatebook, bookData)
+    axios.post(apiList.updateBook, bookData)
     .then((response) => {
       if(response.data.status) {
         dispatch(getAllBooks())
@@ -148,7 +168,7 @@ export const updateBook = (bookId, book) => {
 export const returnBook = (book) => {
   return (dispatch) => {
     dispatch(action(actionType.GET_RETURN_BOOKS_LOADING, true))
-    axios.post(apiList.returnbook, book)
+    axios.post(apiList.returnBook, book)
     .then((response) => {
       if(response.data.status) {
         dispatch(action(actionType.GET_RETURN_BOOKS_SUCCESS, book))
@@ -175,7 +195,7 @@ export const borrowBook = (book, ownerDetails) => {
       bookId: book.id,
       ownerDetails 
     }
-    axios.post(apiList.borrowbook, bookBorrowData)
+    axios.post(apiList.borrowBook, bookBorrowData)
     .then((response) => {
       if(response.data.status) {
         dispatch(action(actionType.GET_BORROW_BOOKS_SUCCESS, { book, owner: ownerDetails.account }))
@@ -205,28 +225,35 @@ export const rateBook = (rating, comment, book, ownerDetails) => {
     const reviewers = book.reviewers || []
     const index = reviewers.indexOf(ownerDetails.account)
     const oldRating = (index === -1) ? 0 : book.ratings[index]
-    lms.rateBook(book.id, rating, comment, oldRating, {
-        from: ownerDetails.account,
-        gas: 300000
-      }).then((response) => {
-        if(isSuccess(response)) {
-          dispatch(action(actionType.GET_RATE_BOOK_SUCCESS, {
-            bookId: book.id,
-            rating: rating,
-            comments: comment,
-            reviewer: ownerDetails.account,
-            flag: true
-          }))
-        } else {
+    const data = {
+      bookId: book.id,
+      rating,
+      comment,
+      oldRating,
+      account: ownerDetails.account
+    }
+    axios.post(apiList.rateBook, data)
+    .then((result) => {
+      if(result.data.status) {
+        dispatch(action(actionType.GET_RATE_BOOK_SUCCESS, {
+          bookId: book.id,
+          rating: rating,
+          comments: comment,
+          reviewer: ownerDetails.account,
+          flag: true
+        }))
+      } else {
           dispatch(action(
             actionType.RATE_BOOK_ERROR,
-            NotificationType('error', 'Error', response.logs[0].args.statusCode.c[0])
+            NotificationType('error', 'Error', result.data.logs[0].args.statusCode.c[0])
           ))
-        }
-    }).catch((e) => {
+      }
+    })
+    .catch((e) => {
       console.log("Error Occured", e)
       dispatch(action(actionType.RATE_BOOK_ERROR, NotificationType('error', 'Error', e.message)))
-    }).then(() => {
+    })
+    .then(() => {
       dispatch(action(actionType.RATE_BOOK_LOADING, false))
       dispatch(getBalance(ownerDetails))
     })
@@ -262,12 +289,22 @@ export const logout = () => {
 export const getMemberDetailsByEmail = (response, callbackFn, argsArr ) => {
   return (dispatch) => {
     dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_LOADING, true))
-    lms.getMemberDetailsByEmail(response.profileObj.email).then((user) => {
-      dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_SUCCESS, { session: response, user, callbackFn, argsArr }))
-    }).catch((e) => {
+    const data = {
+      email : response.profileObj.email
+    }
+    axios.post(apiList.memberDetailsByEmail, data)
+    .then((result) => {
+      if(result.data.status){
+        dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_SUCCESS, { session: response, user : result.data.user, callbackFn, argsArr }))
+      }else {
+        dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_ERROR, NotificationType('error', 'Error', result.data.logs)))
+      }
+    })
+    .catch((e) => {
       console.log("Error Occured", e)
       dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_ERROR, NotificationType('error', 'Error', e.message)))
-    }).then(() => {
+    })
+    .then(() => {
       dispatch(action(actionType.GET_MEMBER_DETAILS_EMAIL_LOADING, false))
     })
   }
@@ -276,12 +313,19 @@ export const getMemberDetailsByEmail = (response, callbackFn, argsArr ) => {
 export const getMemberDetailsByAccount = (account) => {
   return (dispatch) => {
     dispatch(action(actionType.GET_MEMBER_DETAILS_LOADING, true))
-    lms.getMemberDetailsByAccount(account).then((user) => {
-      dispatch(action(actionType.GET_MEMBER_DETAILS_SUCCESS, user))
-    }).catch((e) => {
+    axios.post(apiList.memberDetailsByAccount, account)
+    .then((result) => {
+      if(result.data.status){
+        dispatch(action(actionType.GET_MEMBER_DETAILS_SUCCESS, result.data.user))
+      }else {
+        dispatch(action(actionType.GET_MEMBER_DETAILS_ERROR, NotificationType('error', 'Error', result.data.logs)))
+      }
+    })
+    .catch((e) => {
       console.log("Error Occured", e)
       dispatch(action(actionType.GET_MEMBER_DETAILS_ERROR, NotificationType('error', 'Error', e.message)))
-    }).then(() => {
+    })
+    .then(() => {
       dispatch(action(actionType.GET_MEMBER_DETAILS_LOADING, false))
     })
   }
@@ -290,12 +334,19 @@ export const getMemberDetailsByAccount = (account) => {
 export const getAllMembers = () => {
   return (dispatch) => {
     dispatch(action(actionType.GET_ALL_MEMBERS_LOADING, true))
-    lms.getAllMembers().then((users) => {
-      dispatch(action(actionType.GET_ALL_MEMBERS_SUCCESS, users))
-    }).catch((e) => {
+    axios.get(apiList.members)
+    .then((result) => {
+      if(result.data.status){
+        dispatch(action(actionType.GET_ALL_MEMBERS_SUCCESS, result.data.users))
+      }else {
+        dispatch(action(actionType.GET_ALL_MEMBERS_ERROR, NotificationType('error', 'Error', result.data.logs)))
+      }
+    })
+    .catch((e) => {
       console.log("Error Occured", e)
       dispatch(action(actionType.GET_ALL_MEMBERS_ERROR, NotificationType('error', 'Error', e.message)))
-    }).then(() => {
+    })
+    .then(() => {
       dispatch(action(actionType.GET_ALL_MEMBERS_LOADING, false))
     })
   }
@@ -330,7 +381,7 @@ export const createAccount = (session,password) => {
       "params":[password],
       "id":74
     }
-    return axios.post(apiList.create_account, request)
+    return axios.post(apiList.createAccount, request)
             .then((response) => {
               const user = [
                 session.profileObj.name,
@@ -351,44 +402,41 @@ export const createAccount = (session,password) => {
 export const addMember = (member) => {
   return (dispatch) => {
     dispatch(action(actionType.ADD_MEMBER_LOADING, true))
-    lms.addMember(member[0], member[1], member[2], {
-            from: web3.eth.accounts[0],
-            gas: 600000
-          }).then((response) => {
-            if(isSuccess(response)) {
-              web3.eth.sendTransaction({
-                from: web3.eth.accounts[0],
-                to: member[1],
-                value: web3.toWei(1000)
-              }, (e, res) => {
-                if(e) {
-                  return dispatch(action(actionType.ADD_MEMBER_ERROR, NotificationType('error', 'Error', e.message)))
-                }
-                dispatch(getAllMembers())
-                dispatch(action(actionType.ADD_MEMBER_SUCCESS, true))
-              })
-            } else {
-              dispatch(action(
-                actionType.ADD_MEMBER_ERROR,
-                NotificationType('error', 'Error', response.logs[0].args.statusCode.c[0])
-              ))
-            }
-        }).catch((e) => {
-          console.log("Error Occured", e)
-          dispatch(action(actionType.ADD_MEMBER_ERROR, NotificationType('error', 'Error', e.message)))
-        }).then(() => {
-          dispatch(action(actionType.ADD_MEMBER_LOADING, false))
-        })
+    axios.post(apiList.addMember, member)
+    .then((result) => {
+      console.log("result", result);
+      if(result.data.status){
+        dispatch(getAllMembers())
+        dispatch(action(actionType.ADD_MEMBER_SUCCESS, true))
+      }else{
+        dispatch(action(
+          actionType.ADD_MEMBER_ERROR,
+          NotificationType('error', 'Error', result.data.logs)
+        ))
+      }
+    })
+    .catch((e) => {
+      console.log("Error Occured", e)
+      dispatch(action(actionType.ADD_MEMBER_ERROR, NotificationType('error', 'Error', e.message)))
+    })
+    .then(() => {
+      dispatch(action(actionType.ADD_MEMBER_LOADING, false))
+    })
   }
 }
 
 export const unlockAccount = (session, user, password, flag) => {
   return (dispatch) => {
     dispatch(action(actionType.UNLOCK_ACCOUNT_LOADING, true))
-    web3.personal.unlockAccount(user[1], password, 0, (e, res) => {
+    const data = {
+      user : user[1],
+      password
+    }
+    axios.post(apiList.unlockAccount, data)
+    .then((result) => {
       dispatch(action(actionType.UNLOCK_ACCOUNT_LOADING, false))
-      if(e) {
-        dispatch(action(actionType.UNLOCK_ACCOUNT_ERROR, NotificationType('error', 'Error', e.message)))
+      if(!result.data.status){
+        dispatch(action(actionType.UNLOCK_ACCOUNT_ERROR, NotificationType('error', 'Error', result.data.logs)))
         return
       }
       if(flag) {

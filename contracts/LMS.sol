@@ -6,6 +6,7 @@ import "./helper_contracts/strings.sol";
 import "./helper_contracts/StringLib.sol";
 import "./helper_contracts/zeppelin/lifecycle/Killable.sol";
 
+
 contract LMS is Killable {
     // In order to use the third-party strings library
     using strings for *;

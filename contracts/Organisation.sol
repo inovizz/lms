@@ -7,9 +7,11 @@ import "./helper_contracts/zeppelin/ownership/Ownable.sol";
 import "./DataStore.sol";
 import "./BooksLibrary.sol";
 import "./MembersLibrary.sol";
+import "./DataVerifiable.sol";
 
 
-contract Organisation is Ownable {
+contract Organisation is DataVerifiable {
+
     using strings for *;
     using BooksLibrary for address;
     using MembersLibrary for address;
@@ -30,12 +32,13 @@ contract Organisation is Ownable {
         }
     }
 
-    function Organisation() payable {
+    function Organisation(address orgStore) payable {
         // TODO Check for funds being transferred
         // The contract could also be funded after instantiation through sendTransaction.
+       DataVerifiable.orgStore = orgStore; 
     }
 
-    function setDataStore(address _bookStore, address _memberStore) onlyOwner {
+    function setDataStore(address _bookStore, address _memberStore) orgAdminOrOwner(address(this)) {
         if (_bookStore == 0x0) {
             bookStore = new DataStore();
         } else {
@@ -60,15 +63,15 @@ contract Organisation is Ownable {
         return memberStore.memberCount();
     }
 
-    function addMember(string name, string email, address account) onlyOwner {
+    function addMember(string name, string email, address account) orgAdminOrOwner(address(this)) {
         memberStore.addMember(name, email, account);
     }
 
-    function removeMember(address account) onlyOwner {
+    function removeMember(address account) orgAdminOrOwner(address(this)) {
         memberStore.removeMember(account);
     }
 
-    function getMember(uint id) constant onlyOwner returns (string memberString) {
+    function getMember(uint id) constant orgAdminOrOwner(address(this)) returns (string memberString) {
         if (id < 1 || id > memberStore.memberCount()) {
             return;
         }
@@ -82,7 +85,7 @@ contract Organisation is Ownable {
         return memberString;
     }
 
-    function getAllMembers() constant onlyOwner returns (string memberString, uint8 count) {
+    function getAllMembers() constant orgAdminOrOwner(address(this)) returns (string memberString, uint8 count) {
         string memory member;
         for (uint i = 1; i <= memberStore.memberCount(); i++) {
             member = getMember(i);
@@ -151,11 +154,10 @@ contract Organisation is Ownable {
         bookStore.rateBook(id, rating, oldRating, comments);
     }
 
-    function kill(address upgradedOrganisation) onlyOwner {
+    function kill(address upgradedOrganisation) orgAdminOrOwner(address(this)) {
         if (upgradedOrganisation == 0x0) {
             throw;
         }
-        Organisation(upgradedOrganisation).setDataStore(bookStore, memberStore);
         DataStore(bookStore).transferOwnership(upgradedOrganisation);
         DataStore(memberStore).transferOwnership(upgradedOrganisation);
         selfdestruct(upgradedOrganisation);

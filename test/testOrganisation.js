@@ -1,8 +1,11 @@
 'use strict';
 
 const DataStore = artifacts.require('../contracts/DataStore.sol');
+const Parent = artifacts.require('../contracts/Parent.sol');
 const Organisation = artifacts.require('../contracts/Organisation.sol');
 const sha3 = require('solidity-sha3').default;
+import expectThrow from './helpers/expectThrow';
+
 // web3.sha3 behaves a little differently than Ethereum's or Solidity's sha3.
 // As a workaround, we have used solidity-sha3.
 // TODO: Use solidity-sha3 npm package instead of tarball.
@@ -10,12 +13,16 @@ const sha3 = require('solidity-sha3').default;
 
 
 contract('Organisation', function(accounts) {
-    let bookStore, memberStore, org;
+    let bookStore, memberStore, org, parent, orgStore;
 
     beforeEach(async function() {
+        parent = await Parent.new();
+        await parent.setDataStore(0x0);
+        orgStore = await parent.getOrgStore();
         bookStore = await DataStore.new();
         memberStore = await DataStore.new();
-        org = await Organisation.new({value: web3.toWei(0.1)});
+        org = await Organisation.new(orgStore, {value: web3.toWei(0.1)});
+        parent.makeUserOrgAdmin(accounts[1], org.address);
         // Transfer ownership of stores from default account to organisation. This allows modifying the data store.
         bookStore.transferOwnership(org.address);
         memberStore.transferOwnership(org.address);
@@ -37,6 +44,12 @@ contract('Organisation', function(accounts) {
             assert.isAtMost(attr[3], Math.floor(Date.now() / 1000));
             assert.isAbove(attr[3], Math.floor(Date.now() / 1000) - 300);
         });
+        it('should let only admin or owner add the member', async function() {
+            await expectThrow(org.addMember('name', 'email', accounts[2], {from: accounts[3]}));
+            await org.addMember('name1', 'email2', accounts[2], {from: accounts[1]});
+            let count = await org.memberCount();
+            assert.equal(count.valueOf(), 2);
+        });
         it('should not add the member again', async function() {
             let count = await org.memberCount();
             assert.equal(count.valueOf(), 1);
@@ -49,6 +62,19 @@ contract('Organisation', function(accounts) {
     describe('removeMember', function() {
         it('should deactivate the member', async function() {
             await org.removeMember(accounts[0]);
+            let count = await org.memberCount();
+            assert.equal(count.valueOf(), 1);
+            let member = await org.getMember(1);
+            let attr = member.split(';');
+            assert.equal(attr[0], '1');
+            assert.equal('0x' + attr[1], accounts[0]);
+            assert.equal(attr[2], '1');
+            assert.isAtMost(attr[3], Math.floor(Date.now() / 1000));
+            assert.isAbove(attr[3], Math.floor(Date.now() / 1000) - 300);
+        });
+        it('should let only owner or admin deactivate the member', async function() {
+            await expectThrow(org.removeMember(accounts[0], {from: accounts[2]}));
+            await org.removeMember(accounts[0], {from: accounts[1]});
             let count = await org.memberCount();
             assert.equal(count.valueOf(), 1);
             let member = await org.getMember(1);
@@ -154,7 +180,7 @@ contract('Organisation', function(accounts) {
         it('should not allow contract to add a book if balance is less than reward 10**2', async function() {
             let bookStore1 = await DataStore.new();
             let memberStore1 = await DataStore.new();
-            let org1 = await Organisation.new({value: web3.toWei(0.0000000000001)});
+            let org1 = await Organisation.new(orgStore, {value: web3.toWei(0.0000000000001)});
             bookStore1.transferOwnership(org1.address);
             memberStore1.transferOwnership(org1.address);
             await org1.setDataStore(bookStore1.address, memberStore1.address);

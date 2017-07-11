@@ -23,6 +23,8 @@ const apiList = {
     rateBook:               baseAddress + 'books/ratebook',
     getRatings:             baseAddress + 'books/getRatings', // Get Api
     // searchBook:             baseAddress + 'books/searchbook',
+    authUser:               '/account/',
+    logout:                 '/logout/'
 }
 
 export default apiList;

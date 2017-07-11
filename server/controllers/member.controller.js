@@ -1,5 +1,6 @@
 import { web3, lms } from '../helpers/web3.helper'
-import isSuccess from '../helpers/function.helper'
+import { isSuccess } from '../helpers/function.helper'
+import LMSKeyMap from '../models/lms-key-map.model'
 
 export class MemberController {
     getAllMembers (req, res) {
@@ -204,16 +205,29 @@ export class MemberController {
 		})
 	}
 	unlockAccount (req, res){
-		const data = req.body;
-		web3.personal.unlockAccount(data.user, data.password, 0, (e, r) => {
-			if(e) {
-				res.json({
-					logs: e.message,
-					status: false
+		const data = req.body
+		LMSKeyMap.findOne({ email: data.email }, (err, lmsUser) => {
+			if(err) {
+                console.log(err);  // handle errors!
+            }
+            if (!err && lmsUser !== null) {
+                const lmsKey = lmsUser.lmsKey
+				web3.personal.unlockAccount(data.user, lmsKey, 0, (e, r) => {
+					if(e) {
+						res.json({
+							logs: e.message,
+							status: false
+						})
+					}else{
+						res.json({
+							status: true
+						})
+					}
 				})
-			}else{
+            } else {
 				res.json({
-					status: true
+					logs: 'Authentication failed due to key map',
+					status: false
 				})
 			}
 		})

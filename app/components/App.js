@@ -18,6 +18,7 @@ export class App extends React.Component {
     if (loader) {
       loader.style.display = 'none'
     }
+    this.props.getUserAuthStatus()
   }
   componentWillReceiveProps (nextProps) {
     if(!nextProps.accounts && nextProps.session.authenticated && nextProps.session.user.account) {

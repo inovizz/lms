@@ -2,24 +2,11 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as libraryActions from '../actions/libraryActions'
 import Header from './Header'
-import Modal from 'react-modal'
-import LMSAuth from './LMSAuth'
 import Loader from './Loader'
 import Home from './Home'
 import BookDetailsPage from './BookDetailsPage'
 import NotifyMe from './notifications/NotifyMe'
 import { Switch, Route } from 'react-router-dom'
-
-const modalStyle = {
-  content : {
-    top                   : '50%',
-    left                  : '50%',
-    right                 : 'auto',
-    bottom                : 'auto',
-    width                 : '30%',
-    transform             : 'translate(-50%, -50%)'
-  }
-}
 
 export const mapStateToProps = (state, ownProps) => {
   return {
@@ -38,7 +25,7 @@ export class BooksPage extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      authModalIsOpen: !this.props.isExistingMember.user
+      isAuthCheck: false
     }
   }
   componentDidMount () {
@@ -54,31 +41,40 @@ export class BooksPage extends React.Component {
     if(!this.props.accounts) {
       this.props.getAllMembers()
     }
+    this.props.getUserAuthStatus()
+    this.lmsAuth()
   }
   componentWillReceiveProps (nextProps) {
     if(!nextProps.isExistingMember.user) {
       this.setState({
-        authModalIsOpen: true
+        isAuthCheck: false
       })
     }
     if(nextProps.session.authenticated && nextProps.session.user.account && !nextProps.accounts) {
       this.props.getBalance(nextProps.session.user)
     }
-  }
-  toggleModal (modal, book) {
-    switch (modal) {
-      case 'authModal' : {
-        this.setState({ authModalIsOpen: !this.state.authModalIsOpen })
-        break;
-      }
-    }
+    this.lmsAuth()
   }
   loginFailure (response) {
     console.log(response)
   }
-  signIn (password) {
+  signIn () {
     const { session, user } = this.props.isExistingMember
-    this.props.unlockAccount(session, user, password)
+    this.props.unlockAccount(session, user)
+  }
+  lmsAuth(){
+    if(this.props.isExistingMember){
+      if(this.props.isExistingMember.user){
+        if(!this.state.isAuthCheck){
+          if(this.props.isExistingMember.user[0]){
+            this.signIn()
+          }else{
+            this.props.createAccount(this.props.isExistingMember.session)
+          }
+          this.setState({ isAuthCheck: true })
+        }
+      }
+    }
   }
   renderLoader (flag) {
     const title = this.props.loading.loginLoader
@@ -128,21 +124,6 @@ export class BooksPage extends React.Component {
           <Route path='/book/:id' component={BookDetailsPage} />
           <Route exact path='/' component={Home} />
         </Switch>
-        <Modal
-            isOpen={this.state.authModalIsOpen && (this.props.isExistingMember.user ? true: false) }
-            onRequestClose={() => this.toggleModal('authModal')}
-            shouldCloseOnOverlayClick={false}
-            role='dialog'
-            style={modalStyle}
-            contentLabel='Account'>
-            <LMSAuth
-              closeModal={() => this.toggleModal('authModal')}
-              user={this.props.isExistingMember.user}
-              login={(password) => this.signIn(password)}
-              createAccount={(password) => {
-                this.props.createAccount(this.props.isExistingMember.session, password)
-              }}/>
-          </Modal>
       </div>)
   }
 }

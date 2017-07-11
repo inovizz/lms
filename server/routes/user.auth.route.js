@@ -3,10 +3,11 @@ import ensureAuthenticated from '../helpers/user.auth';
 
 const UserAuthRoute = (app, passport) => {
 
-    app.get('/session/', function (req, res) {
+    app.get('/usernotfound/', function (req, res) {
         res.json({ 
             title: "Social Authentication",
-            status: req.session.passport ? req.session.passport.user || 'Logged out' : 'Not logged in'
+            auth_status: false
+            // status: req.session.passport ? req.session.passport.user || 'Logged out' : 'Not logged in'
          });
     });
 
@@ -15,7 +16,10 @@ const UserAuthRoute = (app, passport) => {
             if (err) {
                 console.log(err);  // handle errors
             } else {
-                res.json({ user });
+                res.json({ 
+                    profileObj: user,
+                    auth_status: true 
+                });
             }
         });
     });
@@ -23,8 +27,8 @@ const UserAuthRoute = (app, passport) => {
     app.get('/auth/google',
         passport.authenticate('google', {
             scope: [
-                'https://www.googleapis.com/auth/plus.login',
-                'https://www.googleapis.com/auth/userinfo.email'
+                'profile',
+                'email'
             ]
         }
         ));
@@ -32,13 +36,14 @@ const UserAuthRoute = (app, passport) => {
     app.get('/auth/google/callback',
         passport.authenticate('google', { failureRedirect: '/' }),
         function (req, res) {
-            res.redirect('/account');
+            res.redirect('/');
         });
 
     app.get('/logout', function (req, res) {
-        console.log("logout : ", req.logout);
         req.logout();
-        res.redirect('/session/');
+        res.json({
+            status: true
+        })
     });
 
 }

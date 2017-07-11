@@ -1,6 +1,5 @@
 import React from 'react'
 import { shallow } from 'enzyme'
-import Modal from 'react-modal'
 import { BooksPage, mapStateToProps } from '../../../components/BooksPage'
 import Header from '../../../components/Header'
 import Loader from '../../../components/Loader'
@@ -29,6 +28,7 @@ describe('BooksPage',() => {
       accounts: null,
       getAllBooks: jest.fn(),
       getAllMembers: jest.fn(),
+      getUserAuthStatus: jest.fn(),
       shuffleAllBooks: jest.fn(),
       getBalance: jest.fn(),
       getMemberDetailsByEmail: jest.fn(),
@@ -85,6 +85,9 @@ describe('BooksPage',() => {
       it('should call getAllMembers if account is empty',() => {
         expect(props.getAllMembers.mock.calls.length).toBe(1)
       })
+      it('should call getUserAuthStatus to get user authentication status',() => {
+        expect(props.getUserAuthStatus.mock.calls.length).toBe(1)
+      })
     })
     describe('after load',() => {
       beforeEach(() => {
@@ -104,15 +107,6 @@ describe('BooksPage',() => {
     })
   })
   describe('componentWillReceiveProps',() => {
-    it('should set authModalIsOpen to true',() => {
-      component.instance().componentWillReceiveProps(props);
-      expect(component.state().authModalIsOpen).toBe(true)
-    })
-    it('should not set authModalIsOpen',() => {
-      props.isExistingMember = { user: {} }
-      component.instance().componentWillReceiveProps(props);
-      expect(component.state().authModalIsOpen).toBe(true)
-    })
     describe('Balance',() => {
       it('should retreive balance if user is authenticated and has no balance',() => {
         component.instance().componentWillReceiveProps(props)
@@ -193,55 +187,6 @@ describe('BooksPage',() => {
       props.loading.addBooksLoading = true
       component = shallow(<BooksPage {...props} />)
       expect(component.find(Loader).props().text).toBe('Updating Book')
-    })
-  })
-  describe('Authentication Modal', () => {
-    beforeEach(() => {
-      component.instance().toggleModal('bookModal')
-    })
-    it('should have authentication Modal',() => {
-      expect(component.find(Modal).length).toBe(1)
-    })
-    it('should close modal onRequestClose',() => {
-      component.find(Modal).props().onRequestClose()
-      expect(component.state().authModalIsOpen).toBe(false)
-    })
-    it('should open bookModal',() => {
-      expect(component.state().authModalIsOpen).toBe(true)
-    })
-    it('should close bookModal',() => {
-      component.find(LMSAuth).props().closeModal('bookModal')
-      expect(component.state().authModalIsOpen).toBe(false)
-    })
-    it('should signIn',() => {
-      component.find(LMSAuth).props().login()
-      expect(props.unlockAccount.mock.calls.length).toBe(1)
-    })
-    it('should create account',() => {
-      component.find(LMSAuth).props().createAccount()
-      expect(props.createAccount.mock.calls.length).toBe(1)
-    })
-    it('If modal is closed and user is logged in',() => {
-      props.isExistingMember.user = {}
-      component = shallow(<BooksPage {...props} />)
-      expect(component.find(Modal).props().isOpen).toBe(false)
-    })
-    it('If modal is closed and user is not logged in',() => {
-      props.isExistingMember.user = undefined
-      component = shallow(<BooksPage {...props} />)
-      expect(component.find(Modal).props().isOpen).toBe(false)
-    })
-    it('If modal is open and user is logged in',() => {
-      props.isExistingMember = { user : {} }
-      component = shallow(<BooksPage {...props} />)
-      component.instance().toggleModal('authModal')
-      expect(component.find(Modal).props().isOpen).toBe(true)
-    })
-    it('If modal is open and user is not logged in',() => {
-      props.isExistingMember = { user : '' }
-      component = shallow(<BooksPage {...props} />)
-      component.instance().toggleModal('authModal')
-      expect(component.find(Modal).props().isOpen).toBe(false)
     })
   })
 })

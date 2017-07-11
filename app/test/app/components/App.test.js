@@ -16,6 +16,7 @@ describe('App', () => {
       },
       accounts: null,
       getMemberDetailsByEmail: jest.fn(),
+      getUserAuthStatus: jest.fn(),
       logout: jest.fn(),
       getBalance: jest.fn()
     }
@@ -59,6 +60,7 @@ describe('App', () => {
     const loader = document.getElementById('loader')
     component.instance().componentDidMount()
     expect(loader.style.display).toBe('none')
+    expect(props.getUserAuthStatus.mock.calls.length).toBe(1)
   })
   it('should hide loader on componentDidMount',() => {
     document.body.innerHTML = '<div id="no-loader"></div>'

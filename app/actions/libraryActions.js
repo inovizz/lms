@@ -279,10 +279,35 @@ export const logout = () => {
   return (dispatch) => {
     sessionService.deleteSession()
     sessionService.deleteUser()
-    if(window.gapi) {
+    axios.get(apiList.logout)
+    .then((result) => {
+      if(result.data.status){
+        console.log("user logged out");
+      }
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+    /*if(window.gapi) {
         window.gapi.auth2.getAuthInstance().disconnect()
-    }
+    }*/
     dispatch(action(actionType.LOGOUT,[]))
+  }
+}
+
+export const getUserAuthStatus = () => {
+  return (dispatch) => {
+    axios.get(apiList.authUser)
+    .then((result) => {
+      console.log("result auth", result);
+      if(result.data.auth_status){
+        dispatch(getMemberDetailsByEmail(result.data))
+      }else{
+        dispatch(logout())
+      }
+    }).catch((err) => {
+      console.log(err);
+    })
   }
 }
 
@@ -372,23 +397,20 @@ export const getRatings = () => {
   }
 }
 
-export const createAccount = (session,password) => {
+export const createAccount = (session) => {
   return (dispatch) => {
     dispatch(action(actionType.CREATE_ACCOUNT_LOADING, true))
-    const request = {
-      "jsonrpc":"2.0",
-      "method":"personal_newAccount",
-      "params":[password],
-      "id":74
+    const data = {
+      email: session.profileObj.email
     }
-    return axios.post(apiList.createAccount, request)
+    return axios.post(apiList.createAccount, data)
             .then((response) => {
               const user = [
                 session.profileObj.name,
                 response.data.data.result,
                 session.profileObj.email
               ];
-              dispatch(unlockAccount(session, user, password, true))
+              dispatch(unlockAccount(session, user, true))
             })
             .catch((e) => {
               console.log("Error Occured", e)
@@ -425,12 +447,12 @@ export const addMember = (member) => {
   }
 }
 
-export const unlockAccount = (session, user, password, flag) => {
+export const unlockAccount = (session, user, flag) => {
   return (dispatch) => {
     dispatch(action(actionType.UNLOCK_ACCOUNT_LOADING, true))
     const data = {
       user : user[1],
-      password
+      email: user[2]
     }
     axios.post(apiList.unlockAccount, data)
     .then((result) => {

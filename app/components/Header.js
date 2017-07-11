@@ -4,7 +4,7 @@ import GoogleLogin from 'react-google-login'
 import { NavLink } from 'react-router-dom'
 import LogoImg from '../img/logo_pramati_trans_152.png'
 
-const Header = ({ loginSuccess, loginFailure, session, accounts, logout }) => (
+const Header = ({ loginSuccess, loginFailure, session, accounts, logout, authUser }) => (
   <nav className='navbar'>
     <div className='container-fluid'>
       <div className='navbar-header'>
@@ -29,16 +29,10 @@ const Header = ({ loginSuccess, loginFailure, session, accounts, logout }) => (
         {
           session.authenticated
             ? <OwnerDetails data={session.user} logout={() => logout()} accounts={accounts} />
-            : <GoogleLogin
-                clientId='672617539191-jqtmbeeu1gc1nvpm2obr2n3m3gtkn8sk.apps.googleusercontent.com'
-                buttonText='Login'
-                style={{ verticalAlign: 'bottom' }}
-                className='btn btn-default'
-                onSuccess={(response) => loginSuccess(response)}
-                onFailure={(response) => loginFailure(response)}>
-                  <span className='glyphicon glyphicon glyphicon-user'></span>&nbsp;&nbsp;
-                  <strong>Login</strong>
-                </GoogleLogin>
+            : <a href='auth/google' className='btn btn-default'>
+                <span className='glyphicon glyphicon glyphicon-user'></span>&nbsp;&nbsp;
+                <strong>Login</strong>
+              </a>
         }
       </div>
     </div>

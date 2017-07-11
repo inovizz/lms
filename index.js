@@ -23,7 +23,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // Connect mongodb
-mongoose.connect(config.mongo_url).catch((err) => {
+mongoose.Promise = global.Promise;
+mongoose.connect(config.mongo_url)
+.then((result) => {
+  console.log("MongoDB Connected");
+})
+.catch((err) => {
   console.log("MongoDB connection error", err);
 });
 

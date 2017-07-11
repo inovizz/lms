@@ -1,6 +1,6 @@
 import { web3, lms } from '../helpers/web3.helper'
 const isbn = require('node-isbn');
-import isSuccess from '../helpers/function.helper'
+import { isSuccess } from '../helpers/function.helper'
 
 export class BookController {
     getAllBooks (req, res) {
@@ -71,7 +71,6 @@ export class BookController {
 		)
 		.then((receipt) => {
 			if(isSuccess(receipt)){
-				console.log(receipt);
 				res.json({
 					result : receipt,
 					status : true

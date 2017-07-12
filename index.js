@@ -23,7 +23,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // Connect mongodb
-mongoose.connect(config.mongo_url);
+mongoose.connect(config.mongo_url).catch((err) => {
+  console.log("MongoDB connection error", err);
+});
 
 // Set up passport strategy
 passportStrategy(passport);

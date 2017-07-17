@@ -11,4 +11,4 @@ sed -i s/localhost/ec2-35-164-104-24.us-west-2.compute.amazonaws.com/ index.js
 sed -i s/localhost/ec2-35-164-104-24.us-west-2.compute.amazonaws.com/ truffle.js
 sed -i s/localhost/ec2-35-164-104-24.us-west-2.compute.amazonaws.com/ scripts/overdue_books_reminder.js
 sed -i s/localhost/ec2-35-164-104-24.us-west-2.compute.amazonaws.com/ server/config.js
-npm install && npm run build
+npm install && npm start

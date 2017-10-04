@@ -153,7 +153,7 @@ contract Organisation is Ownable {
 
     function kill(address upgradedOrganisation) onlyOwner {
         if (upgradedOrganisation == 0x0) {
-            throw;
+            revert();
         }
         Organisation(upgradedOrganisation).setDataStore(bookStore, memberStore);
         DataStore(bookStore).transferOwnership(upgradedOrganisation);

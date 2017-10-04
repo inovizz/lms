@@ -2,7 +2,7 @@ pragma solidity ^0.4.8;
 
 
 contract OrganisationInterface {
-    function OrganisationInterface(address, address);
+    // function OrganisationInterface(address, address);
 
     function setDataStore(address, address);
 
@@ -31,6 +31,6 @@ contract OrganisationInterface {
         // We revert the send so that no-one
         // accidentally loses money when using the
         // contract.
-        throw;
+        revert();
     }
 }

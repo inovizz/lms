@@ -44,7 +44,7 @@ contract Parent is Ownable {
     function kill(address upgradedParent) onlyOwner {
         // Provide the address of upgraded parent in order to transfer all data and ownership to the new parent.
         if (upgradedParent == 0x0) {
-            throw;
+            revert();
         }
         Parent(upgradedParent).setDataStore(orgStore);
         DataStore(orgStore).transferOwnership(upgradedParent);

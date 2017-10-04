@@ -62,7 +62,7 @@ library StringLib {
     /// @param v The string to be converted.
     function bytesToUInt(bytes32 v) constant returns (uint ret) {
         if (v == 0x0) {
-            throw;
+            revert();
         }
 
         uint digit;
@@ -73,7 +73,7 @@ library StringLib {
                 break;
             }
             else if (digit < 48 || digit > 57) {
-                throw;
+                revert();
             }
             ret *= 10;
             ret += (digit - 48);
